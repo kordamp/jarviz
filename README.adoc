@@ -1,4 +1,4 @@
-= Pomchecker
+= JAR file analyzer
 :linkattrs:
 :project-owner:      kordamp
 :project-name:       jarviz
