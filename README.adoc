@@ -6,7 +6,7 @@
 :project-artifactId: jarviz-core
 :project-version: 0.0.0-SNAPSHOT
 
-image:https://github.com/{project-owner}/{project-name}/workflows/Build/badge.svg["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
+image:https://img.shields.io/github/workflow/status/{project-owner}/{project-name}/EarlyAccess?logo=github["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-groupId}/{project-artifactId}.svg[Download, link="https://search.maven.org/#search|ga|1|g:{project-groupId} AND a:{project-artifactId}"]
 
 ---

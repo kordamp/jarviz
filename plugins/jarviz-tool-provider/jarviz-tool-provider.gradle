@@ -20,7 +20,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'org.kordamp.jarviz.tool.Jarviz'
+mainClassName = 'org.kordamp.jarviz.toolprovider.Jarviz'
 
 config {
     docs {

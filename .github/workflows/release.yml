@@ -65,7 +65,7 @@ jobs:
           git push origin main
 
       - name: Deploy
-        run: ./gradlew -Pprofile=release -PreproducibleBuild=true publish -S
+        run: ./gradlew -PreproducibleBuild=true publish -S
 
       - name: Assemble
         uses: jreleaser/release-action@v2

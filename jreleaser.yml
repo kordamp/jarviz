@@ -137,6 +137,7 @@ distributions:
       mainClass: org.kordamp.jarviz.cli.Main
     jbang:
       active: ALWAYS
+      alias: jarviz
     scoop:
       active: ALWAYS
       bucket:
