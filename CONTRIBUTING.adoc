@@ -1,0 +1,110 @@
+= Contributing
+
+Anyone is welcome to open link:https://github.com/kordamp/jarviz/issues[issues] and/or pull-requests for bugfixes,
+feature-requests and/or ideas. If unsure where to start we encourage you to open a
+link:https://github.com/kordamp/jarviz/discussions[discussion] topic first.
+
+== How to build
+
+.Prerequisites
+Java 11.
+
+1. `git clone https://github.com/kordamp/jarviz.git`
+2. `cd jarviz`
+3. `./gradlew build`
+
+TIP: You maye use link:https://github.com/kordamp/gm[] instead in which case the commands are shorter, for example
+`./gradlew publishToMavenLocal` becomes `gm install`.
+
+=== Pull Request Process
+
+ * Create an link:https://github.com/kordamp/jarviz/issues[issue]  outlining the fix or feature.
+ * Fork the jarviz repository to your own github account and clone it locally.
+ * Hack on your changes.
+ * Correctly format your commit message see <<commit-messages,>> below.
+ * Ensure that CI passes, if it fails, fix the failures.
+ * Every pull request requires a review from the jarviz subprojects MAINTAINERS.
+ * If your pull request consists of more than one commit, please squash your commits as described in <<squash-commits,>>
+
+[[commit-messages]]
+=== Commit Messages
+
+ * Use the present tense ("Add feature" not "Added feature")
+ * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
+ * Reference issues and pull requests liberally after the first line
+ * When only changing documentation, include [ci skip] in the commit title
+ * We use link:https://www.conventionalcommits.org/en/v1.0.0/[Conventional Commits] for PR titles and commit messages.
+ ** The following prefixes are allowed:
+  - feat
+  - fix
+  - docs
+  - style
+  - refactor
+  - perf
+  - test
+  - build
+  - ci
+  - chore
+  - revert
+  - i18n
+  - deps
+
+[[squash-commits]]
+=== Squash Commits
+
+Should your pull request consist of more than one commit (perhaps due to a change being requested during the review cycle), please perform a git squash once a reviewer has approved your pull request.
+
+A squash can be performed as follows. Let's say you have the following commits:
+
+```
+initial commit
+second commit
+final commit
+```
+
+Run the command below with the number set to the total commits you wish to squash (in our case 3 commits):
+
+```
+git rebase -i HEAD~3
+```
+
+You default text editor will then open up and you will see the following::
+
+```
+pick eb36612 initial commit
+pick 9ac8968 second commit
+pick a760569 final commit
+
+# Rebase eb1429f..a760569 onto eb1429f (3 commands)
+```
+
+We want to rebase on top of our first commit, so we change the other two commits to `squash`:
+
+```
+pick eb36612 initial commit
+squash 9ac8968 second commit
+squash a760569 final commit
+```
+
+After this, should you wish to update your commit message to better summarise all of your pull request, run:
+
+```
+git commit --amend
+```
+
+You will then need to force push (assuming your initial commit(s) were posted to github):
+
+```
+git push origin your-branch --force
+```
+
+Alternatively, a core member can squash your commits within Github.
+
+== Documentation
+
+Documentation changes should be posted to link:https://github.com/kordamp/jarviz.github.io[kordamp/jarviz.github.io].
+
+== Code of Conduct
+
+This project and everyone participating in it is governed by our link:CODE_OF_CONDUCT.md[Code of Conduct].
+By participating, you are expected to uphold this code. Please report unacceptable behavior to info@kordamp.org.

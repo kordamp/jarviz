@@ -1,0 +1,36 @@
+{
+  "projectName": "jarviz",
+  "projectOwner": "kordamp",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "aalmiray",
+      "name": "Andres Almiray",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13969?v=4",
+      "profile": "https://andresalmiray.com/",
+      "contributions": [
+        "ideas",
+        "code"
+      ]
+    },
+    {
+      "login": "sormuras",
+      "name": "Christian Stein",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2319838?v=4",
+      "profile": "https://sormuras.github.io",
+      "contributions": [
+        "ideas",
+        "infra"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true
+}

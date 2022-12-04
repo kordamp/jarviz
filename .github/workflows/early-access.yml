@@ -1,0 +1,127 @@
+name: EarlyAccess
+
+on:
+  push:
+    branches: [ main ]
+
+
+env:
+  JAVA_VERSION: '11'
+  JAVA_DISTRO: 'zulu'
+  GITHUB_BOT_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
+
+jobs:
+  precheck:
+    name: Precheck
+    if: github.repository == 'kordamp/jarviz' && startsWith(github.event.head_commit.message, 'Releasing version') != true
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.vars.outputs.VERSION }}
+      JAVA_VERSION: ${{ env.JAVA_VERSION }}
+      JAVA_DISTRO: ${{ env.JAVA_DISTRO }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cancel previous run
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Version
+        id: vars
+        shell: bash
+        run: |
+          echo "VERSION=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+  release:
+    name: Release
+    needs: [precheck]
+    if: endsWith(${{ needs.precheck.outputs.VERSION }}, '-SNAPSHOT')
+    runs-on: ubuntu-latest
+    outputs:
+      JAR_SIZE: ${{ steps.bach.outputs.JAR_SIZE }}
+      JAR_CSUM: ${{ steps.bach.outputs.JAR_CSUM }}
+      DOC_SIZE: ${{ steps.bach.outputs.DOC_SIZE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build
+        run: ./gradlew -PreproducibleBuild=true build -S
+
+      - name: Assemble
+        uses: jreleaser/release-action@v2
+        with:
+          arguments: assemble
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ needs.precheck.outputs.VERSION }}
+
+      - name: Release
+        uses: jreleaser/release-action@v2
+        with:
+          arguments: release
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ needs.precheck.outputs.VERSION }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+
+      - name: Grab bach-info
+        id: bach
+        shell: bash
+        run: |
+          JAR_SIZE=$(ls -l out/jreleaser/artifacts/jarviz-tool-provider/jarviz-tool-provider-early-access.jar | awk '{print $5}')
+          JAR_CSUM=$(shasum -a 256 out/jreleaser/artifacts/jarviz-tool-provider/jarviz-tool-provider-early-access.jar | awk '{print $1}')
+          DOC_SIZE=$(ls -l README.adoc | awk '{print $5}')
+          echo "JAR_SIZE=$(echo $JAR_SIZE)" >> $GITHUB_OUTPUT
+          echo "JAR_CSUM=$(echo $JAR_CSUM)" >> $GITHUB_OUTPUT
+          echo "DOC_SIZE=$(echo $DOC_SIZE)" >> $GITHUB_OUTPUT
+
+      - name: JReleaser release output
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jarviz-release
+          path: |
+            out/jreleaser/trace.log
+            out/jreleaser/output.properties
+
+#      - name: Bach-info script
+#        uses: actions/upload-artifact@v3
+#        with:
+#          retention-days: 1
+#          name: bach
+#          path: .github/scripts/update-bach-info.sh
+
+#  update-bach-info:
+#    name: Update bach-info
+#    needs: [precheck, release]
+#    runs-on: ubuntu-latest
+#    continue-on-error: true
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#        with:
+#          repository: kordamp/bach-info
+#          ref: 'main'
+#          fetch-depth: 0
+#          token: ${{ secrets.GIT_ACCESS_TOKEN }}
+#
+#      - name: Download bach-info script
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: bach
+#
+#      - name: Commit
+#        env:
+#          TAG: "early-access"
+#          VERSION: ${{ needs.precheck.outputs.VERSION }}
+#          JAR_SIZE: ${{ needs.release.outputs.JAR_SIZE }}
+#          JAR_CSUM: ${{ needs.release.outputs.JAR_CSUM }}
+#          DOC_SIZE: ${{ needs.release.outputs.DOC_SIZE }}
+#          GITHUB_BOT_EMAIL: ${{ env.GITHUB_BOT_EMAIL }}
+#        run: sh update-bach-info.sh
