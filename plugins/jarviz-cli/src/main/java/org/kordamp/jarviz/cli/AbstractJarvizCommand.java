@@ -33,7 +33,7 @@ public abstract class AbstractJarvizCommand<C extends IO> extends AbstractComman
         return parent;
     }
 
-    protected void execute() {
-
+    protected int execute() {
+        return 0;
     }
 }

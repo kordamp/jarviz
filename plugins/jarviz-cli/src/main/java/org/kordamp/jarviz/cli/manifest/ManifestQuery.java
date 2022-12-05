@@ -18,7 +18,10 @@
 package org.kordamp.jarviz.cli.manifest;
 
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.processors.QueryManifestJarProcessor;
 import picocli.CommandLine;
+
+import java.util.Optional;
 
 /**
  * @author Andres Almiray
@@ -26,5 +29,26 @@ import picocli.CommandLine;
  */
 @CommandLine.Command(name = "query")
 public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
+    @CommandLine.Option(names = {"--attribute-name"}, required = true)
+    public String attributeName;
 
+    @CommandLine.Option(names = {"--section-name"})
+    public String sectionName;
+
+    @Override
+    protected int execute() {
+        QueryManifestJarProcessor processor = null != exclusive.file ?
+            new QueryManifestJarProcessor(exclusive.file) :
+            new QueryManifestJarProcessor(outputdir, exclusive.url);
+        processor.setAttributeName(attributeName);
+        processor.setSectionName(sectionName);
+
+        Optional<String> value = processor.getResult();
+        if (value.isPresent()) {
+            System.out.println(value.get());
+            return 0;
+        }
+
+        return 1;
+    }
 }

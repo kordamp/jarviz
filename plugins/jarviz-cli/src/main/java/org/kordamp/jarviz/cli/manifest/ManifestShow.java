@@ -17,8 +17,14 @@
  */
 package org.kordamp.jarviz.cli.manifest;
 
+import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.JarvizException;
+import org.kordamp.jarviz.core.processors.ShowManifestJarProcessor;
 import picocli.CommandLine;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * @author Andres Almiray
@@ -26,5 +32,23 @@ import picocli.CommandLine;
  */
 @CommandLine.Command(name = "show")
 public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
+    @Override
+    protected int execute() {
+        ShowManifestJarProcessor processor = null != exclusive.file ?
+            new ShowManifestJarProcessor(exclusive.file) :
+            new ShowManifestJarProcessor(outputdir, exclusive.url);
 
+        java.util.jar.Manifest manifest = processor.getResult();
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            manifest.write(baos);
+            baos.flush();
+            baos.close();
+            parent().getOut().println(baos);
+        } catch (IOException e) {
+            throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE", e));
+        }
+
+        return 0;
+    }
 }

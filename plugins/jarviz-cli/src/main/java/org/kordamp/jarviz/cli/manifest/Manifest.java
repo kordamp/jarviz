@@ -32,7 +32,8 @@ public class Manifest extends AbstractJarvizCommand<Main> {
     public CommandLine.Model.CommandSpec spec;
 
     @Override
-    protected void execute() {
+    protected int execute() {
         spec.commandLine().usage(parent.getOut());
+        return 0;
     }
 }

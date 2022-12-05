@@ -51,13 +51,11 @@ abstract class AbstractCommand<C extends IO> implements Callable<Integer>, IO {
         setup();
 
         try {
-            execute();
+            return execute();
         } catch (Exception e) {
             e.printStackTrace(parent().getOut());
             return 1;
         }
-
-        return 0;
     }
 
     protected void setup() {
@@ -66,5 +64,5 @@ abstract class AbstractCommand<C extends IO> implements Callable<Integer>, IO {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     }
 
-    protected abstract void execute();
+    protected abstract int execute();
 }

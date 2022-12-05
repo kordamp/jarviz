@@ -33,10 +33,10 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
 
     public static class Exclusive {
         @CommandLine.Option(names = {"--file"})
-        Path file;
+        public Path file;
 
         @CommandLine.Option(names = {"--url"})
-        URL url;
+        public URL url;
     }
 
     @CommandLine.Option(names = {"--output-directory"})
@@ -50,7 +50,7 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         return parent;
     }
 
-    protected void execute() {
-
+    protected int execute() {
+        return 0;
     }
 }

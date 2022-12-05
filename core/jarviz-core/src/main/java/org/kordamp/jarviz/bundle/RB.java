@@ -15,25 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.services;
+package org.kordamp.jarviz.bundle;
 
-import org.kordamp.jarviz.cli.AbstractJarvizCommand;
-import org.kordamp.jarviz.cli.Main;
-import picocli.CommandLine;
+import org.slf4j.helpers.MessageFormatter;
+
+import java.util.ResourceBundle;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command(name = "services",
-    subcommands = ServicesList.class)
-public class Services extends AbstractJarvizCommand<Main> {
-    @CommandLine.Spec
-    public CommandLine.Model.CommandSpec spec;
+public class RB {
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.kordamp.jarviz.bundle.Messages");
 
-    @Override
-    protected int execute() {
-        spec.commandLine().usage(parent.getOut());
-        return 0;
+    private RB() {
+        // noop
+    }
+
+    public static String $(String key, Object... args) {
+        if (null == args || args.length == 0) {
+            return BUNDLE.getString(key);
+        }
+        return MessageFormatter.arrayFormat(BUNDLE.getString(key), args).getMessage();
     }
 }

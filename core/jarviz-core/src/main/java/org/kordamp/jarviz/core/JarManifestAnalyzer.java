@@ -15,25 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.services;
+package org.kordamp.jarviz.core;
 
-import org.kordamp.jarviz.cli.AbstractJarvizCommand;
-import org.kordamp.jarviz.cli.Main;
-import picocli.CommandLine;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command(name = "services",
-    subcommands = ServicesList.class)
-public class Services extends AbstractJarvizCommand<Main> {
-    @CommandLine.Spec
-    public CommandLine.Model.CommandSpec spec;
-
-    @Override
-    protected int execute() {
-        spec.commandLine().usage(parent.getOut());
-        return 0;
-    }
+public interface JarManifestAnalyzer<R> extends JarAnalyzer<R> {
+    void handle(JarFile jarFile, Manifest manifest);
 }
