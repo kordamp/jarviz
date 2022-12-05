@@ -17,12 +17,12 @@ image:https://img.shields.io/maven-central/v/{project-groupId}/{project-artifact
 [source]
 [subs="attributes"]
 ----
-$ sdk install jarviz {project-version}
+sdk install jarviz {project-version}
 ----
 
 .Jbang
 [source]
 [subs="attributes"]
 ----
-$ jbang jarviz@kordamp --help
+jbang jarviz@kordamp --help
 ----
