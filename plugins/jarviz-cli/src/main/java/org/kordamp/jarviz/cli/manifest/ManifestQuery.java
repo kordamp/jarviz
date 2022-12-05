@@ -39,13 +39,13 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
     protected int execute() {
         QueryManifestJarProcessor processor = null != exclusive.file ?
             new QueryManifestJarProcessor(exclusive.file) :
-            new QueryManifestJarProcessor(outputdir, exclusive.url);
+            new QueryManifestJarProcessor(resolveOutputDirectory(), exclusive.url);
         processor.setAttributeName(attributeName);
         processor.setSectionName(sectionName);
 
         Optional<String> value = processor.getResult();
         if (value.isPresent()) {
-            System.out.println(value.get());
+            parent().getOut().println(value.get());
             return 0;
         }
 

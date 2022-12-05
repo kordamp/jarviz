@@ -17,10 +17,15 @@
  */
 package org.kordamp.jarviz.cli;
 
+import org.kordamp.jarviz.bundle.RB;
+import org.kordamp.jarviz.core.JarvizException;
 import picocli.CommandLine;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author Andres Almiray
@@ -52,5 +57,24 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
 
     protected int execute() {
         return 0;
+    }
+
+    protected Path resolveOutputDirectory() {
+        outputdir = null != outputdir ? outputdir : Paths.get("out");
+
+        if (!outputdir.isAbsolute()) {
+            Path basedir = Paths.get(".").normalize();
+            outputdir = basedir.relativize(outputdir);
+        }
+
+        outputdir = outputdir.resolve("jarviz");
+
+        try {
+            Files.createDirectories(outputdir);
+        } catch (IOException e) {
+            throw new JarvizException(RB.$("ERROR_CREATE_DIRECTORY", outputdir), e);
+        }
+
+        return outputdir;
     }
 }

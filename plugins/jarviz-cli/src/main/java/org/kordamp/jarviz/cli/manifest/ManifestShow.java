@@ -36,7 +36,7 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
     protected int execute() {
         ShowManifestJarProcessor processor = null != exclusive.file ?
             new ShowManifestJarProcessor(exclusive.file) :
-            new ShowManifestJarProcessor(outputdir, exclusive.url);
+            new ShowManifestJarProcessor(resolveOutputDirectory(), exclusive.url);
 
         java.util.jar.Manifest manifest = processor.getResult();
         try {
@@ -46,7 +46,7 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
             baos.close();
             parent().getOut().println(baos);
         } catch (IOException e) {
-            throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE", e));
+            throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE"), e);
         }
 
         return 0;
