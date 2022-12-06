@@ -39,6 +39,8 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
             new ShowManifestJarProcessor(resolveOutputDirectory(), exclusive.url);
 
         java.util.jar.Manifest manifest = processor.getResult();
+        if (null == manifest) return 1;
+
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             manifest.write(baos);

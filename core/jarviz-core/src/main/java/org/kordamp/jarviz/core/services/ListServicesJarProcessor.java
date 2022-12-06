@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static java.util.Collections.list;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -66,7 +66,9 @@ public class ListServicesJarProcessor implements JarProcessor<Optional<List<Stri
 
         try (JarFile jarFile = jarFileResolver.resolveJarFile()) {
             // Iterate all entries as we can't tell if they are sorted
-            for (JarEntry entry : list(jarFile.entries())) {
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
                 String name = entry.getName();
                 if (name.startsWith(META_INF_SERVICES) && name.length() > META_INF_SERVICES.length()) {
                     foundServices = true;

@@ -18,24 +18,22 @@
 package org.kordamp.jarviz.core.services;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.function.IOFunction;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
 import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static java.util.Collections.list;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.kordamp.jarviz.util.JarUtils.withJarEntry;
@@ -82,7 +80,9 @@ public class ShowServicesJarProcessor implements JarProcessor<Optional<List<Stri
 
         String target = META_INF_SERVICES + serviceName;
         try (JarFile jarFile = jarFileResolver.resolveJarFile()) {
-            for (JarEntry entry : list(jarFile.entries())) {
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
                 String name = entry.getName();
                 if (name.equals(target)) {
                     foundServices = true;

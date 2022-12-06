@@ -17,14 +17,12 @@
  */
 package org.kordamp.jarviz.core.processors;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
 import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
+import org.kordamp.jarviz.util.JarUtils;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.jar.JarFile;
@@ -48,11 +46,6 @@ public class ShowManifestJarProcessor implements JarProcessor<Manifest> {
     @Override
     public Manifest getResult() {
         JarFile jarFile = jarFileResolver.resolveJarFile();
-
-        try {
-            return jarFile.getManifest();
-        } catch (IOException e) {
-            throw new JarvizException(RB.$("ERROR_READING_JAR_MANIFEST", jarFile.getName()));
-        }
+        return JarUtils.getManifest(jarFile);
     }
 }
