@@ -15,25 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.services;
+package org.kordamp.jarviz.util;
 
-import org.kordamp.jarviz.cli.AbstractJarvizCommand;
-import org.kordamp.jarviz.cli.Main;
-import picocli.CommandLine;
+import org.apache.commons.io.function.IOFunction;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command(name = "services",
-    subcommands = {ServicesList.class, ServicesShow.class})
-public class Services extends AbstractJarvizCommand<Main> {
-    @CommandLine.Spec
-    public CommandLine.Model.CommandSpec spec;
-
-    @Override
-    protected int execute() {
-        spec.commandLine().usage(parent.getOut());
-        return 0;
+public class JarUtils {
+    public static <T> T withJarEntry(JarFile jarFile, JarEntry entry, IOFunction<InputStream, T> consumer) throws IOException {
+        try (InputStream is = jarFile.getInputStream(entry)) {
+            return consumer.apply(is);
+        }
     }
 }

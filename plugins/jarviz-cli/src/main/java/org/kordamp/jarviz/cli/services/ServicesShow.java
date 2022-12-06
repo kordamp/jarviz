@@ -18,7 +18,7 @@
 package org.kordamp.jarviz.cli.services;
 
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.services.ListServicesJarProcessor;
+import org.kordamp.jarviz.core.services.ShowServicesJarProcessor;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -28,16 +28,20 @@ import java.util.Optional;
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command(name = "list")
-public class ServicesList extends AbstractJarvizSubcommand<Services> {
+@CommandLine.Command(name = "show")
+public class ServicesShow extends AbstractJarvizSubcommand<Services> {
+    @CommandLine.Option(names = {"--service-name"}, required = true)
+    public String serviceName;
+
     @CommandLine.Option(names = {"--release"})
     public Integer file;
 
     @Override
     protected int execute() {
-        ListServicesJarProcessor processor = null != exclusive.file ?
-            new ListServicesJarProcessor(exclusive.file) :
-            new ListServicesJarProcessor(resolveOutputDirectory(), exclusive.url);
+        ShowServicesJarProcessor processor = null != exclusive.file ?
+            new ShowServicesJarProcessor(exclusive.file) :
+            new ShowServicesJarProcessor(resolveOutputDirectory(), exclusive.url);
+        processor.setServiceName(serviceName);
 
         Optional<List<String>> services = processor.getResult();
         if (services.isPresent()) {

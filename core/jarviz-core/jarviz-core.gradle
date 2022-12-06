@@ -17,6 +17,7 @@
  */
 dependencies {
     api "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    api "commons-io:commons-io:$commonsIoVersion"
 }
 
 project.rootProject.gradle.addBuildListener(new BuildAdapter() {
