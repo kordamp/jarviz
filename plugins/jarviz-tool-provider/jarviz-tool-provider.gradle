@@ -23,6 +23,9 @@ plugins {
 mainClassName = 'org.kordamp.jarviz.toolprovider.Jarviz'
 
 config {
+    info {
+        bytecodeVersion = 11
+    }
     docs {
         javadoc {
             empty = true

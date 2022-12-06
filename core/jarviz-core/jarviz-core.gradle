@@ -15,6 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+config {
+    info {
+        bytecodeVersion = 11
+    }
+}
+
 dependencies {
     api "org.slf4j:jcl-over-slf4j:$slf4jVersion"
     api "commons-io:commons-io:$commonsIoVersion"

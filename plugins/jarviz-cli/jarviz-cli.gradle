@@ -33,6 +33,7 @@ jar {
 
 config {
     info {
+        bytecodeVersion = 11
         specification { enabled = true }
     }
 }
