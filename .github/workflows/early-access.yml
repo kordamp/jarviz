@@ -91,38 +91,38 @@ jobs:
             out/jreleaser/trace.log
             out/jreleaser/output.properties
 
-#      - name: Bach-info script
-#        uses: actions/upload-artifact@v3
-#        with:
-#          retention-days: 1
-#          name: bach
-#          path: .github/scripts/update-bach-info.sh
+      - name: Bach-info script
+        uses: actions/upload-artifact@v3
+        with:
+          retention-days: 1
+          name: bach
+          path: .github/scripts/update-bach-info.sh
 
-#  update-bach-info:
-#    name: Update bach-info
-#    needs: [precheck, release]
-#    runs-on: ubuntu-latest
-#    continue-on-error: true
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#        with:
-#          repository: kordamp/bach-info
-#          ref: 'main'
-#          fetch-depth: 0
-#          token: ${{ secrets.GIT_ACCESS_TOKEN }}
-#
-#      - name: Download bach-info script
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: bach
-#
-#      - name: Commit
-#        env:
-#          TAG: "early-access"
-#          VERSION: ${{ needs.precheck.outputs.VERSION }}
-#          JAR_SIZE: ${{ needs.release.outputs.JAR_SIZE }}
-#          JAR_CSUM: ${{ needs.release.outputs.JAR_CSUM }}
-#          DOC_SIZE: ${{ needs.release.outputs.DOC_SIZE }}
-#          GITHUB_BOT_EMAIL: ${{ env.GITHUB_BOT_EMAIL }}
-#        run: sh update-bach-info.sh
+  update-bach-info:
+    name: Update bach-info
+    needs: [precheck, release]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: kordamp/bach-info
+          ref: 'main'
+          fetch-depth: 0
+          token: ${{ secrets.GIT_ACCESS_TOKEN }}
+
+      - name: Download bach-info script
+        uses: actions/download-artifact@v3
+        with:
+          name: bach
+
+      - name: Commit
+        env:
+          TAG: "early-access"
+          VERSION: ${{ needs.precheck.outputs.VERSION }}
+          JAR_SIZE: ${{ needs.release.outputs.JAR_SIZE }}
+          JAR_CSUM: ${{ needs.release.outputs.JAR_CSUM }}
+          DOC_SIZE: ${{ needs.release.outputs.DOC_SIZE }}
+          GITHUB_BOT_EMAIL: ${{ env.GITHUB_BOT_EMAIL }}
+        run: sh update-bach-info.sh
