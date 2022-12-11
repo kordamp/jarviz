@@ -4,10 +4,15 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+  actions: write
 
 env:
   JAVA_VERSION: '11'
   JAVA_DISTRO: 'zulu'
+  REPO_OWNER: 'kordamp'
+  REPO_NAME: 'jarviz'
   GITHUB_BOT_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
 
 jobs:
@@ -43,6 +48,7 @@ jobs:
       JAR_SIZE: ${{ steps.bach.outputs.JAR_SIZE }}
       JAR_CSUM: ${{ steps.bach.outputs.JAR_CSUM }}
       DOC_SIZE: ${{ steps.bach.outputs.DOC_SIZE }}
+      HASHES: ${{ steps.hash.outputs.hashes }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -91,12 +97,45 @@ jobs:
             out/jreleaser/trace.log
             out/jreleaser/output.properties
 
-      - name: Bach-info script
-        uses: actions/upload-artifact@v3
+      - name: SLSA hashes
+        shell: bash
+        id: hash
+        run: |
+          echo "hashes=$(cat out/jreleaser/checksums/checksums_sha256.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+  provenance:
+    needs: [release]
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.4.0
+    with:
+      base64-subjects: "${{ needs.release.outputs.HASHES }}"
+      upload-assets: false
+      provenance-name: 'jarviz-all.intoto.jsonl'
+
+  upload-provenance:
+    name: Upload provenance
+    needs: [precheck, provenance]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download upload script
+        run: |
+          curl -sL https://raw.githubusercontent.com/kordamp/jarviz/main/.github/scripts/upload-provenance.sh --output upload-provenance.sh
+          chmod +x upload-provenance.sh
+
+      - name: Download provenance
+        uses: actions/download-artifact@v3
         with:
-          retention-days: 1
-          name: bach
-          path: .github/scripts/update-bach-info.sh
+          name: jarviz-all.intoto.jsonl
+
+      - name: Commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+          TAG: 'early-access'
+          PROVENANCE_FILE: 'jarviz-all.intoto.jsonl'
+        run: sh upload-provenance.sh
 
   update-bach-info:
     name: Update bach-info
@@ -113,9 +152,9 @@ jobs:
           token: ${{ secrets.GIT_ACCESS_TOKEN }}
 
       - name: Download bach-info script
-        uses: actions/download-artifact@v3
-        with:
-          name: bach
+        run: |
+          curl -sL https://raw.githubusercontent.com/kordamp/jarviz/main/.github/scripts/update-bach-info.sh --output update-bach-info.sh
+          chmod +x update-bach-info.sh
 
       - name: Commit
         env:
@@ -124,5 +163,4 @@ jobs:
           JAR_SIZE: ${{ needs.release.outputs.JAR_SIZE }}
           JAR_CSUM: ${{ needs.release.outputs.JAR_CSUM }}
           DOC_SIZE: ${{ needs.release.outputs.DOC_SIZE }}
-          GITHUB_BOT_EMAIL: ${{ env.GITHUB_BOT_EMAIL }}
         run: sh update-bach-info.sh
