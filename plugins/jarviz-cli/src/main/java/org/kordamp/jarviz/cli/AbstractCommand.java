@@ -17,6 +17,8 @@
  */
 package org.kordamp.jarviz.cli;
 
+import picocli.CommandLine;
+
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 
@@ -24,6 +26,9 @@ import java.util.concurrent.Callable;
  * @author Andres Almiray
  * @since 0.1.0
  */
+@CommandLine.Command(mixinStandardHelpOptions = true,
+    versionProvider = Versions.class,
+    resourceBundle = "org.kordamp.jarviz.cli.Messages")
 abstract class AbstractCommand<C extends IO> implements Callable<Integer>, IO {
     protected abstract C parent();
 

@@ -8,21 +8,22 @@
 
 image:https://img.shields.io/github/workflow/status/{project-owner}/{project-name}/EarlyAccess?logo=github["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-groupId}/{project-artifactId}.svg[Download, link="https://search.maven.org/#search|ga|1|g:{project-groupId} AND a:{project-artifactId}"]
+image:https://slsa.dev/images/gh-badge-level3.svg["SLSA 3", link="https://slsa.dev"]
+image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/total[GitHub all releases]
 
 ---
 
 == Install
 
-.Sdkman
-[source]
-[subs="attributes"]
-----
-$ sdk install jarviz {project-version}
-----
 
-.Jbang
-[source]
-[subs="attributes"]
-----
-$ jbang jarviz@kordamp --help
-----
+== Community
+
+ * Ask questions on our link:https://github.com/{project-owner}/{project-name}/discussions[Discussions] page.
+ * image:https://img.shields.io/twitter/follow/{project-owner}?style=social[Twitter Follow]
+ * Join our link:CONTRIBUTORS.md[contributors] by reporting bugs, proposing features, sending patches, promoting the project, helping others.
+
+== Code of Conduct
+
+This project adheres to a link:https://github.com/{project-owner}/{project-name}/blob/main/CODE_OF_CONDUCT.md[code of conduct].
+By participating, you are expected to uphold this code. We appreciate your contribution. Please refer to our
+link:https://github.com/{project-owner}/{project-name}/blob/main/CONTRIBUTING.adoc[contributing guidelines] for further information.

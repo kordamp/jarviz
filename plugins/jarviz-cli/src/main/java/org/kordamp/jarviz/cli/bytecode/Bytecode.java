@@ -26,7 +26,7 @@ import picocli.CommandLine;
  * @since 0.1.0
  */
 @CommandLine.Command(name = "bytecode",
-    subcommands = {BytecodeShow.class, BytecodeValidate.class})
+    subcommands = {BytecodeShow.class})
 public class Bytecode extends AbstractJarvizCommand<Main> {
     @CommandLine.Spec
     public CommandLine.Model.CommandSpec spec;

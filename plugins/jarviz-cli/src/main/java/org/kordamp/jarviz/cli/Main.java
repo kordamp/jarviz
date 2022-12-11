@@ -19,7 +19,6 @@ package org.kordamp.jarviz.cli;
 
 import org.kordamp.jarviz.cli.bytecode.Bytecode;
 import org.kordamp.jarviz.cli.manifest.Manifest;
-import org.kordamp.jarviz.cli.mrjar.Mrjar;
 import org.kordamp.jarviz.cli.services.Services;
 import picocli.AutoComplete;
 import picocli.CommandLine;
@@ -32,7 +31,7 @@ import java.io.PrintWriter;
  */
 @CommandLine.Command(name = "jarviz",
     subcommands = {
-        Bytecode.class, Manifest.class, Mrjar.class, Services.class,
+        Bytecode.class, Manifest.class, Services.class,
         AutoComplete.GenerateCompletion.class})
 public class Main extends BaseCommand implements Runnable, IO {
     private PrintWriter out;

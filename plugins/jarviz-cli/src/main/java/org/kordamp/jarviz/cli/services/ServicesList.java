@@ -30,8 +30,8 @@ import java.util.Optional;
  */
 @CommandLine.Command(name = "list")
 public class ServicesList extends AbstractJarvizSubcommand<Services> {
-    @CommandLine.Option(names = {"--release"})
-    public Integer file;
+    // @CommandLine.Option(names = {"--release"})
+    // public Integer file;
 
     @Override
     protected int execute() {

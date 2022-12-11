@@ -38,6 +38,12 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
     @CommandLine.Option(names = {"--details"})
     public boolean details;
 
+    @CommandLine.Option(names = {"--bytecode-version"})
+    public Integer bytecodeVersion;
+
+    @CommandLine.Option(names = {"--java-version"})
+    public Integer javaVersion;
+
     @Override
     protected int execute() {
         ShowBytecodeJarProcessor processor = null != exclusive.file ?
@@ -46,41 +52,72 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
 
         BytecodeVersions bytecodeVersions = processor.getResult();
 
-        Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
-        if (manifestBytecode.size() > 0) {
-            parent().getOut().println(RB.$("bytecode.version.attribute", manifestBytecode.stream()
-                .map(String::valueOf)
-                .collect(joining(","))));
+        Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
+        Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
+
+        if (bc == 0 && jv == 0) {
+            Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
+            if (manifestBytecode.size() > 0) {
+                parent().getOut().println(RB.$("bytecode.version.attribute", manifestBytecode.stream()
+                    .map(String::valueOf)
+                    .collect(joining(","))));
+            }
         }
 
-        Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
-        if (unversionedClasses.size() > 0) {
-            unversionedClasses.keySet().stream().sorted().forEach(bytecodeVersion -> {
-                List<String> classes = unversionedClasses.get(bytecodeVersion);
-                parent().getOut().println(RB.$("bytecode.unversioned.classes.total",
-                    bytecodeVersion, classes.size()));
-                if (details) {
-                    classes.forEach(parent().getOut()::println);
-                }
-            });
+        if (jv == 0) {
+            Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
+            if (bc == 0) {
+                unversionedClasses.keySet().stream()
+                    .sorted()
+                    .forEach(bytecodeVersion -> printUnversioned(unversionedClasses, bytecodeVersion));
+            } else {
+                printUnversioned(unversionedClasses, bc);
+            }
         }
 
         Set<Integer> javaVersions = bytecodeVersions.getJavaVersionOfVersionedClasses();
-        if (javaVersions.size() > 0) {
+        if (jv == 0) {
             for (Integer javaVersion : javaVersions) {
                 Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
-                if (versionedClasses.size() > 0) {
+                if (bc == 0) {
                     for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
-                        parent().getOut().println(RB.$("bytecode.versioned.classes.total",
-                            javaVersion, entry.getKey(), entry.getValue().size()));
-                        if (details) {
-                            entry.getValue().forEach(parent().getOut()::println);
-                        }
+                        printVersioned(versionedClasses, javaVersion, entry.getKey());
                     }
+                } else {
+                    printVersioned(versionedClasses, javaVersion, bc);
                 }
+            }
+        } else {
+            Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
+            if (bc == 0) {
+                for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                    printVersioned(versionedClasses, jv, entry.getKey());
+                }
+            } else {
+                printVersioned(versionedClasses, jv, bc);
             }
         }
 
         return 0;
+    }
+
+    private void printUnversioned(Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
+        if (!unversionedClasses.containsKey(bytecodeVersion)) return;
+
+        List<String> classes = unversionedClasses.get(bytecodeVersion);
+        parent().getOut().println(RB.$("bytecode.unversioned.classes.total", bytecodeVersion, classes.size()));
+        if (details) {
+            classes.forEach(parent().getOut()::println);
+        }
+    }
+
+    private void printVersioned(Map<Integer, List<String>> versionedClasses, Integer javaVersion, Integer bytecodeVersion) {
+        if (!versionedClasses.containsKey(bytecodeVersion)) return;
+
+        List<String> classes = versionedClasses.get(bytecodeVersion);
+        parent().getOut().println(RB.$("bytecode.versioned.classes.total", javaVersion, bytecodeVersion, classes.size()));
+        if (details) {
+            classes.forEach(parent().getOut()::println);
+        }
     }
 }
