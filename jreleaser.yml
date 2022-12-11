@@ -137,12 +137,16 @@ distributions:
     jbang:
       active: ALWAYS
       alias: jarviz
+      catalog:
+        commitMessage: 'jarviz {{tagName}}'
     scoop:
       active: ALWAYS
       bucket:
         active: RELEASE
+        commitMessage: 'jarviz {{tagName}}'
     sdkman:
       active: RELEASE
+      candidate: jarviz
     artifacts:
       - path: plugins/{{distributionName}}/build/distributions/jarviz-{{projectVersion}}.zip
         transform: '{{distributionName}}/jarviz-{{projectEffectiveVersion}}.zip'
