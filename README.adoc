@@ -13,8 +13,96 @@ image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/tot
 
 ---
 
+Jarviz is a JAR file analyzer tool.  You can obtain metadata from a JAR such as its manifest, manifest entries,
+bytecode versions, declarative services, and more.
+
+[source]
+----
+Jarviz is a JAR file analyzer tool
+Usage: jarviz [-hV] [-D=<key=value>]... [COMMAND]
+
+Options:
+  -D=<key=value>
+  -h, --help        Show this help message and exit.
+  -V, --version     Print version information and exit.
+
+Commands:
+  bytecode             Commands for the JAR's bytecode
+  manifest             Commands for the JAR's manifest
+  services             Commands for declarative services
+  generate-completion  Generate bash/zsh completion script for jarviz.
+
+Documentation found at https://github.com/kordamp/jarviz
+----
+
 == Install
 
+=== Early Access
+
+*JBang*
+
+[source]
+[subs="attributes"]
+----
+// Download, cache, and run
+jbang {project-name}-snapshot@{project-owner} &lt;command&gt; [&lt;args&gt;]
+----
+
+*manually*
+
+Download the pre-compiled binary matching your OS and processor from the link:https://github.com/{project-owner}/{project-name}/releases/tag/early-access[releases page],
+uncompress and copy to the desired location.
+
+NOTE: Be mindful that `{project-name}-early-access.zip` requires Java 11 to be installed while
+`{project-name}-standalone-early-access-*.zip` can be used without a previous installation of Java as
+it includes its own Java Runtime.
+
+=== Stable
+
+*Sdkman*
+
+Requires Java 11
+[source]
+[subs="attributes"]
+----
+sdk install {project-name}
+----
+
+*Homebrew tap*
+
+[source]
+[subs="attributes"]
+----
+brew install {project-owner}/tap/{project-name}
+----
+
+*Scoop*:
+
+Requires Java 11
+[source]
+[subs="attributes"]
+----
+scoop bucket add {project-name} https://github.com/{project-owner}/scoop-{project-name}.git
+scoop install {project-name}
+----
+
+*JBang*
+
+[source]
+[subs="attributes"]
+----
+// Download, cache, and run
+jbang {project-name}@{project-owner} &lt;command&gt; [&lt;args&gt;]
+----
+
+*manually*
+
+Download the pre-compiled binary matching your OS and processor from the link:https://github.com/{project-owner}/{project-name}/releases/tag/v{project-version}[releases page],
+uncompress and copy to the desired location.
+
+NOTE: Be mindful that `{project-name}-{project-version}.zip` requires Java 11 to be installed while
+`{project-name}-standalone-{project-version}-*.zip` can be used without a previous installation of Java as
+it includes its own Java Runtime.
 
 == Community
 
