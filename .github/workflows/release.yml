@@ -61,8 +61,6 @@ jobs:
           echo ${{ github.event.inputs.version }} > VERSION
           git add VERSION
           sed -i -e "s/^\:project-version\:\ .*/:project-version: ${{ github.event.inputs.version }}/g" README.adoc
-          git config --global user.email "${{ env.GITHUB_BOT_EMAIL }}"
-          git config --global user.name "GitHub Action"
           git commit -a -m "Releasing version ${{ github.event.inputs.version }}"
           git push origin main
 
