@@ -35,6 +35,107 @@ Commands:
 Documentation found at https://github.com/kordamp/jarviz
 ----
 
+== Commands
+
+=== Bytecode
+
+.show
+
+[source]
+----
+$ jarviz btecode show --gav --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
+Unversioned classes. Bytecode version: 47 total: 9
+Unversioned classes. Bytecode version: 48 total: 239
+Unversioned classes. Bytecode version: 49 total: 358
+Unversioned classes. Bytecode version: 50 total: 896
+Unversioned classes. Bytecode version: 51 total: 2089
+Unversioned classes. Bytecode version: 52 total: 3366
+Unversioned classes. Bytecode version: 53 total: 1
+----
+
+[source]
+----
+$ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
+    --bytecode-version 47 --details
+Unversioned classes. Bytecode version: 47 total: 9
+org.aopalliance.aop.Advice
+org.aopalliance.aop.AspectException
+org.aopalliance.intercept.ConstructorInterceptor
+org.aopalliance.intercept.ConstructorInvocation
+org.aopalliance.intercept.Interceptor
+org.aopalliance.intercept.Invocation
+org.aopalliance.intercept.Joinpoint
+org.aopalliance.intercept.MethodInterceptor
+org.aopalliance.intercept.MethodInvocation
+----
+
+`jackson-core` is an MR-JAR.
+
+[source]
+----
+$ jarviz bytecode show --gav com.fasterxml.jackson.core:jackson-core:2.14.1
+Unversioned classes. Bytecode version: 52 total: 160
+Versioned classes 9. Bytecode version: 53 total: 1
+
+$ jarviz bytecode show --gav com.fasterxml.jackson.core:jackson-core:2.14.1 \
+    --bytecode-version 53 --details
+Versioned classes 9. Bytecode version: 53 total: 1
+module-info
+----
+
+=== Manifest
+
+.show
+
+[source]
+----
+$ jarviz manifest show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
+Manifest-Version: 1.0
+Created-By: Maven Jar Plugin 3.2.0
+Build-Jdk-Spec: 11
+Implementation-Title: pomchecker-toolprovider
+Implementation-Version: 1.4.0
+Implementation-Vendor: Kordamp
+Automatic-Module-Name: org.kordamp.maven.pomchecker
+Build-Jdk: 9 (Azul Systems, Inc. 11.0.17+8-LTS)
+Build-OS: Linux amd64 5.15.0-1022-azure
+Build-Revision: b252400e16942f5f944ecec68914e264f2fe37af
+Build-Timestamp: 2022-10-31T18:52:24Z
+Main-Class: org.kordamp.maven.checker.toolprovider.Pomchecker
+
+----
+
+.query
+
+[source]
+----
+$ jarviz manifest query --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
+    --attribute-name Automatic-Module-Name
+org.kordamp.maven.pomchecker
+----
+
+=== Services
+
+.list
+
+[source]
+----
+$ jarviz services list --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
+org.slf4j.spi.SLF4JServiceProvider
+java.util.spi.ToolProvider
+javax.annotation.processing.Processor
+org.apache.commons.logging.LogFactory
+----
+
+.show
+
+[source]
+----
+$ jarviz services show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
+    --service-name java.util.spi.ToolProvider
+org.kordamp.maven.checker.toolprovider.Pomchecker
+----
+
 == Install
 
 === Early Access
