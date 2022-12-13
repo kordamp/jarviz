@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
+import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray
@@ -46,9 +47,8 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
 
     @Override
     protected int execute() {
-        ShowBytecodeJarProcessor processor = null != exclusive.file ?
-            new ShowBytecodeJarProcessor(exclusive.file) :
-            new ShowBytecodeJarProcessor(resolveOutputDirectory(), exclusive.url);
+        ShowBytecodeJarProcessor processor = new ShowBytecodeJarProcessor(createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
 
         BytecodeVersions bytecodeVersions = processor.getResult();
 

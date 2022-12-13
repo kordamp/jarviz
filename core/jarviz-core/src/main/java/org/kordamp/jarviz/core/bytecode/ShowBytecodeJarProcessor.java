@@ -21,12 +21,8 @@ import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
-import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
 import org.kordamp.jarviz.util.JarUtils;
 
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,12 +45,8 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
 
     private final JarFileResolver jarFileResolver;
 
-    public ShowBytecodeJarProcessor(Path file) {
-        this.jarFileResolver = new PathBasedJarFileResolver(file);
-    }
-
-    public ShowBytecodeJarProcessor(Path outputDirectory, URL url) {
-        this.jarFileResolver = new UrlBasedJarFileResolver(outputDirectory, url);
+    public ShowBytecodeJarProcessor(JarFileResolver jarFileResolver) {
+        this.jarFileResolver = jarFileResolver;
     }
 
     @Override

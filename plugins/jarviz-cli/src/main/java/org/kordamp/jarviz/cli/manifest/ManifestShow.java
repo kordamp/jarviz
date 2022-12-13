@@ -26,6 +26,8 @@ import picocli.CommandLine;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+
 /**
  * @author Andres Almiray
  * @since 0.1.0
@@ -34,9 +36,8 @@ import java.io.IOException;
 public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
     @Override
     protected int execute() {
-        ShowManifestJarProcessor processor = null != exclusive.file ?
-            new ShowManifestJarProcessor(exclusive.file) :
-            new ShowManifestJarProcessor(resolveOutputDirectory(), exclusive.url);
+        ShowManifestJarProcessor processor = new ShowManifestJarProcessor(createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
 
         java.util.jar.Manifest manifest = processor.getResult();
         if (null == manifest) return 1;

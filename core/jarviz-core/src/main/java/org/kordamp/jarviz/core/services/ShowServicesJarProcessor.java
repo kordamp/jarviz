@@ -20,13 +20,9 @@ package org.kordamp.jarviz.core.services;
 import org.apache.commons.io.IOUtils;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -49,12 +45,8 @@ public class ShowServicesJarProcessor implements JarProcessor<Optional<List<Stri
     private Integer release;
     private String serviceName;
 
-    public ShowServicesJarProcessor(Path file) {
-        this.jarFileResolver = new PathBasedJarFileResolver(file);
-    }
-
-    public ShowServicesJarProcessor(Path outputDirectory, URL url) {
-        this.jarFileResolver = new UrlBasedJarFileResolver(outputDirectory, url);
+    public ShowServicesJarProcessor(JarFileResolver jarFileResolver) {
+        this.jarFileResolver = jarFileResolver;
     }
 
     public Integer getRelease() {

@@ -40,6 +40,9 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         @CommandLine.Option(names = {"--file"})
         public Path file;
 
+        @CommandLine.Option(names = {"--gav"})
+        public String gav;
+
         @CommandLine.Option(names = {"--url"})
         public URL url;
     }

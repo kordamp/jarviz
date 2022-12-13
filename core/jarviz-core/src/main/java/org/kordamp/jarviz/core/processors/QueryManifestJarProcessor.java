@@ -20,12 +20,8 @@ package org.kordamp.jarviz.core.processors;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
-import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
 import org.kordamp.jarviz.util.JarUtils;
 
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -39,12 +35,8 @@ public class QueryManifestJarProcessor implements JarProcessor<Optional<String>>
     private String attributeName;
     private String sectionName;
 
-    public QueryManifestJarProcessor(Path file) {
-        this.jarFileResolver = new PathBasedJarFileResolver(file);
-    }
-
-    public QueryManifestJarProcessor(Path outputDirectory, URL url) {
-        this.jarFileResolver = new UrlBasedJarFileResolver(outputDirectory, url);
+    public QueryManifestJarProcessor(JarFileResolver jarFileResolver) {
+        this.jarFileResolver = jarFileResolver;
     }
 
     public String getAttributeName() {

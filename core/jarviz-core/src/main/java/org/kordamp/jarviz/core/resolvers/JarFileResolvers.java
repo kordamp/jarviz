@@ -15,29 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core.processors;
+package org.kordamp.jarviz.core.resolvers;
 
 import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.util.JarUtils;
 
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
+import java.net.URL;
+import java.nio.file.Path;
+
+import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class ShowManifestJarProcessor implements JarProcessor<Manifest> {
-    private final JarFileResolver jarFileResolver;
-
-    public ShowManifestJarProcessor(JarFileResolver jarFileResolver) {
-        this.jarFileResolver = jarFileResolver;
-    }
-
-    @Override
-    public Manifest getResult() {
-        JarFile jarFile = jarFileResolver.resolveJarFile();
-        return JarUtils.getManifest(jarFile);
+public class JarFileResolvers {
+    public static JarFileResolver createJarFileResolver(Path file, String gav, URL url, Path outputDirectory) {
+        if (file != null) return new PathBasedJarFileResolver(file);
+        if (isNotBlank(gav)) return new GavBasedJarFileResolver(outputDirectory, gav);
+        return new UrlBasedJarFileResolver(outputDirectory, url);
     }
 }

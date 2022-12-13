@@ -24,6 +24,8 @@ import picocli.CommandLine;
 import java.util.List;
 import java.util.Optional;
 
+import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+
 /**
  * @author Andres Almiray
  * @since 0.1.0
@@ -35,9 +37,8 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
 
     @Override
     protected int execute() {
-        ListServicesJarProcessor processor = null != exclusive.file ?
-            new ListServicesJarProcessor(exclusive.file) :
-            new ListServicesJarProcessor(resolveOutputDirectory(), exclusive.url);
+        ListServicesJarProcessor processor = new ListServicesJarProcessor(createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
 
         Optional<List<String>> services = processor.getResult();
         if (services.isPresent()) {

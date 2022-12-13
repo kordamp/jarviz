@@ -23,6 +23,8 @@ import picocli.CommandLine;
 
 import java.util.Optional;
 
+import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+
 /**
  * @author Andres Almiray
  * @since 0.1.0
@@ -37,9 +39,8 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
 
     @Override
     protected int execute() {
-        QueryManifestJarProcessor processor = null != exclusive.file ?
-            new QueryManifestJarProcessor(exclusive.file) :
-            new QueryManifestJarProcessor(resolveOutputDirectory(), exclusive.url);
+        QueryManifestJarProcessor processor = new QueryManifestJarProcessor(createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
         processor.setAttributeName(attributeName);
         processor.setSectionName(sectionName);
 
