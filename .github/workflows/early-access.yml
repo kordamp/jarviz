@@ -113,7 +113,7 @@ jobs:
     with:
       base64-subjects: "${{ needs.release.outputs.HASHES }}"
       upload-assets: false
-      provenance-name: 'jarviz-all.intoto.jsonl'
+      provenance-name: 'jarviz-all-early-access.intoto.jsonl'
 
   upload-provenance:
     name: Upload provenance
@@ -128,13 +128,13 @@ jobs:
       - name: Download provenance
         uses: actions/download-artifact@v3
         with:
-          name: jarviz-all.intoto.jsonl
+          name: jarviz-all-early-access.intoto.jsonl
 
       - name: Commit
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
           TAG: 'early-access'
-          PROVENANCE_FILE: 'jarviz-all.intoto.jsonl'
+          PROVENANCE_FILE: 'jarviz-all-early-access.intoto.jsonl'
         run: sh upload-provenance.sh
 
   update-bach-info:

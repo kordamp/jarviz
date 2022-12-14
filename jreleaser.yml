@@ -15,7 +15,7 @@ project:
   inceptionYear: 2022
   stereotype: cli
   java:
-    groupId: org.koramp.jarviz
+    groupId: org.kordamp.jarviz
     version: 11
     multiProject: true
   tags:

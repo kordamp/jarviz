@@ -22,6 +22,7 @@ jobs:
       JAR_SIZE: ${{ steps.bach.outputs.JAR_SIZE }}
       JAR_CSUM: ${{ steps.bach.outputs.JAR_CSUM }}
       DOC_SIZE: ${{ steps.bach.outputs.DOC_SIZE }}
+      HASHES: ${{ steps.hash.outputs.hashes }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -61,11 +62,13 @@ jobs:
           echo ${{ github.event.inputs.version }} > VERSION
           git add VERSION
           sed -i -e "s/^\:project-version\:\ .*/:project-version: ${{ github.event.inputs.version }}/g" README.adoc
+          git config --global user.email "${{ secrets.COMMIT_EMAIL }}"
+          git config --global user.name "Andres Almiray"
           git commit -a -m "Releasing version ${{ github.event.inputs.version }}"
           git push origin main
 
-      - name: Deploy
-        run: ./gradlew -PreproducibleBuild=true publish -S
+      - name: Stage
+        run: ./gradlew -PreproducibleBuild=true build publish -S
 
       - name: Assemble
         uses: jreleaser/release-action@v2
@@ -131,11 +134,11 @@ jobs:
     with:
       base64-subjects: "${{ needs.release.outputs.HASHES }}"
       upload-assets: false
-      provenance-name: 'jarviz-all.intoto.jsonl'
+      provenance-name: 'jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl'
 
   upload-provenance:
     name: Upload provenance
-    needs: [precheck, provenance]
+    needs: [provenance]
     runs-on: ubuntu-latest
     steps:
       - name: Download upload script
@@ -146,13 +149,13 @@ jobs:
       - name: Download provenance
         uses: actions/download-artifact@v3
         with:
-          name: jarviz-all.intoto.jsonl
+          name: jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl
 
       - name: Commit
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
           TAG: "v${{ github.event.inputs.version }}"
-          PROVENANCE_FILE: 'jarviz-all.intoto.jsonl'
+          PROVENANCE_FILE: 'jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl'
         run: sh upload-provenance.sh
 
   update-bach-info:
