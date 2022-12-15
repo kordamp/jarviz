@@ -6,7 +6,7 @@
 :project-artifactId: jarviz-core
 :project-version: 0.1.0
 
-image:https://img.shields.io/github/workflow/status/{project-owner}/{project-name}/EarlyAccess?logo=github["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
+image:http://img.shields.io/github/actions/workflow/status/{project-owner}/{project-name}/early-access.yml?branch=main&logo=github&label=Build["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-groupId}/{project-artifactId}.svg[Download, link="https://search.maven.org/#search|ga|1|g:{project-groupId} AND a:{project-artifactId}"]
 image:https://slsa.dev/images/gh-badge-level3.svg["SLSA 3", link="https://slsa.dev"]
 image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/total[GitHub all releases]
