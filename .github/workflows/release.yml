@@ -59,13 +59,13 @@ jobs:
         shell: bash
         run: |
           echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-#          echo ${{ github.event.inputs.version }} > VERSION
-#          git add VERSION
-#          sed -i -e "s/^\:project-version\:\ .*/:project-version: ${{ github.event.inputs.version }}/g" README.adoc
-#          git config --global user.email "${{ secrets.COMMIT_EMAIL }}"
-#          git config --global user.name "Andres Almiray"
-#          git commit -a -m "Releasing version ${{ github.event.inputs.version }}"
-#          git push origin main
+          echo ${{ github.event.inputs.version }} > VERSION
+          git add VERSION
+          sed -i -e "s/^\:project-version\:\ .*/:project-version: ${{ github.event.inputs.version }}/g" README.adoc
+          git config --global user.email "${{ secrets.COMMIT_EMAIL }}"
+          git config --global user.name "Andres Almiray"
+          git commit -a -m "Releasing version ${{ github.event.inputs.version }}"
+          git push origin main
 
       - name: Stage
         run: ./gradlew -PreproducibleBuild=true build publish -S
