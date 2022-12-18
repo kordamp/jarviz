@@ -147,6 +147,7 @@ distributions:
     sdkman:
       active: RELEASE
       candidate: jarviz
+      continueOnError: true
     artifacts:
       - path: plugins/{{distributionName}}/build/distributions/jarviz-{{projectVersion}}.zip
         transform: '{{distributionName}}/jarviz-{{projectEffectiveVersion}}.zip'
