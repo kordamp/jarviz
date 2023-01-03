@@ -43,7 +43,7 @@ Documentation found at https://github.com/kordamp/jarviz
 
 [source]
 ----
-$ jarviz btecode show --gav --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
+$ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
 Unversioned classes. Bytecode version: 47 total: 9
 Unversioned classes. Bytecode version: 48 total: 239
 Unversioned classes. Bytecode version: 49 total: 358
