@@ -39,39 +39,39 @@ release:
         enabled: true
       formatted: ALWAYS
       preset: conventional-commits
-      #contributors:
-      #  format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
-      #contentTemplate: 'src/jreleaser/changelog.tpl'
-      #labelers:
-      #  - label: 'dependencies'
-      #    title: 'regex:^(?:deps(?:\(.*\))?!?):\s.*'
-      #    order: 120
-      #  - label: 'allcontributors1'
-      #    title: 'regex:^docs: update .all-contributorsrc.*'
-      #    order: -1
-      #  - label: 'allcontributors2'
-      #    title: 'regex:^docs: update CONTRIBUTORS.md.*'
-      #    order: -2
-      #categories:
-      #  - title: '⚙️  Dependencies'
-      #    key: 'dependencies'
-      #    order: 70
-      #    labels:
-      #      - 'dependencies'
-      #  - title: 'allcontributors'
-      #    order: 59
-      #    labels:
-      #      - 'allcontributors1'
-      #      - 'allcontributors2'
-      #hide:
-      #  categories:
-      #    - 'merge'
-      #    - 'allcontributors'
-      #  contributors:
-      #    - 'GitHub'
-      #    - 'allcontributors'
-      #replacers:
-      #  - search: 'deps: '
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+      contentTemplate: 'src/jreleaser/changelog.tpl'
+      labelers:
+        - label: 'dependencies'
+          title: 'regex:^(?:deps(?:\(.*\))?!?):\s.*'
+          order: 120
+        - label: 'allcontributors1'
+          title: 'regex:^docs: update .all-contributorsrc.*'
+          order: -1
+        - label: 'allcontributors2'
+          title: 'regex:^docs: update CONTRIBUTORS.md.*'
+          order: -2
+      categories:
+        - title: '⚙️  Dependencies'
+          key: 'dependencies'
+          order: 70
+          labels:
+            - 'dependencies'
+        - title: 'allcontributors'
+          order: 59
+          labels:
+            - 'allcontributors1'
+            - 'allcontributors2'
+      hide:
+        categories:
+          - 'merge'
+          - 'allcontributors'
+        contributors:
+          - 'GitHub'
+          - 'allcontributors'
+      replacers:
+        - search: 'deps: '
 
 signing:
   active: ALWAYS
