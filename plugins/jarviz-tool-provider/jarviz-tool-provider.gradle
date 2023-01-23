@@ -18,9 +18,12 @@
 plugins {
     id 'com.github.johnrengelman.shadow'
     id 'application'
+    id 'org.moditect.gradleplugin'
 }
 
-mainClassName = 'org.kordamp.jarviz.toolprovider.Jarviz'
+application {
+    mainClass = 'org.kordamp.jarviz.toolprovider.Jarviz'
+}
 
 config {
     info {
@@ -57,6 +60,17 @@ idea {
     }
 }
 
+addMainModuleInfo {
+    version = project.version
+    jvmVersion = targetCompatibility
+    overwriteExistingFiles = true
+    jdepsExtraArgs = ['-q']
+    module {
+        mainClass = application.mainClass.get()
+        moduleInfoFile = file('src/java11/module-info.java')
+    }
+}
+
 shadowJar {
     configurations    = [project.configurations.uberjar]
     archiveBaseName   = project.name
@@ -77,7 +91,8 @@ task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.Co
 
 tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
-jar.finalizedBy shadowJar
+jar.finalizedBy(shadowJar)
+addMainModuleInfo.mustRunAfter(shadowJar)
 
 tasks.withType(JavaCompile) { JavaCompile c ->
     c.sourceCompatibility = JavaVersion.VERSION_11

@@ -8,8 +8,6 @@
 # DOC_SIZE
 # GITHUB_BOT_EMAIL
 
-set -e
-
 EFFECTIVE_VERSION=$VERSION
 REPOSITORY_OWNER="kordamp"
 REPOSITORY_NAME="jarviz"
@@ -35,5 +33,5 @@ echo "" >> $TARGET_FILE
 git add $TARGET_FILE
 git config --global user.email "${GITHUB_BOT_EMAIL}"
 git config --global user.name "GitHub Action"
-git commit -a -m "Releasing ${TAG} (${VERSION})"
+git commit -a -m "Releasing ${TOOL_NAME} ${TAG} (${VERSION})"
 git push origin main
