@@ -30,6 +30,11 @@ import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileRe
  */
 @CommandLine.Command(name = "name")
 public class ModuleName extends AbstractJarvizSubcommand<Module> {
+
+    private static final String EXPLICIT = "explicit";
+    private static final String FILENAME = "filename";
+    private static final String MANIFEST = "manifest";
+
     @Override
     protected int execute() {
         NameModuleJarProcessor processor = new NameModuleJarProcessor(createJarFileResolver(
@@ -38,7 +43,8 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
         org.kordamp.jarviz.core.model.ModuleName moduleName = processor.getResult();
 
         parent().getOut().println(RB.$("module.name.name", moduleName.getModuleName()));
-        parent().getOut().println(RB.$("module.name.automatic", resolveAutomatic(moduleName)));
+        parent().getOut().println(RB.$("module.name.source", resolveSource(moduleName)));
+        parent().getOut().println(RB.$("module.name.automatic", !EXPLICIT.equals(resolveSource(moduleName))));
         parent().getOut().println(RB.$("module.name.valid", moduleName.isValid()));
         if (!moduleName.isValid()) {
             parent().getOut().println(RB.$("module.name.reason", moduleName.getReason()));
@@ -47,9 +53,9 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
         return 0;
     }
 
-    private String resolveAutomatic(org.kordamp.jarviz.core.model.ModuleName moduleName) {
-        if (moduleName.isAutomaticByManifest()) return "manifest";
-        if (moduleName.isAutomaticByFilename()) return "filename";
-        return "no";
+    private String resolveSource(org.kordamp.jarviz.core.model.ModuleName moduleName) {
+        if (moduleName.isAutomaticByManifest()) return MANIFEST;
+        if (moduleName.isAutomaticByFilename()) return FILENAME;
+        return EXPLICIT;
     }
 }
