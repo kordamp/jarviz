@@ -14,6 +14,7 @@ project:
   license: Apache-2.0
   inceptionYear: 2022
   stereotype: cli
+  vendor: Kordamp
   java:
     groupId: org.kordamp.jarviz
     version: 11

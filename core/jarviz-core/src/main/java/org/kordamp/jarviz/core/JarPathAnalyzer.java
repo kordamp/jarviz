@@ -17,11 +17,12 @@
  */
 package org.kordamp.jarviz.core;
 
+import java.nio.file.Path;
+
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.2.0
  */
-public interface Constants {
-    String ATTR_BYTECODE_VERSION = "Bytecode-Version";
-    String ATTR_AUTOMATIC_MODULE_NAME = "Automatic-Module-Name";
+public interface JarPathAnalyzer<R> extends JarAnalyzer<R> {
+    void handle(Path path);
 }

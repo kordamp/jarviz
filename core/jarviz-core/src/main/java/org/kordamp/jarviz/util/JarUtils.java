@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -47,11 +48,12 @@ public class JarUtils {
         return JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get(jv);
     }
 
-    public static Manifest getManifest(JarFile jarFile) {
+    public static Optional<Manifest> getManifest(JarFile jarFile) {
         try {
-            return jarFile.getManifest();
+            return Optional.of(jarFile.getManifest());
         } catch (IOException e) {
-            throw new JarvizException(RB.$("ERROR_READING_JAR_MANIFEST", jarFile.getName()));
+            return Optional.empty();
+            // throw new JarvizException(RB.$("ERROR_READING_JAR_MANIFEST", jarFile.getName()));
         }
     }
 

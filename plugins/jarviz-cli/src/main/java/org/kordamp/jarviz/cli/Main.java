@@ -31,7 +31,7 @@ import java.io.PrintWriter;
  */
 @CommandLine.Command(name = "jarviz",
     subcommands = {
-        Bytecode.class, Manifest.class, Services.class,
+        Bytecode.class, Manifest.class, org.kordamp.jarviz.cli.modules.Module.class, Services.class,
         AutoComplete.GenerateCompletion.class})
 public class Main extends BaseCommand implements Runnable, IO {
     private PrintWriter out;
@@ -58,7 +58,7 @@ public class Main extends BaseCommand implements Runnable, IO {
     }
 
     public void run() {
-        Banner.display(out);
+        Banner.display(err);
 
         spec.commandLine().usage(out);
     }

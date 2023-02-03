@@ -24,6 +24,7 @@ import org.kordamp.jarviz.core.model.BytecodeVersions;
 import org.kordamp.jarviz.util.JarUtils;
 
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
@@ -54,17 +55,19 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
         BytecodeVersions bytecodeVersions = new BytecodeVersions();
 
         JarFile jarFile = jarFileResolver.resolveJarFile();
-        Manifest manifest = JarUtils.getManifest(jarFile);
+        Optional<Manifest> manifest = JarUtils.getManifest(jarFile);
 
-        QueryJarManifestAnalyzer analyzer = new QueryJarManifestAnalyzer(ATTR_BYTECODE_VERSION);
-        analyzer.handle(jarFile, manifest);
-        analyzer.getResult().ifPresent(v -> {
-            Set<Integer> set = new TreeSet<>();
-            stream(v.split(","))
-                .map(Integer::parseInt)
-                .forEach(set::add);
-            bytecodeVersions.setManifestBytecode(set);
-        });
+        if (manifest.isPresent()) {
+            QueryJarManifestAnalyzer analyzer = new QueryJarManifestAnalyzer(ATTR_BYTECODE_VERSION);
+            analyzer.handle(jarFile, manifest.get());
+            analyzer.getResult().ifPresent(v -> {
+                Set<Integer> set = new TreeSet<>();
+                stream(v.split(","))
+                    .map(Integer::parseInt)
+                    .forEach(set::add);
+                bytecodeVersions.setManifestBytecode(set);
+            });
+        }
 
         Enumeration<JarEntry> entries = jarFile.entries();
         while (entries.hasMoreElements()) {

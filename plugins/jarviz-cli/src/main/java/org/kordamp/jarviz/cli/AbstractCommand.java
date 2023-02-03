@@ -64,7 +64,7 @@ abstract class AbstractCommand<C extends IO> implements Callable<Integer>, IO {
     }
 
     protected void setup() {
-        Banner.display(parent().getOut());
+        Banner.display(parent().getErr());
 
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     }

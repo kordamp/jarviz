@@ -15,44 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.manifest;
+package org.kordamp.jarviz.cli.modules;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.JarvizException;
-import org.kordamp.jarviz.core.processors.ShowManifestJarProcessor;
+import org.kordamp.jarviz.core.modules.NameModuleJarProcessor;
 import picocli.CommandLine;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Optional;
 
 import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.2.0
  */
-@CommandLine.Command(name = "show")
-public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
+@CommandLine.Command(name = "name")
+public class ModuleName extends AbstractJarvizSubcommand<Module> {
     @Override
     protected int execute() {
-        ShowManifestJarProcessor processor = new ShowManifestJarProcessor(createJarFileResolver(
+        NameModuleJarProcessor processor = new NameModuleJarProcessor(createJarFileResolver(
             exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
 
-        Optional<java.util.jar.Manifest> manifest = processor.getResult();
-        if (manifest.isEmpty()) return 1;
+        org.kordamp.jarviz.core.model.ModuleName moduleName = processor.getResult();
 
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            manifest.get().write(baos);
-            baos.flush();
-            baos.close();
-            parent().getOut().println(baos);
-        } catch (IOException e) {
-            throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE"), e);
+        parent().getOut().println(RB.$("module.name.name", moduleName.getModuleName()));
+        parent().getOut().println(RB.$("module.name.automatic", resolveAutomatic(moduleName)));
+        parent().getOut().println(RB.$("module.name.valid", moduleName.isValid()));
+        if (!moduleName.isValid()) {
+            parent().getOut().println(RB.$("module.name.reason", moduleName.getReason()));
         }
 
         return 0;
+    }
+
+    private String resolveAutomatic(org.kordamp.jarviz.core.model.ModuleName moduleName) {
+        if (moduleName.isAutomaticByManifest()) return "manifest";
+        if (moduleName.isAutomaticByFilename()) return "filename";
+        return "no";
     }
 }

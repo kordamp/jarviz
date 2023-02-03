@@ -27,9 +27,10 @@ Options:
   -V, --version     Print version information and exit.
 
 Commands:
-  bytecode             Commands for the JAR's bytecode
-  manifest             Commands for the JAR's manifest
-  services             Commands for declarative services
+  bytecode             Commands for the JAR's bytecode.
+  manifest             Commands for the JAR's manifest.
+  module               Commands for modular JARs.
+  services             Commands for declarative services.
   generate-completion  Generate bash/zsh completion script for jarviz.
 
 Documentation found at https://github.com/kordamp/jarviz
@@ -112,6 +113,26 @@ Main-Class: org.kordamp.maven.checker.toolprovider.Pomchecker
 $ jarviz manifest query --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
     --attribute-name Automatic-Module-Name
 org.kordamp.maven.pomchecker
+----
+
+=== Module
+
+.name
+
+[source]
+----
+$ jarviz module name --gav org.slf4j:slf4j-api:1.7.36
+name: org.slf4j
+automatic: manifest
+valid: true
+----
+
+[source]
+----
+$ jarviz module name --gav org.slf4j:slf4j-api:2.0.6
+name: org.slf4j
+automatic: no
+valid: true
 ----
 
 === Services

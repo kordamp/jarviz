@@ -58,10 +58,13 @@ public class QueryManifestJarProcessor implements JarProcessor<Optional<String>>
     @Override
     public Optional<String> getResult() {
         JarFile jarFile = jarFileResolver.resolveJarFile();
-        Manifest manifest = JarUtils.getManifest(jarFile);
+        Optional<Manifest> manifest = JarUtils.getManifest(jarFile);
 
-        QueryJarManifestAnalyzer analyzer = new QueryJarManifestAnalyzer(sectionName, attributeName);
-        analyzer.handle(jarFile, manifest);
-        return analyzer.getResult();
+        if (manifest.isPresent()) {
+            QueryJarManifestAnalyzer analyzer = new QueryJarManifestAnalyzer(sectionName, attributeName);
+            analyzer.handle(jarFile, manifest.get());
+            return analyzer.getResult();
+        }
+        return Optional.empty();
     }
 }

@@ -15,30 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core.processors;
+package org.kordamp.jarviz.core;
 
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.util.JarUtils;
-
-import java.util.Optional;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.2.0
  */
-public class ShowManifestJarProcessor implements JarProcessor<Optional<Manifest>> {
-    private final JarFileResolver jarFileResolver;
-
-    public ShowManifestJarProcessor(JarFileResolver jarFileResolver) {
-        this.jarFileResolver = jarFileResolver;
-    }
-
-    @Override
-    public Optional<Manifest> getResult() {
-        JarFile jarFile = jarFileResolver.resolveJarFile();
-        return JarUtils.getManifest(jarFile);
-    }
+public interface JarFileAnalyzer<R> extends JarAnalyzer<R> {
+    void handle(JarFile jarFile);
 }
