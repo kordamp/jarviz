@@ -22,5 +22,5 @@ package org.kordamp.jarviz.core;
  * @since 0.1.0
  */
 public interface JarProcessor<R> {
-    R getResult();
+    R getResult() throws JarvizException;
 }

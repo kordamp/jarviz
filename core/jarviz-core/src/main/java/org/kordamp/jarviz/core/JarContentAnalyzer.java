@@ -25,5 +25,5 @@ import java.util.jar.JarFile;
  * @since 0.1.0
  */
 public interface JarContentAnalyzer<R> extends JarAnalyzer<R> {
-    void handle(JarFile jarFile, JarEntry jarEntry);
+    void handle(JarFile jarFile, JarEntry jarEntry) throws JarvizException;
 }

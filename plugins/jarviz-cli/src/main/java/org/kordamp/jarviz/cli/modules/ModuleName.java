@@ -30,7 +30,6 @@ import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileRe
  */
 @CommandLine.Command(name = "name")
 public class ModuleName extends AbstractJarvizSubcommand<Module> {
-
     private static final String EXPLICIT = "explicit";
     private static final String FILENAME = "filename";
     private static final String MANIFEST = "manifest";
@@ -42,12 +41,12 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
 
         org.kordamp.jarviz.core.model.ModuleName moduleName = processor.getResult();
 
-        parent().getOut().println(RB.$("module.name.name", moduleName.getModuleName()));
-        parent().getOut().println(RB.$("module.name.source", resolveSource(moduleName)));
-        parent().getOut().println(RB.$("module.name.automatic", !EXPLICIT.equals(resolveSource(moduleName))));
-        parent().getOut().println(RB.$("module.name.valid", moduleName.isValid()));
+        parent().getOut().println(RB.$("module.name", moduleName.getModuleName()));
+        parent().getOut().println(RB.$("module.source", resolveSource(moduleName)));
+        parent().getOut().println(RB.$("module.automatic", !EXPLICIT.equals(resolveSource(moduleName))));
+        parent().getOut().println(RB.$("module.valid", moduleName.isValid()));
         if (!moduleName.isValid()) {
-            parent().getOut().println(RB.$("module.name.reason", moduleName.getReason()));
+            parent().getOut().println(RB.$("module.reason", moduleName.getReason()));
         }
 
         return 0;

@@ -24,5 +24,5 @@ import java.nio.file.Path;
  * @since 0.2.0
  */
 public interface JarPathAnalyzer<R> extends JarAnalyzer<R> {
-    void handle(Path path);
+    void handle(Path path) throws JarvizException;
 }

@@ -387,7 +387,7 @@ public class StringUtils {
 
         int i = className.lastIndexOf(".");
         if (i > -1) {
-            className = className.substring(i + 1, className.length());
+            className = className.substring(i + 1);
         }
 
         return className;
@@ -613,7 +613,7 @@ public class StringUtils {
     }
 
     public static String padLeft(String str, int numChars, String padding) {
-        return numChars <= str.length() ? str : getPadding(padding.toString(), numChars - str.length()) + str;
+        return numChars <= str.length() ? str : getPadding(padding, numChars - str.length()) + str;
     }
 
     public static String padRight(String str, int numChars) {

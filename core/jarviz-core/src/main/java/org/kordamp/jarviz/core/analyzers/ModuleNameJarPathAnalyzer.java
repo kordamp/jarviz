@@ -18,6 +18,7 @@
 package org.kordamp.jarviz.core.analyzers;
 
 import org.kordamp.jarviz.core.JarPathAnalyzer;
+import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.model.ModuleName;
 
 import java.lang.module.FindException;
@@ -51,7 +52,7 @@ public class ModuleNameJarPathAnalyzer implements JarPathAnalyzer<ModuleName> {
     }
 
     @Override
-    public void handle(Path path) {
+    public void handle(Path path) throws JarvizException {
         if (isNotBlank(automaticModuleNameByManifest)) {
             moduleName = ModuleName.fromAutomaticByManifest(automaticModuleNameByManifest,
                 isAutomaticNameValid(automaticModuleNameByManifest).orElse(null));

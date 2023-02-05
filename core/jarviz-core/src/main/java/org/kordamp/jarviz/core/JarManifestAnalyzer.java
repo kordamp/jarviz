@@ -25,5 +25,5 @@ import java.util.jar.Manifest;
  * @since 0.1.0
  */
 public interface JarManifestAnalyzer<R> extends JarAnalyzer<R> {
-    void handle(JarFile jarFile, Manifest manifest);
+    void handle(JarFile jarFile, Manifest manifest) throws JarvizException;
 }

@@ -20,6 +20,7 @@ package org.kordamp.jarviz.core.services;
 import org.apache.commons.io.IOUtils;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
+import org.kordamp.jarviz.core.JarvizException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -66,7 +67,7 @@ public class ShowServicesJarProcessor implements JarProcessor<Optional<List<Stri
     }
 
     @Override
-    public Optional<List<String>> getResult() {
+    public Optional<List<String>> getResult() throws JarvizException {
         List<String> services = new ArrayList<>();
         boolean foundServices = false;
 

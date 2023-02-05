@@ -19,6 +19,7 @@ package org.kordamp.jarviz.core.bytecode;
 
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
+import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
 import org.kordamp.jarviz.util.JarUtils;
@@ -51,7 +52,7 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
     }
 
     @Override
-    public BytecodeVersions getResult() {
+    public BytecodeVersions getResult() throws JarvizException {
         BytecodeVersions bytecodeVersions = new BytecodeVersions();
 
         JarFile jarFile = jarFileResolver.resolveJarFile();

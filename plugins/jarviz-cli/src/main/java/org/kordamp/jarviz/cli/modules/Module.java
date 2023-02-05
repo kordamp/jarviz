@@ -26,7 +26,7 @@ import picocli.CommandLine;
  * @since 0.2.0
  */
 @CommandLine.Command(name = "module",
-    subcommands = {ModuleName.class})
+    subcommands = {ModuleName.class, ModuleDescriptor.class})
 public class Module extends AbstractJarvizCommand<Main> {
     @CommandLine.Spec
     public CommandLine.Model.CommandSpec spec;

@@ -18,6 +18,7 @@
 package org.kordamp.jarviz.core.analyzers;
 
 import org.kordamp.jarviz.core.JarManifestAnalyzer;
+import org.kordamp.jarviz.core.JarvizException;
 
 import java.util.Optional;
 import java.util.jar.Attributes;
@@ -45,7 +46,7 @@ public class QueryJarManifestAnalyzer implements JarManifestAnalyzer<Optional<St
     }
 
     @Override
-    public void handle(JarFile jarFile, Manifest manifest) {
+    public void handle(JarFile jarFile, Manifest manifest) throws JarvizException {
         if (null == manifest) return;
 
         if (isNotBlank(sectionName)) {

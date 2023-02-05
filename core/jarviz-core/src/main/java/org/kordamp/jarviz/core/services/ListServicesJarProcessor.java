@@ -19,6 +19,7 @@ package org.kordamp.jarviz.core.services;
 
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
+import org.kordamp.jarviz.core.JarvizException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class ListServicesJarProcessor implements JarProcessor<Optional<List<Stri
     }
 
     @Override
-    public Optional<List<String>> getResult() {
+    public Optional<List<String>> getResult() throws JarvizException {
         List<String> services = new ArrayList<>();
         boolean foundServices = false;
 

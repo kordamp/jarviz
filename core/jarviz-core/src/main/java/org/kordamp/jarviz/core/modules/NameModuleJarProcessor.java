@@ -19,6 +19,7 @@ package org.kordamp.jarviz.core.modules;
 
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
+import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.ModuleNameJarPathAnalyzer;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.core.model.ModuleName;
@@ -49,7 +50,7 @@ public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
     }
 
     @Override
-    public ModuleName getResult() {
+    public ModuleName getResult() throws JarvizException {
         JarFile jarFile = jarFileResolver.resolveJarFile();
         Path jarPath = Paths.get(jarFile.getName());
         String automaticModuleNameByFilename = deriveModuleNameFromFilename(jarPath.getFileName().toString());

@@ -19,6 +19,7 @@ package org.kordamp.jarviz.core.processors;
 
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
+import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.util.JarUtils;
 
@@ -56,7 +57,7 @@ public class QueryManifestJarProcessor implements JarProcessor<Optional<String>>
     }
 
     @Override
-    public Optional<String> getResult() {
+    public Optional<String> getResult() throws JarvizException {
         JarFile jarFile = jarFileResolver.resolveJarFile();
         Optional<Manifest> manifest = JarUtils.getManifest(jarFile);
 
