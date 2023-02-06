@@ -128,6 +128,8 @@ assemble:
           platform: 'linux_musl-x86_64'
         - path: '{{jdkPathPrefix}}/zulu17LinuxMuslArm/{{jdkFilePrefix}}-linux_musl_aarch64'
           platform: 'linux_musl-aarch_64'
+        - path: '{{jdkPathPrefix}}/zulu17Windows32/{{jdkFilePrefix}}-win_i686'
+          platform: 'windows-x86_32'
         - path: '{{jdkPathPrefix}}/zulu17Windows/{{jdkFilePrefix}}-win_x64'
           platform: 'windows-x86_64'
         - path: '{{jdkPathPrefix}}/zulu17WindowsArm/{{jdkFilePrefix}}-win_aarch64'

@@ -92,6 +92,11 @@ jdks {
         url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_musl_aarch64.tar.gz'
         checksum = '6b920559abafbe9bdef386a20ecf3a2f318bc1f0d8359eb1f95aee26606bbc70'
     }
+    zulu17Windows32 {
+        platform = 'windows-x86_32'
+        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-win_i686.zip'
+        checksum = 'c3c5a3061524a8facc9694bb3055c432cb26ffe12c8eec6f3e3c1258c99bd786'
+    }
     zulu17Windows {
         platform = 'windows-x86_64'
         url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-win_x64.zip'
