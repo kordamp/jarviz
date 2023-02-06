@@ -48,12 +48,12 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
 
         org.kordamp.jarviz.core.model.ModuleName moduleName = processor.getResult();
 
-        parent().getOut().println(RB.$("module.name", moduleName.getModuleName()));
-        parent().getOut().println(RB.$("module.source", resolveSource(moduleName)));
-        parent().getOut().println(RB.$("module.automatic", !EXPLICIT.equals(resolveSource(moduleName))));
-        parent().getOut().println(RB.$("module.valid", moduleName.isValid()));
+        parent().getOut().println($$("module.name", moduleName.getModuleName()));
+        parent().getOut().println($$("module.source", resolveSource(moduleName)));
+        parent().getOut().println($$("module.automatic", !EXPLICIT.equals(resolveSource(moduleName))));
+        parent().getOut().println($$("module.valid", $b(moduleName.isValid())));
         if (!moduleName.isValid()) {
-            parent().getOut().println(RB.$("module.reason", moduleName.getReason()));
+            parent().getOut().println($$("module.reason", moduleName.getReason()));
         }
 
         report(jarFileResolver, moduleName);

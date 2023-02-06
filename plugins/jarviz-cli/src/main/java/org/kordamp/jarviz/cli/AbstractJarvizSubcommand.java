@@ -42,6 +42,8 @@ import java.util.Locale;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.util.stream.Collectors.toList;
+import static org.kordamp.jarviz.cli.internal.Colorizer.bool;
+import static org.kordamp.jarviz.cli.internal.Colorizer.colorize;
 import static org.kordamp.jarviz.util.StringUtils.getHyphenatedName;
 import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
@@ -174,6 +176,14 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_WRITE_FILE", reportPath.toAbsolutePath()), e);
         }
+    }
+
+    protected String $$(String key, Object... args) {
+        return colorize(RB.$(key, args));
+    }
+
+    protected String $b(boolean val) {
+        return bool(val);
     }
 
     private long fileSize(Path jarPath) {

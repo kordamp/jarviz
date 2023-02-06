@@ -19,6 +19,7 @@ package org.kordamp.jarviz.cli.bytecode;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.Colorizer;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.bytecode.ShowBytecodeJarProcessor;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
@@ -64,8 +65,9 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         if (bc == 0 && jv == 0) {
             Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
             if (manifestBytecode.size() > 0) {
-                parent().getOut().println(RB.$("bytecode.version.attribute", manifestBytecode.stream()
+                parent().getOut().println($$("bytecode.version.attribute", manifestBytecode.stream()
                     .map(String::valueOf)
+                    .map(Colorizer::cyan)
                     .collect(joining(","))));
             }
         }
@@ -113,7 +115,7 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         if (!unversionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = unversionedClasses.get(bytecodeVersion);
-        parent().getOut().println(RB.$("bytecode.unversioned.classes.total", bytecodeVersion, classes.size()));
+        parent().getOut().println($$("bytecode.unversioned.classes.total", bytecodeVersion, classes.size()));
         if (details) {
             classes.forEach(parent().getOut()::println);
         }
@@ -123,7 +125,7 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         if (!versionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = versionedClasses.get(bytecodeVersion);
-        parent().getOut().println(RB.$("bytecode.versioned.classes.total", javaVersion, bytecodeVersion, classes.size()));
+        parent().getOut().println($$("bytecode.versioned.classes.total", javaVersion, bytecodeVersion, classes.size()));
         if (details) {
             classes.forEach(parent().getOut()::println);
         }

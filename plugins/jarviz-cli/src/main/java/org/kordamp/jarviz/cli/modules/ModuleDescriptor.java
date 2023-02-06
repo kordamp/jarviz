@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.kordamp.jarviz.cli.internal.Colorizer.magenta;
 import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
 
 /**
@@ -76,56 +77,64 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         md.exports().stream().map(java.lang.module.ModuleDescriptor.Exports::source).forEach(hiddenPackages::remove);
         md.opens().stream().map(java.lang.module.ModuleDescriptor.Opens::source).forEach(hiddenPackages::remove);
 
-        parent().getOut().println(RB.$("module.name", md.name()));
-        md.version().ifPresent(v -> parent().getOut().println(RB.$("module.version", v)));
-        parent().getOut().println(RB.$("module.open", md.isOpen()));
-        parent().getOut().println(RB.$("module.automatic", md.isAutomatic()));
-        md.mainClass().ifPresent(c -> parent().getOut().println(RB.$("module.main.class", c)));
+        parent().getOut().println($$("module.name", md.name()));
+        md.version().ifPresent(v -> parent().getOut().println($$("module.version", v)));
+        parent().getOut().println($$("module.open", $b(md.isOpen())));
+        parent().getOut().println($$("module.automatic", $b(md.isAutomatic())));
+        md.mainClass().ifPresent(c -> parent().getOut().println($$("module.main.class", c)));
 
         if (!unqualifiedExports.isEmpty()) {
-            parent().getOut().println(RB.$("module.exports"));
-            unqualifiedExports.forEach(e -> parent().getOut().println(INDENT + e.source() + toLowerCaseString(e.modifiers())));
+            parent().getOut().println($$("module.exports"));
+            unqualifiedExports.forEach(e -> parent().getOut()
+                .println(INDENT + e.source() + magenta(toLowerCaseString(e.modifiers()))));
         }
 
         if (!md.requires().isEmpty()) {
-            parent().getOut().println(RB.$("module.requires"));
+            parent().getOut().println($$("module.requires"));
             md.requires().stream()
-                .sorted().forEach(r -> parent().getOut().println(INDENT + r.name() + toLowerCaseString(r.modifiers())));
+                .sorted().forEach(r -> parent().getOut()
+                    .println(INDENT + r.name() + magenta(toLowerCaseString(r.modifiers()))));
         }
 
         if (!md.uses().isEmpty()) {
-            parent().getOut().println(RB.$("module.uses"));
+            parent().getOut().println($$("module.uses"));
             md.uses().stream()
-                .sorted().forEach(s -> parent().getOut().println(INDENT + s));
+                .sorted().forEach(s -> parent().getOut()
+                    .println(INDENT + s));
         }
 
         if (!md.provides().isEmpty()) {
-            parent().getOut().println(RB.$("module.provides"));
+            parent().getOut().println($$("module.provides"));
             md.provides().stream()
                 .sorted(comparing(java.lang.module.ModuleDescriptor.Provides::service))
-                .forEach(p -> parent().getOut().println(INDENT + RB.$("module.provides.with", p.service(), toString(p.providers()))));
+                .forEach(p -> parent().getOut()
+                    .println(INDENT + $$("module.provides.with", p.service(), toString(p.providers()))));
         }
 
         if (!qualifiedExports.isEmpty()) {
             parent().getOut().println(RB.$("module.exports.qualified"));
             qualifiedExports
-                .forEach(e -> parent().getOut().println(INDENT + RB.$("module.exports.to", e.source(), toLowerCaseString(e.targets()))));
+                .forEach(e -> parent().getOut()
+                    .println(INDENT + $$("module.exports.to", e.source(), toLowerCaseString(e.targets()))));
         }
 
         if (!unqualifiedOpenPackages.isEmpty()) {
-            parent().getOut().println(RB.$("module.opens"));
-            unqualifiedOpenPackages.forEach(p -> parent().getOut().println(INDENT + p.source() + toLowerCaseString(p.modifiers())));
+            parent().getOut().println($$("module.opens"));
+            unqualifiedOpenPackages.forEach(p -> parent().getOut()
+                .println(INDENT + p.source() + magenta(toLowerCaseString(p.modifiers()))));
         }
 
         if (!qualifiedOpenPackages.isEmpty()) {
-            parent().getOut().println(RB.$("module.opens.qualified"));
+            parent().getOut().println($$("module.opens.qualified"));
             qualifiedOpenPackages
-                .forEach(e -> parent().getOut().println(INDENT + RB.$("module.opens.to", e.source(), toLowerCaseString(e.targets()))));
+                .forEach(e -> parent().getOut()
+                    .println(INDENT + $$("module.opens.to", e.source(), toLowerCaseString(e.targets()))));
         }
 
         if (!hiddenPackages.isEmpty()) {
-            parent().getOut().println(RB.$("module.contains"));
-            hiddenPackages.forEach(p -> parent().getOut().println(INDENT + p));
+            parent().getOut().println($$("module.contains"));
+            hiddenPackages.forEach(p -> parent().getOut()
+                .println(INDENT + p));
         }
 
         report(jarFileResolver, md);
@@ -265,7 +274,7 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
                         } else {
                             exports.collapsable(RB.$("report.key.export"))
                                 .node(RB.$("report.key.package")).value(e.source()).end()
-                                .array(RB.$("report.key.targets")).collapsableChildren(RB.$("report.key.targets"), e.targets()).end()
+                                .array(RB.$("report.key.targets")).collapsableChildren(RB.$("report.key.target"), e.targets()).end()
                                 .end();
                         }
                     });
@@ -281,7 +290,7 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
                         } else {
                             exports.collapsable(RB.$("report.key.open"))
                                 .node(RB.$("report.key.package")).value(e.source()).end()
-                                .array(RB.$("report.key.targets")).collapsableChildren(RB.$("report.key.targets"), e.targets()).end()
+                                .array(RB.$("report.key.targets")).collapsableChildren(RB.$("report.key.target"), e.targets()).end()
                                 .end();
                         }
                     });
