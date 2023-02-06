@@ -73,6 +73,7 @@ jobs:
       - name: Assemble
         uses: jreleaser/release-action@v2
         with:
+          version: early-access
           arguments: assemble
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
@@ -80,6 +81,7 @@ jobs:
       - name: Release
         uses: jreleaser/release-action@v2
         with:
+          version: early-access
           arguments: full-release
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}

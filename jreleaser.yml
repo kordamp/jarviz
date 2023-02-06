@@ -118,6 +118,8 @@ assemble:
           platform: 'osx-x86_64'
         - path: '{{jdkPathPrefix}}/zulu17OsxArm/{{jdkFilePrefix}}-macosx_aarch64/zulu-17.jdk/Contents/Home'
           platform: 'osx-aarch_64'
+        - path: '{{jdkPathPrefix}}/zulu17Linux32/{{jdkFilePrefix}}-linux_i686'
+          platform: 'linux-x86_32'
         - path: '{{jdkPathPrefix}}/zulu17Linux/{{jdkFilePrefix}}-linux_x64'
           platform: 'linux-x86_64'
         - path: '{{jdkPathPrefix}}/zulu17LinuxArm/{{jdkFilePrefix}}-linux_aarch64'
