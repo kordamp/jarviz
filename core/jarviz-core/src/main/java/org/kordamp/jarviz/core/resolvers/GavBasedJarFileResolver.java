@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.jar.JarFile;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -78,6 +79,19 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
 
         Path path = Paths.get(url.getPath()).getFileName();
         Path file = cacheDirectory.resolve(path);
+
+        if (Files.exists(file)) {
+            try {
+                Instant localLastModified = Files.getLastModifiedTime(file).toInstant();
+                Instant remoteLastModified = Instant.ofEpochMilli(url.openConnection().getLastModified());
+                if (localLastModified.isAfter(remoteLastModified)) {
+                    jarFile = new JarFile(file.toFile());
+                    return jarFile;
+                }
+            } catch (IOException e) {
+                throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
+            }
+        }
 
         try (InputStream stream = url.openStream()) {
             Files.copy(stream, file, REPLACE_EXISTING);
