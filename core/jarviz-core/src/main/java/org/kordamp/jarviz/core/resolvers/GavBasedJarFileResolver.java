@@ -36,14 +36,17 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class GavBasedJarFileResolver implements JarFileResolver {
+public class GavBasedJarFileResolver implements JarFileResolver<String> {
+    private final String gav;
     private final String groupId;
     private final String artifactId;
     private final String version;
-    private final Path outputDirectory;
+    private final Path cacheDirectory;
+    private JarFile jarFile;
 
-    public GavBasedJarFileResolver(Path outputDirectory, String gav) {
-        this.outputDirectory = outputDirectory;
+    public GavBasedJarFileResolver(Path cacheDirectory, String gav) {
+        this.cacheDirectory = cacheDirectory;
+        this.gav = gav;
 
         String[] parts = gav.split(":");
         if (parts.length == 3) {
@@ -56,7 +59,14 @@ public class GavBasedJarFileResolver implements JarFileResolver {
     }
 
     @Override
+    public String getSource() {
+        return gav;
+    }
+
+    @Override
     public JarFile resolveJarFile() {
+        if (null != jarFile) return jarFile;
+
         String str = "https://repo1.maven.org/maven2/" + groupId + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + ".jar";
 
         URL url = null;
@@ -67,7 +77,7 @@ public class GavBasedJarFileResolver implements JarFileResolver {
         }
 
         Path path = Paths.get(url.getPath()).getFileName();
-        Path file = outputDirectory.resolve(path);
+        Path file = cacheDirectory.resolve(path);
 
         try (InputStream stream = url.openStream()) {
             Files.copy(stream, file, REPLACE_EXISTING);
@@ -76,7 +86,8 @@ public class GavBasedJarFileResolver implements JarFileResolver {
         }
 
         try {
-            return new JarFile(file.toFile());
+            jarFile = new JarFile(file.toFile());
+            return jarFile;
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
         }

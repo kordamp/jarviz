@@ -17,10 +17,16 @@
  */
 package org.kordamp.jarviz.cli.services;
 
+import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.services.ListServicesJarProcessor;
+import org.kordamp.jarviz.reporting.Format;
+import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,15 +43,40 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
 
     @Override
     protected int execute() {
-        ListServicesJarProcessor processor = new ListServicesJarProcessor(createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
+        JarFileResolver<?> jarFileResolver = createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        ListServicesJarProcessor processor = new ListServicesJarProcessor(jarFileResolver);
 
         Optional<List<String>> services = processor.getResult();
         if (services.isPresent()) {
             services.get().forEach(parent().getOut()::println);
+            report(jarFileResolver, services.get());
             return 0;
         }
 
         return 1;
+    }
+
+    private void report(JarFileResolver<?> jarFileResolver, List<String> services) {
+        if (null == reportPath) return;
+
+        for (Format format : validateReportFormats()) {
+            Node node = buildReport(format, Paths.get(jarFileResolver.resolveJarFile().getName()), services);
+            writeReport(resolveFormatter(format).write(node), format);
+        }
+    }
+
+    private Node buildReport(Format format, Path jarPath, List<String> services) {
+        Node root = createRootNode(jarPath);
+        Node implementations = root.array(RB.$("report.key.services"));
+
+        for (String service : services) {
+            if (format != Format.XML) {
+                implementations.node(service);
+            } else {
+                implementations.node(RB.$("report.key.service")).value(service).end();
+            }
+        }
+        return root;
     }
 }

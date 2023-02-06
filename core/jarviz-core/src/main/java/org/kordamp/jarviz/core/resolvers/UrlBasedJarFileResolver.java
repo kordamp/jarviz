@@ -35,24 +35,32 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class UrlBasedJarFileResolver implements JarFileResolver {
+public class UrlBasedJarFileResolver implements JarFileResolver<URL> {
     private final URL url;
-    private final Path outputDirectory;
+    private final Path cacheDirectory;
+    private JarFile jarFile;
 
-    public UrlBasedJarFileResolver(Path outputDirectory, URL url) {
-        this.outputDirectory = outputDirectory;
+    public UrlBasedJarFileResolver(Path cacheDirectory, URL url) {
+        this.cacheDirectory = cacheDirectory;
         this.url = url;
     }
 
     @Override
+    public URL getSource() {
+        return url;
+    }
+
+    @Override
     public JarFile resolveJarFile() {
+        if (null != jarFile) return jarFile;
+
         Path path = Paths.get(url.getPath()).getFileName();
 
         if (!path.getFileName().toString().endsWith(".jar")) {
             throw new JarvizException(RB.$("ERROR_PATH_IS_NOT_JAR", path.toAbsolutePath()));
         }
 
-        Path file = outputDirectory.resolve(path);
+        Path file = cacheDirectory.resolve(path);
 
         try (InputStream stream = url.openStream()) {
             Files.copy(stream, file, REPLACE_EXISTING);
@@ -61,7 +69,8 @@ public class UrlBasedJarFileResolver implements JarFileResolver {
         }
 
         try {
-            return new JarFile(file.toFile());
+            jarFile = new JarFile(file.toFile());
+            return jarFile;
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
         }

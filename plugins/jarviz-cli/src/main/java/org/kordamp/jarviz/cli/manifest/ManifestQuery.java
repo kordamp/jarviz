@@ -17,13 +17,20 @@
  */
 package org.kordamp.jarviz.cli.manifest;
 
+import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.processors.QueryManifestJarProcessor;
+import org.kordamp.jarviz.reporting.Format;
+import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
@@ -39,17 +46,42 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
 
     @Override
     protected int execute() {
-        QueryManifestJarProcessor processor = new QueryManifestJarProcessor(createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
+        JarFileResolver<?> jarFileResolver = createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        QueryManifestJarProcessor processor = new QueryManifestJarProcessor(jarFileResolver);
         processor.setAttributeName(attributeName);
         processor.setSectionName(sectionName);
 
         Optional<String> value = processor.getResult();
         if (value.isPresent()) {
             parent().getOut().println(value.get());
+            report(jarFileResolver, value.get());
             return 0;
         }
 
         return 1;
+    }
+
+    private void report(JarFileResolver<?> jarFileResolver, String value) {
+        if (null == reportPath) return;
+
+        Node node = buildReport(Paths.get(jarFileResolver.resolveJarFile().getName()), value);
+        for (Format format : validateReportFormats()) {
+            writeReport(resolveFormatter(format).write(node), format);
+        }
+    }
+
+    private Node buildReport(Path jarPath, String value) {
+        Node root = createRootNode(jarPath);
+
+        if (isNotBlank(sectionName)) {
+            root.node(RB.$("report.key.section.name")).value(sectionName).end();
+        }
+
+        root.node(RB.$("report.key.attribute.name"))
+            .node(RB.$("report.key.name")).value(attributeName).end()
+            .node(RB.$("report.key.value")).value(value).end();
+
+        return root;
     }
 }

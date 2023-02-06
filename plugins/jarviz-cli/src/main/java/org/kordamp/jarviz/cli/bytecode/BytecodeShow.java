@@ -19,10 +19,15 @@ package org.kordamp.jarviz.cli.bytecode;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.bytecode.ShowBytecodeJarProcessor;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
+import org.kordamp.jarviz.reporting.Format;
+import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,8 +52,9 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
 
     @Override
     protected int execute() {
-        ShowBytecodeJarProcessor processor = new ShowBytecodeJarProcessor(createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
+        JarFileResolver<?> jarFileResolver = createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        ShowBytecodeJarProcessor processor = new ShowBytecodeJarProcessor(jarFileResolver);
 
         BytecodeVersions bytecodeVersions = processor.getResult();
 
@@ -98,6 +104,8 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
             }
         }
 
+        report(jarFileResolver, bytecodeVersions);
+
         return 0;
     }
 
@@ -118,6 +126,102 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         parent().getOut().println(RB.$("bytecode.versioned.classes.total", javaVersion, bytecodeVersion, classes.size()));
         if (details) {
             classes.forEach(parent().getOut()::println);
+        }
+    }
+
+    private void report(JarFileResolver<?> jarFileResolver, BytecodeVersions bytecodeVersions) {
+        if (null == reportPath) return;
+
+        for (Format format : validateReportFormats()) {
+            Node node = buildReport(format, Paths.get(jarFileResolver.resolveJarFile().getName()), bytecodeVersions);
+            writeReport(resolveFormatter(format).write(node), format);
+        }
+    }
+
+    private Node buildReport(Format format, Path jarPath, BytecodeVersions bytecodeVersions) {
+        Node root = createRootNode(jarPath);
+
+        Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
+        Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
+
+        if (bc == 0 && jv == 0) {
+            Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
+            if (manifestBytecode.size() > 0) {
+                Node bytecode = root.array(RB.$("report.key.bytecode"));
+                manifestBytecode.stream()
+                    .map(String::valueOf)
+                    .forEach(v -> {
+                        if (format == Format.TXT) {
+                            bytecode.node(v).end();
+                        } else {
+                            bytecode.collapsable(RB.$("report.key.version")).value(v).end();
+                        }
+                    });
+            }
+        }
+
+        if (jv == 0) {
+            Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
+            if (bc == 0) {
+                unversionedClasses.keySet().stream()
+                    .sorted()
+                    .forEach(bytecodeVersion -> reportUnversioned(root, unversionedClasses, bytecodeVersion));
+            } else {
+                reportUnversioned(root, unversionedClasses, bc);
+            }
+        }
+
+        Set<Integer> javaVersions = bytecodeVersions.getJavaVersionOfVersionedClasses();
+        if (jv == 0) {
+            for (Integer javaVersion : javaVersions) {
+                Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
+                if (bc == 0) {
+                    for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                        reportVersioned(root, versionedClasses, javaVersion, entry.getKey());
+                    }
+                } else {
+                    reportVersioned(root, versionedClasses, javaVersion, bc);
+                }
+            }
+        } else {
+            Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
+            if (bc == 0) {
+                for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                    reportVersioned(root, versionedClasses, jv, entry.getKey());
+                }
+            } else {
+                reportVersioned(root, versionedClasses, jv, bc);
+            }
+        }
+
+        return root;
+    }
+
+    private void reportUnversioned(Node root, Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
+        if (!unversionedClasses.containsKey(bytecodeVersion)) return;
+
+        List<String> classes = unversionedClasses.get(bytecodeVersion);
+        Node unversioned = root.node(RB.$("report.key.unversioned"))
+            .node(RB.$("report.key.bytecode")).value(bytecodeVersion).end()
+            .node(RB.$("report.key.total")).value(classes.size()).end();
+
+        if (details) {
+            unversioned.array(RB.$("report.key.classes"))
+                .collapsableChildren(RB.$("report.key.class"), classes);
+        }
+    }
+
+    private void reportVersioned(Node root, Map<Integer, List<String>> versionedClasses, Integer javaVersion, Integer bytecodeVersion) {
+        if (!versionedClasses.containsKey(bytecodeVersion)) return;
+
+        List<String> classes = versionedClasses.get(bytecodeVersion);
+        Node versioned = root.node(RB.$("report.key.versioned"))
+            .node(RB.$("report.key.bytecode")).value(bytecodeVersion).end()
+            .node(RB.$("report.key.total")).value(classes.size()).end();
+
+        if (details) {
+            versioned.array(RB.$("report.key.classes"))
+                .collapsableChildren(RB.$("report.key.class"), classes);
         }
     }
 }

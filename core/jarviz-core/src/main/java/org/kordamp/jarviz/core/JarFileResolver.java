@@ -23,6 +23,8 @@ import java.util.jar.JarFile;
  * @author Andres Almiray
  * @since 0.1.0
  */
-public interface JarFileResolver {
+public interface JarFileResolver<T> {
+    T getSource();
+
     JarFile resolveJarFile();
 }

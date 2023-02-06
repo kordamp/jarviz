@@ -19,6 +19,14 @@ package org.kordamp.jarviz.cli;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarvizException;
+import org.kordamp.jarviz.reporting.Format;
+import org.kordamp.jarviz.reporting.Formatter;
+import org.kordamp.jarviz.reporting.JsonFormatter;
+import org.kordamp.jarviz.reporting.Node;
+import org.kordamp.jarviz.reporting.TxtFormatter;
+import org.kordamp.jarviz.reporting.XmlFormatter;
+import org.kordamp.jarviz.reporting.YamlFormatter;
+import org.kordamp.jarviz.util.ChecksumUtils;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -26,6 +34,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static java.util.stream.Collectors.toList;
+import static org.kordamp.jarviz.util.StringUtils.getHyphenatedName;
+import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
@@ -33,6 +51,10 @@ import java.nio.file.Paths;
  */
 @CommandLine.Command
 public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCommand<C> {
+    public static final String INDENT = "  ";
+    public static final String SPACE = " ";
+    public static final String EMPTY = "";
+
     @CommandLine.ArgGroup(multiplicity = "1")
     public Exclusive exclusive;
 
@@ -47,11 +69,18 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         public URL url;
     }
 
-    @CommandLine.Option(names = {"--output-directory"})
-    public Path outputdir;
+    @CommandLine.Option(names = {"--cache-directory"})
+    public Path cache;
 
     @CommandLine.ParentCommand
     public C parent;
+
+    @CommandLine.Option(names = {"--report-path"})
+    protected Path reportPath;
+
+    @CommandLine.Option(names = {"--report-format"},
+        paramLabel = "<format>")
+    String[] reportFormats;
 
     @Override
     protected C parent() {
@@ -62,22 +91,100 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         return 0;
     }
 
-    protected Path resolveOutputDirectory() {
-        outputdir = null != outputdir ? outputdir : Paths.get("out");
+    protected Path resolveCacheDirectory() {
+        cache = null != cache ? cache : Paths.get("cache");
 
-        if (!outputdir.isAbsolute()) {
+        if (!cache.isAbsolute()) {
             Path basedir = Paths.get(".").normalize();
-            outputdir = basedir.relativize(outputdir);
+            cache = basedir.relativize(cache);
         }
 
-        outputdir = outputdir.resolve("jarviz");
+        cache = cache.resolve("jarviz");
 
         try {
-            Files.createDirectories(outputdir);
+            Files.createDirectories(cache);
         } catch (IOException e) {
-            throw new JarvizException(RB.$("ERROR_CREATE_DIRECTORY", outputdir), e);
+            throw new JarvizException(RB.$("ERROR_CREATE_DIRECTORY", cache), e);
         }
 
-        return outputdir;
+        return cache;
+    }
+
+    protected Path resolveReportPath(Format format) {
+        return Paths.get(reportPath.toAbsolutePath() + "." + format.toString().toLowerCase(Locale.ROOT));
+    }
+
+    protected List<Format> validateReportFormats() {
+        if (null != reportPath && null == reportFormats || reportFormats.length == 0) {
+            return Collections.singletonList(Format.TXT);
+        }
+
+        return collectEntries(reportFormats).stream()
+            .map(Format::of)
+            .collect(toList());
+    }
+
+    protected List<String> collectEntries(String[] input) {
+        return collectEntries(input, false);
+    }
+
+    protected List<String> collectEntries(String[] input, boolean lowerCase) {
+        List<String> list = new ArrayList<>();
+        if (null != input && input.length > 0) {
+            for (String s : input) {
+                if (isNotBlank(s)) {
+                    if (!s.contains("-") && lowerCase) {
+                        s = getHyphenatedName(s);
+                    }
+                    list.add(lowerCase ? s.toLowerCase(Locale.ENGLISH) : s);
+                }
+            }
+        }
+        return list;
+    }
+
+    protected Formatter resolveFormatter(Format format) {
+        switch (format) {
+            case XML:
+                return XmlFormatter.INSTANCE;
+            case JSON:
+                return JsonFormatter.INSTANCE;
+            case YAML:
+                return YamlFormatter.INSTANCE;
+            case TXT:
+            default:
+                return TxtFormatter.INSTANCE;
+        }
+    }
+
+    protected Node createRootNode(Path jarPath) {
+        return Node.root(RB.$("report.key.jarviz"))
+            .node(RB.$("report.key.subject"))
+            .node(RB.$("report.key.file")).value(jarPath.getFileName()).end()
+            .node(RB.$("report.key.size")).value(fileSize(jarPath)).end()
+            .node(RB.$("report.key.sha256")).value(sha256(jarPath)).end()
+            .end();
+    }
+
+    protected void writeReport(String content, Format format) {
+        Path reportPath = resolveReportPath(format);
+        try {
+            Files.createDirectories(reportPath.getParent());
+            Files.write(reportPath, content.getBytes(), CREATE, TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            throw new JarvizException(RB.$("ERROR_WRITE_FILE", reportPath.toAbsolutePath()), e);
+        }
+    }
+
+    private long fileSize(Path jarPath) {
+        try {
+            return Files.size(jarPath);
+        } catch (IOException e) {
+            throw new JarvizException(RB.$("ERROR_UNEXPECTED"), e);
+        }
+    }
+
+    private String sha256(Path jarPath) {
+          return ChecksumUtils.checksum(jarPath);
     }
 }

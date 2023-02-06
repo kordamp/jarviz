@@ -30,15 +30,23 @@ import java.util.jar.JarFile;
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class PathBasedJarFileResolver implements JarFileResolver {
+public class PathBasedJarFileResolver implements JarFileResolver<Path> {
     private final Path file;
+    private JarFile jarFile;
 
     public PathBasedJarFileResolver(Path file) {
         this.file = file;
     }
 
     @Override
+    public Path getSource() {
+        return file;
+    }
+
+    @Override
     public JarFile resolveJarFile() {
+        if (null != jarFile) return jarFile;
+
         if (Files.notExists(file)) {
             throw new JarvizException(RB.$("ERROR_PATH_DOES_NOT_EXIST", file.toAbsolutePath()));
         }
@@ -53,7 +61,8 @@ public class PathBasedJarFileResolver implements JarFileResolver {
         }
 
         try {
-            return new JarFile(file.toFile());
+            jarFile = new JarFile(file.toFile());
+            return jarFile;
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
         }

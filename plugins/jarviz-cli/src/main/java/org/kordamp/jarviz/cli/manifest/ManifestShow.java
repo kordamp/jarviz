@@ -19,12 +19,17 @@ package org.kordamp.jarviz.cli.manifest;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.processors.ShowManifestJarProcessor;
+import org.kordamp.jarviz.reporting.Format;
+import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
@@ -37,8 +42,9 @@ import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileRe
 public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
     @Override
     protected int execute() {
-        ShowManifestJarProcessor processor = new ShowManifestJarProcessor(createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
+        JarFileResolver<?> jarFileResolver = createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        ShowManifestJarProcessor processor = new ShowManifestJarProcessor(jarFileResolver);
 
         Optional<java.util.jar.Manifest> manifest = processor.getResult();
         if (manifest.isEmpty()) return 1;
@@ -49,10 +55,25 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
             baos.flush();
             baos.close();
             parent().getOut().println(baos);
+            report(jarFileResolver, baos.toString().trim());
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE"), e);
         }
 
         return 0;
+    }
+
+    private void report(JarFileResolver<?> jarFileResolver, String manifest) {
+        if (null == reportPath) return;
+
+        Node node = buildReport(Paths.get(jarFileResolver.resolveJarFile().getName()), manifest);
+        for (Format format : validateReportFormats()) {
+            writeReport(resolveFormatter(format).write(node), format);
+        }
+    }
+
+    private Node buildReport(Path jarPath, String manifest) {
+        return createRootNode(jarPath)
+            .node(RB.$("report.key.manifest")).value(manifest).end();
     }
 }

@@ -19,8 +19,14 @@ package org.kordamp.jarviz.cli.modules;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.modules.NameModuleJarProcessor;
+import org.kordamp.jarviz.reporting.Format;
+import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
 
@@ -36,8 +42,9 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
 
     @Override
     protected int execute() {
-        NameModuleJarProcessor processor = new NameModuleJarProcessor(createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveOutputDirectory()));
+        JarFileResolver<?> jarFileResolver = createJarFileResolver(
+            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        NameModuleJarProcessor processor = new NameModuleJarProcessor(jarFileResolver);
 
         org.kordamp.jarviz.core.model.ModuleName moduleName = processor.getResult();
 
@@ -49,6 +56,8 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
             parent().getOut().println(RB.$("module.reason", moduleName.getReason()));
         }
 
+        report(jarFileResolver, moduleName);
+
         return 0;
     }
 
@@ -56,5 +65,27 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
         if (moduleName.isAutomaticByManifest()) return MANIFEST;
         if (moduleName.isAutomaticByFilename()) return FILENAME;
         return EXPLICIT;
+    }
+
+    private void report(JarFileResolver<?> jarFileResolver, org.kordamp.jarviz.core.model.ModuleName moduleName) {
+        if (null == reportPath) return;
+
+        for (Format format : validateReportFormats()) {
+            Node node = buildReport(Paths.get(jarFileResolver.resolveJarFile().getName()), moduleName);
+            writeReport(resolveFormatter(format).write(node), format);
+        }
+    }
+
+    private Node buildReport(Path jarPath, org.kordamp.jarviz.core.model.ModuleName moduleName) {
+        Node root = createRootNode(jarPath)
+            .node(RB.$("report.key.name")).value(moduleName.getModuleName()).end()
+            .node(RB.$("report.key.source")).value(resolveSource(moduleName)).end()
+            .node(RB.$("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
+            .node(RB.$("report.key.valid")).value(moduleName.isValid()).end();
+        if (!moduleName.isValid()) {
+            root.node(RB.$("report.key.reason")).value(moduleName.getReason()).end();
+        }
+
+        return root;
     }
 }
