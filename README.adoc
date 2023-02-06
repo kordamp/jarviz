@@ -14,7 +14,7 @@ image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/tot
 ---
 
 Jarviz is a JAR file analyzer tool.  You can obtain metadata from a JAR such as its manifest, manifest entries,
-bytecode versions, declarative services, and more.
+bytecode versions, declarative services, JPMS module descriptors and more.
 
 [source]
 ----
@@ -42,6 +42,11 @@ Documentation found at https://github.com/kordamp/jarviz
 
 .show
 
+Show the JAR's bytecode version(s).
+Will show the value of the `Bytecode-Version` manifest attribute
+if it exists; an ordered list of total unversioned classes per
+bytecode version; an ordered list of total versioned classes.
+
 [source]
 ----
 $ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
@@ -53,6 +58,8 @@ Unversioned classes. Bytecode version: 51 total: 2089
 Unversioned classes. Bytecode version: 52 total: 3366
 Unversioned classes. Bytecode version: 53 total: 1
 ----
+
+Use the `--details` flag to list all classes per bytecode version
 
 [source]
 ----
@@ -70,7 +77,7 @@ org.aopalliance.intercept.MethodInterceptor
 org.aopalliance.intercept.MethodInvocation
 ----
 
-`jackson-core` is an MR-JAR.
+`jackson-core` is an Multi Release JAR (MR-JAR).
 
 [source]
 ----
@@ -88,6 +95,8 @@ module-info
 
 .show
 
+Show the JAR's manifest.
+
 [source]
 ----
 $ jarviz manifest show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
@@ -103,10 +112,11 @@ Build-OS: Linux amd64 5.15.0-1022-azure
 Build-Revision: b252400e16942f5f944ecec68914e264f2fe37af
 Build-Timestamp: 2022-10-31T18:52:24Z
 Main-Class: org.kordamp.maven.checker.toolprovider.Pomchecker
-
 ----
 
 .query
+
+Query manifest attributes.
 
 [source]
 ----
@@ -119,6 +129,11 @@ org.kordamp.maven.pomchecker
 
 .name
 
+Show the module name.
+Will show the module name, whether it's automatic or not, and if the name is valid.
+
+`slf4j-api:1.7.36` defines an `Automatic-Module-Name` in its manifest
+
 [source]
 ----
 $ jarviz module name --gav org.slf4j:slf4j-api:1.7.36
@@ -128,6 +143,8 @@ automatic: true
 valid: true
 ----
 
+`slf4j-api:2.0.6` defines a full module descriptor
+
 [source]
 ----
 $ jarviz module name --gav org.slf4j:slf4j-api:2.0.6
@@ -136,6 +153,8 @@ source: explicit
 automatic: false
 valid: true
 ----
+
+This JAR filename is invalid
 
 [source]
 ----
@@ -147,9 +166,34 @@ valid: false
 reason: foo.1.TAG: Invalid module name: '1' is not a Java identifier
 ----
 
+.descriptor
+
+Show the module descriptor in detail.
+
+[source]
+----
+$ jarviz module descriptor --gav jakarta.activation:jakarta.activation-api:2.1.1
+name: jakarta.activation
+version: 2.1.1
+open: false
+automatic: false
+exports:
+  jakarta.activation
+  jakarta.activation.spi
+requires:
+  java.base mandated
+  java.desktop static
+  java.logging
+uses:
+  jakarta.activation.spi.MailcapRegistryProvider
+  jakarta.activation.spi.MimeTypeRegistryProvider
+----
+
 === Services
 
 .list
+
+Display registered services.
 
 [source]
 ----
@@ -162,11 +206,102 @@ org.apache.commons.logging.LogFactory
 
 .show
 
+Display service implementations for a given service.
+
 [source]
 ----
 $ jarviz services show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
     --service-name java.util.spi.ToolProvider
 org.kordamp.maven.checker.toolprovider.Pomchecker
+----
+
+== Reports
+
+All commands accept the following settings for generating reports:
+
+[source]
+----
+--report-format=<format>
+                Report format to use. Repeatable.
+--report-path=<reportPath>
+                Path to report filename (without extension)
+----
+
+Format may be any of [`txt`, `xml`, `json`, `yaml`].
+
+.Example
+
+[source]
+----
+$ jarviz module name --gav com.sun.mail:jakarta.mail:2.0.1 \
+    --report-path jakarta.mail \
+    --report-format txt \
+    --report-format xml \
+    --report-format json \
+    --report-format yaml
+name: jakarta.mail
+source: explicit
+automatic: false
+valid: true
+----
+
+[source]
+.jakarta.mail.txt
+----
+subject:
+  file: jakarta.mail-2.0.1.jar
+  size: 689294
+  sha256: 8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23
+name: jakarta.mail
+source: explicit
+automatic: false
+valid: true
+----
+
+[source,xml]
+[subs="verbatim"]
+.jakarta.mail.xml
+----
+<jarviz>
+  <subject>
+    <file>jakarta.mail-2.0.1.jar</file>
+    <size>689294</size>
+    <sha256>8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23</sha256>
+  </subject>
+  <name>jakarta.mail</name>
+  <source>explicit</source>
+  <automatic>false</automatic>
+  <valid>true</valid>
+</jarviz>
+----
+
+[source,json]
+.jakarta.mail.json
+----
+{
+  "subject": {
+    "file": "jakarta.mail-2.0.1.jar",
+    "size": 689294,
+    "sha256": "8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23"
+  },
+  "name": "jakarta.mail",
+  "source": "explicit",
+  "automatic": false,
+  "valid": true
+}
+----
+
+[source,yaml]
+.jakarta.mail.yaml
+----
+subject:
+  file: jakarta.mail-2.0.1.jar
+  size: 689294
+  sha256: 8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23
+name: jakarta.mail
+source: explicit
+automatic: false
+valid: true
 ----
 
 == Install
