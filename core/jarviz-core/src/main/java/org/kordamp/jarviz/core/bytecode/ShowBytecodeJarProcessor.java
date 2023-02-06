@@ -45,9 +45,9 @@ import static org.kordamp.jarviz.util.JarUtils.readMajorVersion;
 public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> {
     private static final Pattern MULTIRELEASE = Pattern.compile("META-INF/versions/(\\d+)/(.*\\.class)");
 
-    private final JarFileResolver jarFileResolver;
+    private final JarFileResolver<?> jarFileResolver;
 
-    public ShowBytecodeJarProcessor(JarFileResolver jarFileResolver) {
+    public ShowBytecodeJarProcessor(JarFileResolver<?> jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

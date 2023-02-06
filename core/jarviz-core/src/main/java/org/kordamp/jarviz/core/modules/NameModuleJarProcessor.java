@@ -43,9 +43,9 @@ public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
     // This should be the correct pattern
     // private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+(\\.|_|-|\\+|$))");
     private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+(\\.|$))");
-    private final JarFileResolver jarFileResolver;
+    private final JarFileResolver<?> jarFileResolver;
 
-    public NameModuleJarProcessor(JarFileResolver jarFileResolver) {
+    public NameModuleJarProcessor(JarFileResolver<?> jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

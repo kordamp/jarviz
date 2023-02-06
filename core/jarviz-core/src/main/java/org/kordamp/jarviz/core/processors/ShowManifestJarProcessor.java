@@ -31,9 +31,9 @@ import java.util.jar.Manifest;
  * @since 0.1.0
  */
 public class ShowManifestJarProcessor implements JarProcessor<Optional<Manifest>> {
-    private final JarFileResolver jarFileResolver;
+    private final JarFileResolver<?> jarFileResolver;
 
-    public ShowManifestJarProcessor(JarFileResolver jarFileResolver) {
+    public ShowManifestJarProcessor(JarFileResolver<?> jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

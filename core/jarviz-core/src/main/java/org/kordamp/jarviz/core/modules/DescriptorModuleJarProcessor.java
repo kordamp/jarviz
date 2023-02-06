@@ -32,9 +32,9 @@ import java.util.jar.JarFile;
  * @since 0.2.0
  */
 public class DescriptorModuleJarProcessor implements JarProcessor<ModuleDescriptor> {
-    private final JarFileResolver jarFileResolver;
+    private final JarFileResolver<?> jarFileResolver;
 
-    public DescriptorModuleJarProcessor(JarFileResolver jarFileResolver) {
+    public DescriptorModuleJarProcessor(JarFileResolver<?> jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

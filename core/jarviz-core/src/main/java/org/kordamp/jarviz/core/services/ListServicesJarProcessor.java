@@ -37,10 +37,10 @@ import static java.util.Collections.unmodifiableList;
  */
 public class ListServicesJarProcessor implements JarProcessor<Optional<List<String>>> {
     private static final String META_INF_SERVICES = "META-INF/services/";
-    private final JarFileResolver jarFileResolver;
+    private final JarFileResolver<?> jarFileResolver;
     private Integer release;
 
-    public ListServicesJarProcessor(JarFileResolver jarFileResolver) {
+    public ListServicesJarProcessor(JarFileResolver<?> jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

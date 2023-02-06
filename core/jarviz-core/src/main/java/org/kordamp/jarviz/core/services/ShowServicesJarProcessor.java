@@ -42,11 +42,11 @@ import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
  */
 public class ShowServicesJarProcessor implements JarProcessor<Optional<List<String>>> {
     private static final String META_INF_SERVICES = "META-INF/services/";
-    private final JarFileResolver jarFileResolver;
+    private final JarFileResolver<?> jarFileResolver;
     private Integer release;
     private String serviceName;
 
-    public ShowServicesJarProcessor(JarFileResolver jarFileResolver) {
+    public ShowServicesJarProcessor(JarFileResolver<?> jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
