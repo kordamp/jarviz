@@ -74,6 +74,6 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
 
     private Node buildReport(Path jarPath, String manifest) {
         return createRootNode(jarPath)
-            .node(RB.$("report.key.manifest")).value(manifest).end();
+            .node($("report.key.manifest")).value(manifest).end();
     }
 }

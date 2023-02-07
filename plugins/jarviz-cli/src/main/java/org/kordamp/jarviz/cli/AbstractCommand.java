@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(mixinStandardHelpOptions = true,
     versionProvider = Versions.class,
     resourceBundle = "org.kordamp.jarviz.cli.Messages")
-abstract class AbstractCommand<C extends IO> implements Callable<Integer>, IO {
+public abstract class AbstractCommand<C extends IO> extends BaseCommand implements Callable<Integer>, IO {
     protected abstract C parent();
 
     @Override

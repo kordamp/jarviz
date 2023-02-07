@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.cli.modules;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.modules.DescriptorModuleJarProcessor;
@@ -112,7 +111,7 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!qualifiedExports.isEmpty()) {
-            parent().getOut().println(RB.$("module.exports.qualified"));
+            parent().getOut().println($("module.exports.qualified"));
             qualifiedExports
                 .forEach(e -> parent().getOut()
                     .println(INDENT + $$("module.exports.to", e.source(), toLowerCaseString(e.targets()))));
@@ -153,12 +152,12 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
 
     private Node buildReport(Format format, Path jarPath, java.lang.module.ModuleDescriptor md) {
         Node root = createRootNode(jarPath);
-        Node module = root.node(RB.$("report.key.module"));
-        module.node(RB.$("report.key.name")).value(md.name()).end();
-        md.version().ifPresent(v -> module.node(RB.$("report.key.version")).value(v).end());
-        module.node(RB.$("report.key.open")).value(md.isOpen()).end();
-        module.node(RB.$("report.key.automatic")).value(md.isAutomatic()).end();
-        md.mainClass().ifPresent(c -> module.node(RB.$("report.key.main.class")).value(c).end());
+        Node module = root.node($("report.key.module"));
+        module.node($("report.key.name")).value(md.name()).end();
+        md.version().ifPresent(v -> module.node($("report.key.version")).value(v).end());
+        module.node($("report.key.open")).value(md.isOpen()).end();
+        module.node($("report.key.automatic")).value(md.isAutomatic()).end();
+        md.mainClass().ifPresent(c -> module.node($("report.key.main.class")).value(c).end());
 
         List<java.lang.module.ModuleDescriptor.Exports> unqualifiedExports = md.exports().stream()
             .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
@@ -185,14 +184,14 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         md.opens().stream().map(java.lang.module.ModuleDescriptor.Opens::source).forEach(hiddenPackages::remove);
 
         if (!unqualifiedExports.isEmpty()) {
-            Node exports = module.array(RB.$("report.key.exports"));
+            Node exports = module.array($("report.key.exports"));
             unqualifiedExports.forEach(e -> {
                 if (format == Format.TXT) {
                     exports.node(e.source() + toLowerCaseString(e.modifiers())).end();
                 } else {
-                    exports.collapsable(RB.$("report.key.export"))
-                        .node(RB.$("report.key.package")).value(e.source()).end()
-                        .node(RB.$("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
+                    exports.collapsable($("report.key.export"))
+                        .node($("report.key.package")).value(e.source()).end()
+                        .node($("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
                         .cleanup();
                 }
             });
@@ -200,14 +199,14 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!md.requires().isEmpty()) {
-            Node requires = module.array(RB.$("report.key.requires"));
+            Node requires = module.array($("report.key.requires"));
             md.requires().forEach(r -> {
                 if (format == Format.TXT) {
                     requires.node(r.name() + toLowerCaseString(r.modifiers())).end();
                 } else {
-                    requires.collapsable(RB.$("report.key.require"))
-                        .node(RB.$("report.key.module")).value(r.name()).end()
-                        .node(RB.$("report.key.modifiers")).value(toLowerCaseString(r.modifiers())).end()
+                    requires.collapsable($("report.key.require"))
+                        .node($("report.key.module")).value(r.name()).end()
+                        .node($("report.key.modifiers")).value(toLowerCaseString(r.modifiers())).end()
                         .cleanup();
                 }
             });
@@ -215,31 +214,31 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!md.uses().isEmpty() || !md.provides().isEmpty()) {
-            Node services = module.node(RB.$("report.key.services"));
+            Node services = module.node($("report.key.services"));
 
             if (!md.uses().isEmpty()) {
-                Node requires = services.array(RB.$("report.key.uses"));
+                Node requires = services.array($("report.key.uses"));
                 md.uses().forEach(s -> {
                     if (format == Format.TXT) {
                         requires.node(s).end();
                     } else {
-                        requires.collapsable(RB.$("report.key.service")).value(s).end();
+                        requires.collapsable($("report.key.service")).value(s).end();
                     }
                 });
                 requires.end();
             }
 
             if (!md.provides().isEmpty()) {
-                Node provides = services.array(RB.$("report.key.provides"));
+                Node provides = services.array($("report.key.provides"));
                 md.provides().stream()
                     .sorted(comparing(java.lang.module.ModuleDescriptor.Provides::service))
                     .forEach(p -> {
                         if (format == Format.TXT) {
                             provides.node(p.service()).children(p.providers()).end();
                         } else {
-                            provides.collapsable(RB.$("report.key.provider"))
-                                .node(RB.$("report.key.service")).value(p.service()).end()
-                                .array(RB.$("report.key.implementations")).collapsableChildren(RB.$("report.key.implementation"), p.providers()).end()
+                            provides.collapsable($("report.key.provider"))
+                                .node($("report.key.service")).value(p.service()).end()
+                                .array($("report.key.implementations")).collapsableChildren($("report.key.implementation"), p.providers()).end()
                                 .cleanup();
                         }
                     });
@@ -248,14 +247,14 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!unqualifiedOpenPackages.isEmpty()) {
-            Node opens = module.array(RB.$("report.key.opens"));
+            Node opens = module.array($("report.key.opens"));
             unqualifiedOpenPackages.forEach(e -> {
                 if (format == Format.TXT) {
                     opens.node(e.source() + toLowerCaseString(e.modifiers())).end();
                 } else {
-                    opens.collapsable(RB.$("report.key.open"))
-                        .node(RB.$("report.key.module")).value(e.source()).end()
-                        .node(RB.$("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
+                    opens.collapsable($("report.key.open"))
+                        .node($("report.key.module")).value(e.source()).end()
+                        .node($("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
                         .cleanup();
                 }
             });
@@ -263,18 +262,18 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!qualifiedExports.isEmpty() || !qualifiedOpenPackages.isEmpty()) {
-            Node qualified = module.node(RB.$("report.key.qualified"));
+            Node qualified = module.node($("report.key.qualified"));
 
             if (!qualifiedExports.isEmpty()) {
-                Node exports = qualified.array(RB.$("report.key.exports"));
+                Node exports = qualified.array($("report.key.exports"));
                 qualifiedExports
                     .forEach(e -> {
                         if (format == Format.TXT) {
                             exports.node(e.source()).children(e.targets()).end();
                         } else {
-                            exports.collapsable(RB.$("report.key.export"))
-                                .node(RB.$("report.key.package")).value(e.source()).end()
-                                .array(RB.$("report.key.targets")).collapsableChildren(RB.$("report.key.target"), e.targets()).end()
+                            exports.collapsable($("report.key.export"))
+                                .node($("report.key.package")).value(e.source()).end()
+                                .array($("report.key.targets")).collapsableChildren($("report.key.target"), e.targets()).end()
                                 .end();
                         }
                     });
@@ -282,15 +281,15 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
             }
 
             if (!qualifiedOpenPackages.isEmpty()) {
-                Node exports = qualified.array(RB.$("report.key.opens"));
+                Node exports = qualified.array($("report.key.opens"));
                 qualifiedOpenPackages
                     .forEach(e -> {
                         if (format == Format.TXT) {
                             exports.node(e.source()).children(e.targets()).end();
                         } else {
-                            exports.collapsable(RB.$("report.key.open"))
-                                .node(RB.$("report.key.package")).value(e.source()).end()
-                                .array(RB.$("report.key.targets")).collapsableChildren(RB.$("report.key.target"), e.targets()).end()
+                            exports.collapsable($("report.key.open"))
+                                .node($("report.key.package")).value(e.source()).end()
+                                .array($("report.key.targets")).collapsableChildren($("report.key.target"), e.targets()).end()
                                 .end();
                         }
                     });
@@ -299,12 +298,12 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!hiddenPackages.isEmpty()) {
-            Node contains = module.array(RB.$("report.key.contains"));
+            Node contains = module.array($("report.key.contains"));
             hiddenPackages.forEach(s -> {
                 if (format == Format.TXT) {
                     contains.node(s).end();
                 } else {
-                    contains.collapsable(RB.$("report.key.package")).value(s).end();
+                    contains.collapsable($("report.key.package")).value(s).end();
                 }
             });
             contains.end();

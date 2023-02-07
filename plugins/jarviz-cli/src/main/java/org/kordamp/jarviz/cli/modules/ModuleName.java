@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.cli.modules;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.modules.NameModuleJarProcessor;
@@ -78,12 +77,12 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
 
     private Node buildReport(Path jarPath, org.kordamp.jarviz.core.model.ModuleName moduleName) {
         Node root = createRootNode(jarPath)
-            .node(RB.$("report.key.name")).value(moduleName.getModuleName()).end()
-            .node(RB.$("report.key.source")).value(resolveSource(moduleName)).end()
-            .node(RB.$("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
-            .node(RB.$("report.key.valid")).value(moduleName.isValid()).end();
+            .node($("report.key.name")).value(moduleName.getModuleName()).end()
+            .node($("report.key.source")).value(resolveSource(moduleName)).end()
+            .node($("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
+            .node($("report.key.valid")).value(moduleName.isValid()).end();
         if (!moduleName.isValid()) {
-            root.node(RB.$("report.key.reason")).value(moduleName.getReason()).end();
+            root.node($("report.key.reason")).value(moduleName.getReason()).end();
         }
 
         return root;

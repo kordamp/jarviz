@@ -71,17 +71,16 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         public URL url;
     }
 
-    @CommandLine.Option(names = {"--cache-directory"})
+    @CommandLine.Option(names = {"--cache-directory"}, paramLabel = "<directory>")
     public Path cache;
 
     @CommandLine.ParentCommand
     public C parent;
 
-    @CommandLine.Option(names = {"--report-path"})
+    @CommandLine.Option(names = {"--report-path"}, paramLabel = "<path>")
     protected Path reportPath;
 
-    @CommandLine.Option(names = {"--report-format"},
-        paramLabel = "<format>")
+    @CommandLine.Option(names = {"--report-format"}, paramLabel = "<format>")
     String[] reportFormats;
 
     @Override
@@ -160,11 +159,11 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
     }
 
     protected Node createRootNode(Path jarPath) {
-        return Node.root(RB.$("report.key.jarviz"))
-            .node(RB.$("report.key.subject"))
-            .node(RB.$("report.key.file")).value(jarPath.getFileName()).end()
-            .node(RB.$("report.key.size")).value(fileSize(jarPath)).end()
-            .node(RB.$("report.key.sha256")).value(sha256(jarPath)).end()
+        return Node.root($("report.key.jarviz"))
+            .node($("report.key.subject"))
+            .node($("report.key.file")).value(jarPath.getFileName()).end()
+            .node($("report.key.size")).value(fileSize(jarPath)).end()
+            .node($("report.key.sha256")).value(sha256(jarPath)).end()
             .end();
     }
 
@@ -179,7 +178,7 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
     }
 
     protected String $$(String key, Object... args) {
-        return colorize(RB.$(key, args));
+        return colorize($(key, args));
     }
 
     protected String $b(boolean val) {

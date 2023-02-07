@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.cli.services;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.services.ShowServicesJarProcessor;
@@ -38,7 +37,7 @@ import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileRe
  */
 @CommandLine.Command(name = "show")
 public class ServicesShow extends AbstractJarvizSubcommand<Services> {
-    @CommandLine.Option(names = {"--service-name"}, required = true)
+    @CommandLine.Option(names = {"--service-name"}, required = true, paramLabel = "<name>")
     public String serviceName;
 
     @CommandLine.Option(names = {"--release"})
@@ -72,14 +71,14 @@ public class ServicesShow extends AbstractJarvizSubcommand<Services> {
 
     private Node buildReport(Format format, Path jarPath, List<String> services) {
         Node root = createRootNode(jarPath);
-        Node implementations = root.node(RB.$("report.key.service")).value(serviceName).end()
-            .array(RB.$("report.key.implementations"));
+        Node implementations = root.node($("report.key.service")).value(serviceName).end()
+            .array($("report.key.implementations"));
 
         for (String service : services) {
             if (format != Format.XML) {
                 implementations.node(service);
             } else {
-                implementations.node(RB.$("report.key.implementation")).value(service).end();
+                implementations.node($("report.key.implementation")).value(service).end();
             }
         }
         return root;

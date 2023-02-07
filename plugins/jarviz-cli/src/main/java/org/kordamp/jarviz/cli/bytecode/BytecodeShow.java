@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.cli.bytecode;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.cli.internal.Colorizer;
 import org.kordamp.jarviz.core.JarFileResolver;
@@ -45,10 +44,10 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
     @CommandLine.Option(names = {"--details"})
     public boolean details;
 
-    @CommandLine.Option(names = {"--bytecode-version"})
+    @CommandLine.Option(names = {"--bytecode-version"}, paramLabel = "<version>")
     public Integer bytecodeVersion;
 
-    @CommandLine.Option(names = {"--java-version"})
+    @CommandLine.Option(names = {"--java-version"}, paramLabel = "<version>")
     public Integer javaVersion;
 
     @Override
@@ -149,14 +148,14 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         if (bc == 0 && jv == 0) {
             Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
             if (manifestBytecode.size() > 0) {
-                Node bytecode = root.array(RB.$("report.key.bytecode"));
+                Node bytecode = root.array($("report.key.bytecode"));
                 manifestBytecode.stream()
                     .map(String::valueOf)
                     .forEach(v -> {
                         if (format == Format.TXT) {
                             bytecode.node(v).end();
                         } else {
-                            bytecode.collapsable(RB.$("report.key.version")).value(v).end();
+                            bytecode.collapsable($("report.key.version")).value(v).end();
                         }
                     });
             }
@@ -203,13 +202,13 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         if (!unversionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = unversionedClasses.get(bytecodeVersion);
-        Node unversioned = root.node(RB.$("report.key.unversioned"))
-            .node(RB.$("report.key.bytecode")).value(bytecodeVersion).end()
-            .node(RB.$("report.key.total")).value(classes.size()).end();
+        Node unversioned = root.node($("report.key.unversioned"))
+            .node($("report.key.bytecode")).value(bytecodeVersion).end()
+            .node($("report.key.total")).value(classes.size()).end();
 
         if (details) {
-            unversioned.array(RB.$("report.key.classes"))
-                .collapsableChildren(RB.$("report.key.class"), classes);
+            unversioned.array($("report.key.classes"))
+                .collapsableChildren($("report.key.class"), classes);
         }
     }
 
@@ -217,13 +216,13 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         if (!versionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = versionedClasses.get(bytecodeVersion);
-        Node versioned = root.node(RB.$("report.key.versioned"))
-            .node(RB.$("report.key.bytecode")).value(bytecodeVersion).end()
-            .node(RB.$("report.key.total")).value(classes.size()).end();
+        Node versioned = root.node($("report.key.versioned"))
+            .node($("report.key.bytecode")).value(bytecodeVersion).end()
+            .node($("report.key.total")).value(classes.size()).end();
 
         if (details) {
-            versioned.array(RB.$("report.key.classes"))
-                .collapsableChildren(RB.$("report.key.class"), classes);
+            versioned.array($("report.key.classes"))
+                .collapsableChildren($("report.key.class"), classes);
         }
     }
 }

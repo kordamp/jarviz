@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.cli.services;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.services.ListServicesJarProcessor;
@@ -68,13 +67,13 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
 
     private Node buildReport(Format format, Path jarPath, List<String> services) {
         Node root = createRootNode(jarPath);
-        Node implementations = root.array(RB.$("report.key.services"));
+        Node implementations = root.array($("report.key.services"));
 
         for (String service : services) {
             if (format != Format.XML) {
                 implementations.node(service);
             } else {
-                implementations.node(RB.$("report.key.service")).value(service).end();
+                implementations.node($("report.key.service")).value(service).end();
             }
         }
         return root;

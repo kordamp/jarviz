@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.cli.manifest;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.processors.QueryManifestJarProcessor;
@@ -38,10 +37,10 @@ import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
  */
 @CommandLine.Command(name = "query")
 public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
-    @CommandLine.Option(names = {"--attribute-name"}, required = true)
+    @CommandLine.Option(names = {"--attribute-name"}, required = true, paramLabel = "<name>")
     public String attributeName;
 
-    @CommandLine.Option(names = {"--section-name"})
+    @CommandLine.Option(names = {"--section-name"}, paramLabel = "<name>")
     public String sectionName;
 
     @Override
@@ -75,12 +74,12 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
         Node root = createRootNode(jarPath);
 
         if (isNotBlank(sectionName)) {
-            root.node(RB.$("report.key.section.name")).value(sectionName).end();
+            root.node($("report.key.section.name")).value(sectionName).end();
         }
 
-        root.node(RB.$("report.key.attribute.name"))
-            .node(RB.$("report.key.name")).value(attributeName).end()
-            .node(RB.$("report.key.value")).value(value).end();
+        root.node($("report.key.attribute.name"))
+            .node($("report.key.name")).value(attributeName).end()
+            .node($("report.key.value")).value(value).end();
 
         return root;
     }

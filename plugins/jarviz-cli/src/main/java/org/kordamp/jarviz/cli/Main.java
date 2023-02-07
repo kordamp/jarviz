@@ -71,6 +71,8 @@ public class Main extends BaseCommand implements Runnable, IO {
         Main cmd = new Main();
         CommandLine commandLine = new CommandLine(cmd);
         commandLine.setCaseInsensitiveEnumValuesAllowed(true);
+        commandLine.setUsageHelpWidth(90);
+        commandLine.setUsageHelpLongOptionsMaxWidth(42);
         cmd.out = commandLine.getOut();
         cmd.err = commandLine.getErr();
         return execute(commandLine, args);
@@ -80,6 +82,8 @@ public class Main extends BaseCommand implements Runnable, IO {
         Main cmd = new Main();
         CommandLine commandLine = new CommandLine(cmd);
         commandLine.setCaseInsensitiveEnumValuesAllowed(true);
+        commandLine.setUsageHelpWidth(90);
+        commandLine.setUsageHelpLongOptionsMaxWidth(42);
         commandLine.setOut(out);
         commandLine.setErr(err);
         cmd.out = out;

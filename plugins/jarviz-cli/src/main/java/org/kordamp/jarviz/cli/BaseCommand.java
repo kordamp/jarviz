@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 @CommandLine.Command(mixinStandardHelpOptions = true,
     versionProvider = Versions.class,
     resourceBundle = "org.kordamp.jarviz.cli.Messages")
-abstract class BaseCommand {
+public abstract class BaseCommand {
     static {
         if (System.getenv().containsKey("JARVIZ_NO_COLOR")) {
             System.setProperty("picocli.ansi", "false");
