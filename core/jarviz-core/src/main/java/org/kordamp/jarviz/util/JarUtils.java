@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.util;
 
-import org.apache.commons.io.function.IOFunction;
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarvizException;
 
@@ -81,5 +80,10 @@ public class JarUtils {
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_READING_JAR_ENTRY", entry.getName(), jarFile.getName()));
         }
+    }
+
+    @FunctionalInterface
+    public interface IOFunction<T, R> {
+        R apply(final T t) throws IOException;
     }
 }

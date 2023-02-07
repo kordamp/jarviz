@@ -17,12 +17,13 @@
  */
 package org.kordamp.jarviz.core.services;
 
-import org.apache.commons.io.IOUtils;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -79,7 +80,8 @@ public class ShowServicesJarProcessor implements JarProcessor<Optional<List<Stri
                 String name = entry.getName();
                 if (name.equals(target)) {
                     foundServices = true;
-                    services.addAll(withJarEntry(jarFile, entry, inputStream -> IOUtils.readLines(inputStream, StandardCharsets.UTF_8).stream()
+                    services.addAll(withJarEntry(jarFile, entry, inputStream -> new BufferedReader(new InputStreamReader(inputStream,
+                        StandardCharsets.UTF_8)).lines()
                         .filter(s -> isNotBlank(s) && !s.startsWith("#"))
                         .collect(toList())));
                     break;
