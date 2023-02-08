@@ -23,8 +23,6 @@ import org.kordamp.jarviz.core.JarvizException;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -35,24 +33,11 @@ import java.util.jar.Manifest;
  * @since 0.1.0
  */
 public class JarUtils {
-    private static final Map<String, Integer> JDK_TO_MAJOR_VERSION_NUMBER_MAPPING = new LinkedHashMap<>();
-
-    static {
-        for (int i = 6; i < 35; i++) {
-            JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.put(String.valueOf(i), 44 + i);
-        }
-    }
-
-    public static Integer javaVersionToBytecodeVersion(String jv) {
-        return JDK_TO_MAJOR_VERSION_NUMBER_MAPPING.get(jv);
-    }
-
     public static Optional<Manifest> getManifest(JarFile jarFile) {
         try {
-            return Optional.of(jarFile.getManifest());
+            return Optional.ofNullable(jarFile.getManifest());
         } catch (IOException e) {
             return Optional.empty();
-            // throw new JarvizException(RB.$("ERROR_READING_JAR_MANIFEST", jarFile.getName()));
         }
     }
 
