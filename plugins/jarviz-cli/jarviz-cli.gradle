@@ -42,7 +42,6 @@ dependencies {
     api project(':jarviz-core')
     annotationProcessor "info.picocli:picocli-codegen:$picocliVersion"
     api "info.picocli:picocli:$picocliVersion"
-    runtimeOnly "org.slf4j:slf4j-simple:$slf4jVersion"
 }
 
 processResources {

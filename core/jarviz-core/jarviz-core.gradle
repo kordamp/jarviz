@@ -21,10 +21,6 @@ config {
     }
 }
 
-dependencies {
-    api "org.slf4j:jcl-over-slf4j:$slf4jVersion"
-}
-
 project.rootProject.gradle.addBuildListener(new BuildAdapter() {
     @Override
     void projectsEvaluated(Gradle gradle) {

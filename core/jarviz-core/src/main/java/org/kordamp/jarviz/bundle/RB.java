@@ -17,8 +17,7 @@
  */
 package org.kordamp.jarviz.bundle;
 
-import org.slf4j.helpers.MessageFormatter;
-
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 /**
@@ -36,6 +35,6 @@ public class RB {
         if (null == args || args.length == 0) {
             return BUNDLE.getString(key);
         }
-        return MessageFormatter.arrayFormat(BUNDLE.getString(key), args).getMessage();
+        return MessageFormat.format(BUNDLE.getString(key), args);
     }
 }

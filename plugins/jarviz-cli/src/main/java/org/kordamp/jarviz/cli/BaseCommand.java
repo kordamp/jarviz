@@ -17,9 +17,9 @@
  */
 package org.kordamp.jarviz.cli;
 
-import org.slf4j.helpers.MessageFormatter;
 import picocli.CommandLine;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -54,6 +54,6 @@ public abstract class BaseCommand {
         if (null == args || args.length == 0) {
             return bundle.getString(key);
         }
-        return MessageFormatter.arrayFormat(bundle.getString(key), args).getMessage();
+        return MessageFormat.format(bundle.getString(key), args);
     }
 }
