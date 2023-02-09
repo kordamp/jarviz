@@ -56,6 +56,7 @@ public class ModuleNameJarPathAnalyzer implements JarPathAnalyzer<ModuleName> {
         if (isNotBlank(automaticModuleNameByManifest)) {
             moduleName = ModuleName.fromAutomaticByManifest(automaticModuleNameByManifest,
                 isAutomaticNameValid(automaticModuleNameByManifest).orElse(null));
+            return;
         }
 
         try {
