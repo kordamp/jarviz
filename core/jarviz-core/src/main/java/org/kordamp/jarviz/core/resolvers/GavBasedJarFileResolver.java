@@ -21,14 +21,16 @@ import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarvizException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarFile;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -68,7 +70,10 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
     public JarFile resolveJarFile() {
         if (null != jarFile) return jarFile;
 
-        String str = "https://repo1.maven.org/maven2/" + groupId + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + ".jar";
+        String filename = artifactId + "-" + version + ".jar";
+        String str = "https://repo1.maven.org/maven2/" + groupId + "/" + artifactId + "/" + version + "/" + filename;
+        String mavenLocal = String.join(File.separator, List.of(System.getProperty("user.home"), ".m2", "repository",
+            groupId.replace("/", File.separator), artifactId, version, filename));
 
         URL url = null;
         try {
@@ -77,28 +82,49 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
             throw new JarvizException(RB.$("ERROR_INVALID_URL", str));
         }
 
-        Path path = Paths.get(url.getPath()).getFileName();
-        Path file = cacheDirectory.resolve(path);
-
-        if (Files.exists(file)) {
-            try {
-                Instant localLastModified = Files.getLastModifiedTime(file).toInstant();
-                Instant remoteLastModified = Instant.ofEpochMilli(url.openConnection().getLastModified());
-                if (localLastModified.isAfter(remoteLastModified)) {
-                    jarFile = new JarFile(file.toFile());
-                    return jarFile;
-                }
-            } catch (IOException e) {
-                throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
-            }
+        Instant remoteLastModified = null;
+        try {
+            remoteLastModified = Instant.ofEpochMilli(url.openConnection().getLastModified());
+        } catch (IOException e) {
+            throw new JarvizException(RB.$("ERROR_HEAD_URL", url));
         }
 
+        // Naive check on local Maven repository
+        Optional<Path> file = checkCachedFile(remoteLastModified, Path.of(mavenLocal));
+        if (file.isEmpty()) {
+            file = checkCachedFile(remoteLastModified, cacheDirectory.resolve(filename));
+        }
+        if (file.isPresent()) {
+            return createJarFile(file.get());
+        }
+
+        Path path = cacheDirectory.resolve(filename);
+
         try (InputStream stream = url.openStream()) {
-            Files.copy(stream, file, REPLACE_EXISTING);
+            Files.copy(stream, path, REPLACE_EXISTING);
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_DOWNLOADING_URL", url), e);
         }
 
+        return createJarFile(path);
+    }
+
+    private Optional<Path> checkCachedFile(Instant remoteLastModified, Path file) {
+        if (Files.exists(file)) {
+            try {
+                Instant localLastModified = Files.getLastModifiedTime(file).toInstant();
+                if (localLastModified.isAfter(remoteLastModified)) {
+                    return Optional.of(file);
+                }
+            } catch (IOException e) {
+                throw new JarvizException(RB.$("ERROR_FILE_LAST_MODIFIED", file.toAbsolutePath()));
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private JarFile createJarFile(Path file) {
         try {
             jarFile = new JarFile(file.toFile());
             return jarFile;
