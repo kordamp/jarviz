@@ -76,7 +76,6 @@ public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
             name = name.substring(0, matcher.start());
         }
 
-        return name.replace('-', '.')
-            .replace('_', '.');
+        return name.replace("[^A-Za-z0-9]", ".");
     }
 }

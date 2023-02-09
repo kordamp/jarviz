@@ -56,7 +56,6 @@ public class ModuleNameJarPathAnalyzer implements JarPathAnalyzer<ModuleName> {
         if (isNotBlank(automaticModuleNameByManifest)) {
             moduleName = ModuleName.fromAutomaticByManifest(automaticModuleNameByManifest,
                 isAutomaticNameValid(automaticModuleNameByManifest).orElse(null));
-            return;
         }
 
         try {
@@ -66,8 +65,17 @@ public class ModuleNameJarPathAnalyzer implements JarPathAnalyzer<ModuleName> {
                 .findFirst()
                 .get();
         } catch (FindException fe) {
-            // automatic by filename
-            moduleName = ModuleName.fromAutomaticByFilename(automaticModuleNameByFilename, fe.getCause().getMessage());
+            Throwable cause = getRootCause(fe);
+            if (cause instanceof InvalidModuleDescriptorException) {
+                // explicit module descriptor is invalid
+                // TODO: read module name from [versioned] module-info.class
+                moduleName = ModuleName.fromModuleDescriptor("", cause.getMessage());
+                return;
+            }
+            if (null == moduleName) {
+                // automatic by filename
+                moduleName = ModuleName.fromAutomaticByFilename(automaticModuleNameByFilename, cause.getMessage());
+            }
         } catch (InvalidModuleDescriptorException imde) {
             // explicit
             // TODO: read module name from [versioned] module-info.class
@@ -98,5 +106,12 @@ public class ModuleNameJarPathAnalyzer implements JarPathAnalyzer<ModuleName> {
         } catch (IllegalArgumentException exception) {
             return Optional.of(exception.getMessage());
         }
+    }
+
+    private Throwable getRootCause(Throwable throwable) {
+        while (null != throwable.getCause()) {
+            throwable = throwable.getCause();
+        }
+        return throwable;
     }
 }
