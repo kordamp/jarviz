@@ -18,6 +18,8 @@
 package org.kordamp.jarviz.cli;
 
 import org.kordamp.jarviz.cli.bytecode.Bytecode;
+import org.kordamp.jarviz.cli.internal.Banner;
+import org.kordamp.jarviz.cli.internal.BaseCommand;
 import org.kordamp.jarviz.cli.manifest.Manifest;
 import org.kordamp.jarviz.cli.services.Services;
 import picocli.AutoComplete;

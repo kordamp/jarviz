@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli;
+package org.kordamp.jarviz.cli.internal;
 
+import org.kordamp.jarviz.cli.IO;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -27,8 +28,7 @@ import java.util.concurrent.Callable;
  * @since 0.1.0
  */
 @CommandLine.Command(mixinStandardHelpOptions = true,
-    versionProvider = Versions.class,
-    resourceBundle = "org.kordamp.jarviz.cli.Messages")
+    versionProvider = Versions.class)
 public abstract class AbstractCommand<C extends IO> extends BaseCommand implements Callable<Integer>, IO {
     protected abstract C parent();
 

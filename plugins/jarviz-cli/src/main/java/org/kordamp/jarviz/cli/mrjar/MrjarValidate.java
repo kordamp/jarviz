@@ -17,7 +17,7 @@
  */
 package org.kordamp.jarviz.cli.mrjar;
 
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import picocli.CommandLine;
 
 /**

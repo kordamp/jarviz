@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli;
+package org.kordamp.jarviz.cli.internal;
 
 import org.kordamp.jarviz.bundle.RB;
+import org.kordamp.jarviz.cli.IO;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Formatter;

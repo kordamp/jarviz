@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli;
+package org.kordamp.jarviz.cli.internal;
 
 import org.kordamp.jarviz.util.JarvizOutput;
 
@@ -33,7 +33,7 @@ import java.util.Scanner;
  * @author Andres Almiray
  * @since 0.1.0
  */
-final class Banner {
+public final class Banner {
     private static final Banner BANNER = new Banner();
     private final ResourceBundle bundle = ResourceBundle.getBundle(Banner.class.getName());
     private final String productVersion = bundle.getString("product.version");

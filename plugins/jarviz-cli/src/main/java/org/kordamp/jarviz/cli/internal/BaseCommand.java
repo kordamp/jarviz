@@ -15,13 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli;
+package org.kordamp.jarviz.cli.internal;
 
 import picocli.CommandLine;
 
 import java.text.MessageFormat;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * @author Andres Almiray
@@ -29,7 +28,7 @@ import java.util.ResourceBundle;
  */
 @CommandLine.Command(mixinStandardHelpOptions = true,
     versionProvider = Versions.class,
-    resourceBundle = "org.kordamp.jarviz.cli.Messages")
+    resourceBundle = "org.kordamp.jarviz.cli.internal.Messages")
 public abstract class BaseCommand {
     static {
         if (System.getenv().containsKey("JARVIZ_NO_COLOR")) {
@@ -39,8 +38,6 @@ public abstract class BaseCommand {
 
     @CommandLine.Spec
     public CommandLine.Model.CommandSpec spec;
-
-    public ResourceBundle bundle = ResourceBundle.getBundle("org.kordamp.jarviz.cli.Messages");
 
     @CommandLine.Option(names = "-D",
         paramLabel = "<key=value>",
@@ -52,8 +49,8 @@ public abstract class BaseCommand {
 
     protected String $(String key, Object... args) {
         if (null == args || args.length == 0) {
-            return bundle.getString(key);
+            return spec.resourceBundle().getString(key);
         }
-        return MessageFormat.format(bundle.getString(key), args);
+        return MessageFormat.format(spec.resourceBundle().getString(key), args);
     }
 }

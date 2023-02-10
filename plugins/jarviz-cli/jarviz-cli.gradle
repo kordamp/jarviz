@@ -27,7 +27,10 @@ application {
 
 jar {
     manifest {
-        attributes('Main-Class': 'org.kordamp.jarviz.cli.Main')
+        attributes([
+            'Main-Class': 'org.kordamp.jarviz.cli.Main',
+            'Automatic-Module-Name': 'org.kordamp.jarviz.cli'
+        ])
     }
 }
 

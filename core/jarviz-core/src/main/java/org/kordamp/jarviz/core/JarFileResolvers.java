@@ -15,23 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli;
+package org.kordamp.jarviz.core;
 
-import org.kordamp.jarviz.util.JarvizVersion;
-import picocli.CommandLine;
+import org.kordamp.jarviz.core.resolvers.GavBasedJarFileResolver;
+import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
+import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.net.URL;
+import java.nio.file.Path;
+
+import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class Versions implements CommandLine.IVersionProvider {
-    @Override
-    public String[] getVersion() throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        JarvizVersion.banner(new PrintStream(baos));
-        return baos.toString().split("\n");
+public class JarFileResolvers {
+    public static JarFileResolver<?> createJarFileResolver(Path file, String gav, URL url, Path cacheDirectory) {
+        if (file != null) return new PathBasedJarFileResolver(file);
+        if (isNotBlank(gav)) return new GavBasedJarFileResolver(cacheDirectory, gav);
+        return new UrlBasedJarFileResolver(cacheDirectory, url);
     }
 }

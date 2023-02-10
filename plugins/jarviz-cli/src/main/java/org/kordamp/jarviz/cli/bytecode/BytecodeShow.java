@@ -17,7 +17,7 @@
  */
 package org.kordamp.jarviz.cli.bytecode;
 
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.cli.internal.Colorizer;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.bytecode.ShowBytecodeJarProcessor;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
-import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray

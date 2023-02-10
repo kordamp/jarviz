@@ -17,7 +17,7 @@
  */
 package org.kordamp.jarviz.cli.services;
 
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.services.ShowServicesJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
@@ -29,7 +29,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray

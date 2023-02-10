@@ -17,7 +17,7 @@
  */
 package org.kordamp.jarviz.cli.bytecode;
 
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import picocli.CommandLine;
 
 /**

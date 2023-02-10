@@ -42,6 +42,7 @@ config {
     quality {
         checkstyle {
             toolVersion = checkstyleVersion
+            exclude('module-info.*')
             aggregate {
                 enabled = true
             }

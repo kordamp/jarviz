@@ -15,23 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core.resolvers;
-
-import org.kordamp.jarviz.core.JarFileResolver;
-
-import java.net.URL;
-import java.nio.file.Path;
-
-import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.3.0
  */
-public class JarFileResolvers {
-    public static JarFileResolver<?> createJarFileResolver(Path file, String gav, URL url, Path cacheDirectory) {
-        if (file != null) return new PathBasedJarFileResolver(file);
-        if (isNotBlank(gav)) return new GavBasedJarFileResolver(cacheDirectory, gav);
-        return new UrlBasedJarFileResolver(cacheDirectory, url);
-    }
+module org.kordamp.jarviz.core {
+    exports org.kordamp.jarviz.bundle;
+    exports org.kordamp.jarviz.core;
+    exports org.kordamp.jarviz.core.bytecode;
+    exports org.kordamp.jarviz.core.model;
+    exports org.kordamp.jarviz.core.modules;
+    exports org.kordamp.jarviz.core.processors;
+    exports org.kordamp.jarviz.core.services;
+    exports org.kordamp.jarviz.reporting;
+    exports org.kordamp.jarviz.util;
 }

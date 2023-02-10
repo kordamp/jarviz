@@ -15,25 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli;
+package org.kordamp.jarviz.cli.internal;
 
+import org.kordamp.jarviz.util.JarvizVersion;
 import picocli.CommandLine;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command
-public abstract class AbstractJarvizCommand<C extends IO> extends AbstractCommand<C> {
-    @CommandLine.ParentCommand
-    public C parent;
-
+public class Versions implements CommandLine.IVersionProvider {
     @Override
-    protected C parent() {
-        return parent;
-    }
-
-    protected int execute() {
-        return 0;
+    public String[] getVersion() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JarvizVersion.banner(new PrintStream(baos));
+        return baos.toString().split("\n");
     }
 }

@@ -17,7 +17,7 @@
  */
 package org.kordamp.jarviz.cli.modules;
 
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.modules.NameModuleJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
@@ -27,7 +27,7 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray

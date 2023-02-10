@@ -18,7 +18,7 @@
 package org.kordamp.jarviz.cli.manifest;
 
 import org.kordamp.jarviz.bundle.RB;
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.processors.ShowManifestJarProcessor;
@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray

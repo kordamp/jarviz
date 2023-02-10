@@ -17,7 +17,7 @@
  */
 package org.kordamp.jarviz.cli.modules;
 
-import org.kordamp.jarviz.cli.AbstractJarvizSubcommand;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.modules.DescriptorModuleJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
@@ -36,7 +36,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.kordamp.jarviz.cli.internal.Colorizer.magenta;
-import static org.kordamp.jarviz.core.resolvers.JarFileResolvers.createJarFileResolver;
+import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray

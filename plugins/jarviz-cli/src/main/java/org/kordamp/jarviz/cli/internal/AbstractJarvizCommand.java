@@ -15,25 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.bytecode;
+package org.kordamp.jarviz.cli.internal;
 
-import org.kordamp.jarviz.cli.internal.AbstractJarvizCommand;
-import org.kordamp.jarviz.cli.Main;
+import org.kordamp.jarviz.cli.IO;
 import picocli.CommandLine;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command(name = "bytecode",
-    subcommands = {BytecodeShow.class})
-public class Bytecode extends AbstractJarvizCommand<Main> {
-    @CommandLine.Spec
-    public CommandLine.Model.CommandSpec spec;
+@CommandLine.Command
+public abstract class AbstractJarvizCommand<C extends IO> extends AbstractCommand<C> {
+    @CommandLine.ParentCommand
+    public C parent;
 
     @Override
+    protected C parent() {
+        return parent;
+    }
+
     protected int execute() {
-        spec.commandLine().usage(parent.getOut());
         return 0;
     }
 }
