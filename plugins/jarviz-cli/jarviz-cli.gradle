@@ -69,55 +69,45 @@ distributions {
 }
 
 jdks {
-    zulu17Linux32 {
-        platform = 'linux-x86_32'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_i686.zip'
-        checksum = '8e0d2f5079801d54a07d72c65f2fb6855d546f504092d1ae7422c75eafa4e045'
-    }
-    zulu17Linux {
+    zulu19Linux {
         platform = 'linux-x86_64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_x64.zip'
-        checksum = '7668ebaecc81041d8d1e79e857552887f56c445ef4c6e8d634007b7b67f5a1d3'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-linux_x64.zip'
+        checksum = '2F7A3D9EFD4126CFB19762E9642FF20576D34A2128921A0895D1F7289A852AB9'
     }
-    zulu17LinuxArm {
+    zulu19LinuxArm {
         platform = 'linux-aarch64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_aarch64.tar.gz'
-        checksum = '2b8066bbdbc5cff422bb6b6db1b8f8d362b576340cce8492f1255502af632b06'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-linux_aarch64.tar.gz'
+        checksum = '76216EFA69E448FE487D57310372AEA0DF1CF15B82974C84A8CB0D97EB934165'
     }
-    zulu17LinuxMusl {
+    zulu19LinuxMusl {
         platform = 'linux_musl-x86_64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_musl_x64.tar.gz'
-        checksum = 'bcc5342011bd9f3643372aadbdfa68d47463ff0d8621668a0bdf2910614d95c6'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-linux_musl_x64.tar.gz'
+        checksum = 'D425036B1DDF91DCE3D0D053FE5D3807746A9FB7271490A5AA72E8C37FAF17FB'
     }
-    zulu17LinuxMuslArm {
+    zulu19LinuxMuslArm {
         platform = 'linux_musl-aarch64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_musl_aarch64.tar.gz'
-        checksum = '6b920559abafbe9bdef386a20ecf3a2f318bc1f0d8359eb1f95aee26606bbc70'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-linux_musl_aarch64.tar.gz'
+        checksum = 'C534B402168FF345AB03DD3036BD0826BB225C518614BF6885D40F6E4E4F9ADB'
     }
-    zulu17Windows32 {
-        platform = 'windows-x86_32'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-win_i686.zip'
-        checksum = 'c3c5a3061524a8facc9694bb3055c432cb26ffe12c8eec6f3e3c1258c99bd786'
-    }
-    zulu17Windows {
+    zulu19Windows {
         platform = 'windows-x86_64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-win_x64.zip'
-        checksum = 'e965aa0ea7a0661a3446cf8f10ee00684b851f883b803315289f26b4aa907fdb'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-win_x64.zip'
+        checksum = 'D6C768C5EC3252F936BD0562C25458F7C753C62835CA3E91166F975F7A5FE9F1'
     }
-    zulu17WindowsArm {
-        platform = 'windows-aarch64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-win_aarch64.zip'
-        checksum = '1a9d4ab3b52ce3db7354691163e5a36979af9c37d80c3c490c12af07de21d8f3'
-    }
-    zulu17Osx {
+    // zulu19WindowsArm {
+    //     platform = 'windows-aarch64'
+    //     url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-win_aarch64.zip'
+    //     checksum = '1a9d4ab3b52ce3db7354691163e5a36979af9c37d80c3c490c12af07de21d8f3'
+    // }
+    zulu19Osx {
         platform = 'osx-x86_64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-macosx_x64.zip'
-        checksum = 'f75fe30aced4fbee8db108fbb123b3af328503a2af46e173cbe43613b995e492'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-macosx_x64.zip'
+        checksum = '622DE3D817384DABBFFAFB7DE34D4640ADFE7F6719588112075F6A9081DCB9AC'
     }
-    zulu17OsxArm {
+    zulu19OsxArm {
         platform = 'osx-aarch64'
-        url = 'https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-macosx_aarch64.zip'
-        checksum = '8c287018d358ec2c43995bf09a0cdaa235f0bdd434673777a564daee2c3872df'
+        url = 'https://cdn.azul.com/zulu/bin/zulu19.32.13-ca-jdk19.0.2-macosx_aarch64.zip'
+        checksum = 'D7C845D106892C26B052828320E87DB362F4442148F1F9F56306DE58CB6025C2'
     }
 }
 

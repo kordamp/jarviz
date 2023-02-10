@@ -1,7 +1,7 @@
 environment:
   properties:
     jdkPathPrefix: 'plugins/jarviz-cli/build/jdks'
-    jdkFilePrefix: 'zulu17.32.13-ca-jdk17.0.2'
+    jdkFilePrefix: 'zulu19.32.13-ca-jdk19.0.2'
 
 project:
   name: jarviz
@@ -114,26 +114,22 @@ assemble:
         multiRelease: 11
         ignoreMissingDeps: true
       targetJdks:
-        - path: '{{jdkPathPrefix}}/zulu17Osx/{{jdkFilePrefix}}-macosx_x64/zulu-17.jdk/Contents/Home'
+        - path: '{{jdkPathPrefix}}/zulu19Osx/{{jdkFilePrefix}}-macosx_x64/zulu-19.jdk/Contents/Home'
           platform: 'osx-x86_64'
-        - path: '{{jdkPathPrefix}}/zulu17OsxArm/{{jdkFilePrefix}}-macosx_aarch64/zulu-17.jdk/Contents/Home'
+        - path: '{{jdkPathPrefix}}/zulu19OsxArm/{{jdkFilePrefix}}-macosx_aarch64/zulu-19.jdk/Contents/Home'
           platform: 'osx-aarch_64'
-        - path: '{{jdkPathPrefix}}/zulu17Linux32/{{jdkFilePrefix}}-linux_i686'
-          platform: 'linux-x86_32'
-        - path: '{{jdkPathPrefix}}/zulu17Linux/{{jdkFilePrefix}}-linux_x64'
+        - path: '{{jdkPathPrefix}}/zulu19Linux/{{jdkFilePrefix}}-linux_x64'
           platform: 'linux-x86_64'
-        - path: '{{jdkPathPrefix}}/zulu17LinuxArm/{{jdkFilePrefix}}-linux_aarch64'
+        - path: '{{jdkPathPrefix}}/zulu19LinuxArm/{{jdkFilePrefix}}-linux_aarch64'
           platform: 'linux-aarch_64'
-        - path: '{{jdkPathPrefix}}/zulu17LinuxMusl/{{jdkFilePrefix}}-linux_musl_x64'
+        - path: '{{jdkPathPrefix}}/zulu19LinuxMusl/{{jdkFilePrefix}}-linux_musl_x64'
           platform: 'linux_musl-x86_64'
-        - path: '{{jdkPathPrefix}}/zulu17LinuxMuslArm/{{jdkFilePrefix}}-linux_musl_aarch64'
+        - path: '{{jdkPathPrefix}}/zulu19LinuxMuslArm/{{jdkFilePrefix}}-linux_musl_aarch64'
           platform: 'linux_musl-aarch_64'
-        - path: '{{jdkPathPrefix}}/zulu17Windows32/{{jdkFilePrefix}}-win_i686'
-          platform: 'windows-x86_32'
-        - path: '{{jdkPathPrefix}}/zulu17Windows/{{jdkFilePrefix}}-win_x64'
+        - path: '{{jdkPathPrefix}}/zulu19Windows/{{jdkFilePrefix}}-win_x64'
           platform: 'windows-x86_64'
-        - path: '{{jdkPathPrefix}}/zulu17WindowsArm/{{jdkFilePrefix}}-win_aarch64'
-          platform: 'windows-aarch_64'
+        #- path: '{{jdkPathPrefix}}/zulu19WindowsArm/{{jdkFilePrefix}}-win_aarch64'
+        #  platform: 'windows-aarch_64'
       mainJar:
         path: 'plugins/jarviz-cli/build/libs/jarviz-cli-{{projectVersion}}.jar'
       jars:
