@@ -27,8 +27,7 @@ import java.util.Map;
  * @since 0.1.0
  */
 @CommandLine.Command(mixinStandardHelpOptions = true,
-    versionProvider = Versions.class,
-    resourceBundle = "org.kordamp.jarviz.cli.internal.Messages")
+    versionProvider = Versions.class)
 public abstract class BaseCommand {
     static {
         if (System.getenv().containsKey("JARVIZ_NO_COLOR")) {

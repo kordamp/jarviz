@@ -22,15 +22,13 @@ plugins {
 
 application {
     applicationName = 'jarviz'
+    mainModule = 'org.kordamp.jarviz.cli'
     mainClass = 'org.kordamp.jarviz.cli.Main'
 }
 
 jar {
     manifest {
-        attributes([
-            'Main-Class': 'org.kordamp.jarviz.cli.Main',
-            'Automatic-Module-Name': 'org.kordamp.jarviz.cli'
-        ])
+        attributes('Main-Class': 'org.kordamp.jarviz.cli.Main')
     }
 }
 

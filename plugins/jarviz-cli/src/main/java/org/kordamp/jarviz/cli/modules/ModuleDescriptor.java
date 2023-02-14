@@ -111,7 +111,7 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
 
         if (!qualifiedExports.isEmpty()) {
-            parent().getOut().println($("module.exports.qualified"));
+            parent().getOut().println($$("module.exports.qualified"));
             qualifiedExports
                 .forEach(e -> parent().getOut()
                     .println(INDENT + $$("module.exports.to", e.source(), toLowerCaseString(e.targets()))));

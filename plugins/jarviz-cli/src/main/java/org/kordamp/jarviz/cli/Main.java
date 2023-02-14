@@ -27,6 +27,8 @@ import picocli.CommandLine;
 
 import java.io.PrintWriter;
 
+import static java.util.ResourceBundle.getBundle;
+
 /**
  * @author Andres Almiray
  * @since 0.1.0
@@ -75,6 +77,7 @@ public class Main extends BaseCommand implements Runnable, IO {
         commandLine.setCaseInsensitiveEnumValuesAllowed(true);
         commandLine.setUsageHelpWidth(90);
         commandLine.setUsageHelpLongOptionsMaxWidth(42);
+        commandLine.setResourceBundle(getBundle("org.kordamp.jarviz.cli.internal.Messages"));
         cmd.out = commandLine.getOut();
         cmd.err = commandLine.getErr();
         return execute(commandLine, args);
@@ -86,6 +89,7 @@ public class Main extends BaseCommand implements Runnable, IO {
         commandLine.setCaseInsensitiveEnumValuesAllowed(true);
         commandLine.setUsageHelpWidth(90);
         commandLine.setUsageHelpLongOptionsMaxWidth(42);
+        commandLine.setResourceBundle(getBundle("org.kordamp.jarviz.cli.internal.Messages"));
         commandLine.setOut(out);
         commandLine.setErr(err);
         cmd.out = out;

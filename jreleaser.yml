@@ -19,6 +19,8 @@ project:
     groupId: org.kordamp.jarviz
     version: 11
     multiProject: true
+    mainClass: org.kordamp.jarviz.cli.Main
+    mainModule: org.kordamp.jarviz.cli
   tags:
     - 'jar'
     - 'build'
@@ -106,8 +108,6 @@ assemble:
   jlink:
     jarviz-standalone:
       active: ALWAYS
-      java:
-        mainClass: org.kordamp.jarviz.cli.Main
       imageName: '{{distributionName}}-{{projectEffectiveVersion}}'
       executable: jarviz
       jdeps:
@@ -137,8 +137,6 @@ assemble:
 
 distributions:
   jarviz-cli:
-    java:
-      mainClass: org.kordamp.jarviz.cli.Main
     jbang:
       active: ALWAYS
       alias: jarviz
