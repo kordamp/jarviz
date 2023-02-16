@@ -32,6 +32,6 @@ public class Versions implements CommandLine.IVersionProvider {
     public String[] getVersion() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JarvizVersion.banner(new PrintStream(baos));
-        return baos.toString().split("\n");
+        return baos.toString().split(System.lineSeparator());
     }
 }
