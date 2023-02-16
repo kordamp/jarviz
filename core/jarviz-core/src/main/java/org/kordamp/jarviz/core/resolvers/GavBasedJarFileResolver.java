@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,8 +79,8 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
 
         URL url = null;
         try {
-            url = new URL(str);
-        } catch (MalformedURLException e) {
+            url = new URI(str).toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new JarvizException(RB.$("ERROR_INVALID_URL", str));
         }
 
