@@ -21,6 +21,8 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author Andres Almiray
  * @since 0.1.0
@@ -31,6 +33,8 @@ public class JarvizVersion {
     private static final String BUILD_DATE = BUNDLE.getString("build_date");
     private static final String BUILD_TIME = BUNDLE.getString("build_time");
     private static final String BUILD_REVISION = BUNDLE.getString("build_revision");
+    private static final String SEPARATOR = "------------------------------------------------------------%n";
+    private static final String JARVIZ_VERSION_FORMATTED = "jarviz %s%n";
 
     public static String getPlainVersion() {
         return JRELEASER_VERSION;
@@ -41,22 +45,7 @@ public class JarvizVersion {
     }
 
     public static void banner(PrintStream out, boolean full) {
-        if (full) {
-            out.printf("------------------------------------------------------------%n");
-            out.printf("jarviz %s%n", JRELEASER_VERSION);
-
-            String jvm = System.getProperty("java.version") + " (" +
-                System.getProperty("java.vendor") + " " +
-                System.getProperty("java.vm.version") + ")";
-
-            out.printf("------------------------------------------------------------%n");
-            out.printf("Build time:   %s %s%n", BUILD_DATE, BUILD_TIME);
-            out.println("Revision:     " + BUILD_REVISION);
-            out.println("JVM:          " + jvm);
-            out.printf("------------------------------------------------------------%n");
-        } else {
-            out.printf("jarviz %s%n", JRELEASER_VERSION);
-        }
+        banner(new PrintWriter(out, true, UTF_8), full);
     }
 
     public static void banner(PrintWriter out) {
@@ -65,20 +54,20 @@ public class JarvizVersion {
 
     public static void banner(PrintWriter out, boolean full) {
         if (full) {
-            out.printf("------------------------------------------------------------%n");
-            out.printf("jarviz %s%n", JRELEASER_VERSION);
+            out.printf(SEPARATOR);
+            out.printf(JARVIZ_VERSION_FORMATTED, JRELEASER_VERSION);
 
             String jvm = System.getProperty("java.version") + " (" +
                 System.getProperty("java.vendor") + " " +
                 System.getProperty("java.vm.version") + ")";
 
-            out.printf("------------------------------------------------------------%n");
+            out.printf(SEPARATOR);
             out.printf("Build time:   %s %s%n", BUILD_DATE, BUILD_TIME);
-            out.println("Revision:     " + BUILD_REVISION);
-            out.println("JVM:          " + jvm);
-            out.printf("------------------------------------------------------------%n");
+            out.printf("Revision:     %s%n", BUILD_REVISION);
+            out.printf("JVM:          %s%n", jvm);
+            out.printf(SEPARATOR);
         } else {
-            out.printf("jarviz %s%n", JRELEASER_VERSION);
+            out.printf(JARVIZ_VERSION_FORMATTED, JRELEASER_VERSION);
         }
     }
 }
