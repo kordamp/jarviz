@@ -151,165 +151,164 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
     }
 
     private Node buildReport(Format format, Path jarPath, java.lang.module.ModuleDescriptor md) {
-        Node root = createRootNode(jarPath);
-        Node module = root.node($("report.key.module"));
-        module.node($("report.key.name")).value(md.name()).end();
-        md.version().ifPresent(v -> module.node($("report.key.version")).value(v).end());
-        module.node($("report.key.open")).value(md.isOpen()).end();
-        module.node($("report.key.automatic")).value(md.isAutomatic()).end();
-        md.mainClass().ifPresent(c -> module.node($("report.key.main.class")).value(c).end());
+        return appendSubject(createRootNode(), jarPath, "module descriptor", resultNode -> {
+            Node module = resultNode.node($("report.key.module"));
+            module.node($("report.key.name")).value(md.name()).end();
+            md.version().ifPresent(v -> module.node($("report.key.version")).value(v).end());
+            module.node($("report.key.open")).value(md.isOpen()).end();
+            module.node($("report.key.automatic")).value(md.isAutomatic()).end();
+            md.mainClass().ifPresent(c -> module.node($("report.key.main.class")).value(c).end());
 
-        List<java.lang.module.ModuleDescriptor.Exports> unqualifiedExports = md.exports().stream()
-            .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
-            .filter(e -> !e.isQualified())
-            .collect(toList());
+            List<java.lang.module.ModuleDescriptor.Exports> unqualifiedExports = md.exports().stream()
+                .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
+                .filter(e -> !e.isQualified())
+                .collect(toList());
 
-        List<java.lang.module.ModuleDescriptor.Exports> qualifiedExports = md.exports().stream()
-            .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
-            .filter(java.lang.module.ModuleDescriptor.Exports::isQualified)
-            .collect(toList());
+            List<java.lang.module.ModuleDescriptor.Exports> qualifiedExports = md.exports().stream()
+                .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
+                .filter(java.lang.module.ModuleDescriptor.Exports::isQualified)
+                .collect(toList());
 
-        List<java.lang.module.ModuleDescriptor.Opens> unqualifiedOpenPackages = md.opens().stream()
-            .sorted(comparing(java.lang.module.ModuleDescriptor.Opens::source))
-            .filter(o -> !o.isQualified())
-            .collect(toList());
+            List<java.lang.module.ModuleDescriptor.Opens> unqualifiedOpenPackages = md.opens().stream()
+                .sorted(comparing(java.lang.module.ModuleDescriptor.Opens::source))
+                .filter(o -> !o.isQualified())
+                .collect(toList());
 
-        List<java.lang.module.ModuleDescriptor.Opens> qualifiedOpenPackages = md.opens().stream()
-            .sorted(comparing(java.lang.module.ModuleDescriptor.Opens::source))
-            .filter(java.lang.module.ModuleDescriptor.Opens::isQualified)
-            .collect(toList());
+            List<java.lang.module.ModuleDescriptor.Opens> qualifiedOpenPackages = md.opens().stream()
+                .sorted(comparing(java.lang.module.ModuleDescriptor.Opens::source))
+                .filter(java.lang.module.ModuleDescriptor.Opens::isQualified)
+                .collect(toList());
 
-        Set<String> hiddenPackages = new TreeSet<>(md.packages());
-        md.exports().stream().map(java.lang.module.ModuleDescriptor.Exports::source).forEach(hiddenPackages::remove);
-        md.opens().stream().map(java.lang.module.ModuleDescriptor.Opens::source).forEach(hiddenPackages::remove);
+            Set<String> hiddenPackages = new TreeSet<>(md.packages());
+            md.exports().stream().map(java.lang.module.ModuleDescriptor.Exports::source).forEach(hiddenPackages::remove);
+            md.opens().stream().map(java.lang.module.ModuleDescriptor.Opens::source).forEach(hiddenPackages::remove);
 
-        if (!unqualifiedExports.isEmpty()) {
-            Node exports = module.array($("report.key.exports"));
-            unqualifiedExports.forEach(e -> {
-                if (format == Format.TXT) {
-                    exports.node(e.source() + toLowerCaseString(e.modifiers())).end();
-                } else {
-                    exports.collapsable($("report.key.export"))
-                        .node($("report.key.package")).value(e.source()).end()
-                        .node($("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
-                        .cleanup();
-                }
-            });
-            exports.end();
-        }
-
-        if (!md.requires().isEmpty()) {
-            Node requires = module.array($("report.key.requires"));
-            md.requires().forEach(r -> {
-                if (format == Format.TXT) {
-                    requires.node(r.name() + toLowerCaseString(r.modifiers())).end();
-                } else {
-                    requires.collapsable($("report.key.require"))
-                        .node($("report.key.module")).value(r.name()).end()
-                        .node($("report.key.modifiers")).value(toLowerCaseString(r.modifiers())).end()
-                        .cleanup();
-                }
-            });
-            requires.end();
-        }
-
-        if (!md.uses().isEmpty() || !md.provides().isEmpty()) {
-            Node services = module.node($("report.key.services"));
-
-            if (!md.uses().isEmpty()) {
-                Node requires = services.array($("report.key.uses"));
-                md.uses().forEach(s -> {
+            if (!unqualifiedExports.isEmpty()) {
+                Node exports = module.array($("report.key.exports"));
+                unqualifiedExports.forEach(e -> {
                     if (format == Format.TXT) {
-                        requires.node(s).end();
+                        exports.node(e.source() + toLowerCaseString(e.modifiers())).end();
                     } else {
-                        requires.collapsable($("report.key.service")).value(s).end();
+                        exports.collapsable($("report.key.export"))
+                            .node($("report.key.package")).value(e.source()).end()
+                            .node($("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
+                            .cleanup();
+                    }
+                });
+                exports.end();
+            }
+
+            if (!md.requires().isEmpty()) {
+                Node requires = module.array($("report.key.requires"));
+                md.requires().forEach(r -> {
+                    if (format == Format.TXT) {
+                        requires.node(r.name() + toLowerCaseString(r.modifiers())).end();
+                    } else {
+                        requires.collapsable($("report.key.require"))
+                            .node($("report.key.module")).value(r.name()).end()
+                            .node($("report.key.modifiers")).value(toLowerCaseString(r.modifiers())).end()
+                            .cleanup();
                     }
                 });
                 requires.end();
             }
 
-            if (!md.provides().isEmpty()) {
-                Node provides = services.array($("report.key.provides"));
-                md.provides().stream()
-                    .sorted(comparing(java.lang.module.ModuleDescriptor.Provides::service))
-                    .forEach(p -> {
+            if (!md.uses().isEmpty() || !md.provides().isEmpty()) {
+                Node services = module.node($("report.key.services"));
+
+                if (!md.uses().isEmpty()) {
+                    Node requires = services.array($("report.key.uses"));
+                    md.uses().forEach(s -> {
                         if (format == Format.TXT) {
-                            provides.node(p.service()).children(p.providers()).end();
+                            requires.node(s).end();
                         } else {
-                            provides.collapsable($("report.key.provider"))
-                                .node($("report.key.service")).value(p.service()).end()
-                                .array($("report.key.implementations")).collapsableChildren($("report.key.implementation"), p.providers()).end()
-                                .cleanup();
+                            requires.collapsable($("report.key.service")).value(s).end();
                         }
                     });
-                provides.end();
-            }
-        }
-
-        if (!unqualifiedOpenPackages.isEmpty()) {
-            Node opens = module.array($("report.key.opens"));
-            unqualifiedOpenPackages.forEach(e -> {
-                if (format == Format.TXT) {
-                    opens.node(e.source() + toLowerCaseString(e.modifiers())).end();
-                } else {
-                    opens.collapsable($("report.key.open"))
-                        .node($("report.key.module")).value(e.source()).end()
-                        .node($("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
-                        .cleanup();
+                    requires.end();
                 }
-            });
-            opens.end();
-        }
 
-        if (!qualifiedExports.isEmpty() || !qualifiedOpenPackages.isEmpty()) {
-            Node qualified = module.node($("report.key.qualified"));
-
-            if (!qualifiedExports.isEmpty()) {
-                Node exports = qualified.array($("report.key.exports"));
-                qualifiedExports
-                    .forEach(e -> {
-                        if (format == Format.TXT) {
-                            exports.node(e.source()).children(e.targets()).end();
-                        } else {
-                            exports.collapsable($("report.key.export"))
-                                .node($("report.key.package")).value(e.source()).end()
-                                .array($("report.key.targets")).collapsableChildren($("report.key.target"), e.targets()).end()
-                                .end();
-                        }
-                    });
-                exports.end();
-            }
-
-            if (!qualifiedOpenPackages.isEmpty()) {
-                Node exports = qualified.array($("report.key.opens"));
-                qualifiedOpenPackages
-                    .forEach(e -> {
-                        if (format == Format.TXT) {
-                            exports.node(e.source()).children(e.targets()).end();
-                        } else {
-                            exports.collapsable($("report.key.open"))
-                                .node($("report.key.package")).value(e.source()).end()
-                                .array($("report.key.targets")).collapsableChildren($("report.key.target"), e.targets()).end()
-                                .end();
-                        }
-                    });
-                exports.end();
-            }
-        }
-
-        if (!hiddenPackages.isEmpty()) {
-            Node contains = module.array($("report.key.contains"));
-            hiddenPackages.forEach(s -> {
-                if (format == Format.TXT) {
-                    contains.node(s).end();
-                } else {
-                    contains.collapsable($("report.key.package")).value(s).end();
+                if (!md.provides().isEmpty()) {
+                    Node provides = services.array($("report.key.provides"));
+                    md.provides().stream()
+                        .sorted(comparing(java.lang.module.ModuleDescriptor.Provides::service))
+                        .forEach(p -> {
+                            if (format == Format.TXT) {
+                                provides.node(p.service()).children(p.providers()).end();
+                            } else {
+                                provides.collapsable($("report.key.provider"))
+                                    .node($("report.key.service")).value(p.service()).end()
+                                    .array($("report.key.implementations")).collapsableChildren($("report.key.implementation"), p.providers()).end()
+                                    .cleanup();
+                            }
+                        });
+                    provides.end();
                 }
-            });
-            contains.end();
-        }
+            }
 
-        return root;
+            if (!unqualifiedOpenPackages.isEmpty()) {
+                Node opens = module.array($("report.key.opens"));
+                unqualifiedOpenPackages.forEach(e -> {
+                    if (format == Format.TXT) {
+                        opens.node(e.source() + toLowerCaseString(e.modifiers())).end();
+                    } else {
+                        opens.collapsable($("report.key.open"))
+                            .node($("report.key.module")).value(e.source()).end()
+                            .node($("report.key.modifiers")).value(toLowerCaseString(e.modifiers())).end()
+                            .cleanup();
+                    }
+                });
+                opens.end();
+            }
+
+            if (!qualifiedExports.isEmpty() || !qualifiedOpenPackages.isEmpty()) {
+                Node qualified = module.node($("report.key.qualified"));
+
+                if (!qualifiedExports.isEmpty()) {
+                    Node exports = qualified.array($("report.key.exports"));
+                    qualifiedExports
+                        .forEach(e -> {
+                            if (format == Format.TXT) {
+                                exports.node(e.source()).children(e.targets()).end();
+                            } else {
+                                exports.collapsable($("report.key.export"))
+                                    .node($("report.key.package")).value(e.source()).end()
+                                    .array($("report.key.targets")).collapsableChildren($("report.key.target"), e.targets()).end()
+                                    .end();
+                            }
+                        });
+                    exports.end();
+                }
+
+                if (!qualifiedOpenPackages.isEmpty()) {
+                    Node exports = qualified.array($("report.key.opens"));
+                    qualifiedOpenPackages
+                        .forEach(e -> {
+                            if (format == Format.TXT) {
+                                exports.node(e.source()).children(e.targets()).end();
+                            } else {
+                                exports.collapsable($("report.key.open"))
+                                    .node($("report.key.package")).value(e.source()).end()
+                                    .array($("report.key.targets")).collapsableChildren($("report.key.target"), e.targets()).end()
+                                    .end();
+                            }
+                        });
+                    exports.end();
+                }
+            }
+
+            if (!hiddenPackages.isEmpty()) {
+                Node contains = module.array($("report.key.contains"));
+                hiddenPackages.forEach(s -> {
+                    if (format == Format.TXT) {
+                        contains.node(s).end();
+                    } else {
+                        contains.collapsable($("report.key.package")).value(s).end();
+                    }
+                });
+                contains.end();
+            }
+        });
     }
 
     private <T> String toLowerCaseString(Collection<T> set) {

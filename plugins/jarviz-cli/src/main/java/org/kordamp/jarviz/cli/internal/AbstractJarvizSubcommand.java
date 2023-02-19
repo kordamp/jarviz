@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
@@ -159,13 +160,24 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         }
     }
 
-    protected Node createRootNode(Path jarPath) {
-        return Node.root($("report.key.jarviz"))
-            .node($("report.key.subject"))
-            .node($("report.key.file")).value(jarPath.getFileName()).end()
-            .node($("report.key.size")).value(fileSize(jarPath)).end()
-            .node($("report.key.sha256")).value(sha256(jarPath)).end()
-            .end();
+    protected Node createRootNode() {
+        return Node.root($("report.key.jarviz"));
+    }
+
+    protected Node appendSubject(Node root, Path jarPath, String command, Consumer<Node> result) {
+        Node subjects = root.getChildren().isEmpty() ? root.array($("report.key.subjects")) : root.getChildren().get(0);
+        Node resultNode = subjects
+            .collapsable($("report.key.subject"))
+                .node($("report.key.command")).value(command).end()
+                .node($("report.key.jar"))
+                    .node($("report.key.file")).value(jarPath.getFileName()).end()
+                    .node($("report.key.size")).value(fileSize(jarPath)).end()
+                    .node($("report.key.sha256")).value(sha256(jarPath)).end()
+                .end()
+                .node($("report.key.result"));
+        result.accept(resultNode);
+
+        return root;
     }
 
     protected void writeReport(String content, Format format) {

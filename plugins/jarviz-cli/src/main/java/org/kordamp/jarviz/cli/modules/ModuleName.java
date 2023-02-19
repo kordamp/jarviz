@@ -49,7 +49,7 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
 
         parent().getOut().println($$("module.name", moduleName.getModuleName()));
         parent().getOut().println($$("module.source", resolveSource(moduleName)));
-        parent().getOut().println($$("module.automatic", !EXPLICIT.equals(resolveSource(moduleName))));
+        parent().getOut().println($$("module.automatic", $b(!EXPLICIT.equals(resolveSource(moduleName)))));
         parent().getOut().println($$("module.valid", $b(moduleName.isValid())));
         if (!moduleName.isValid()) {
             parent().getOut().println($$("module.reason", moduleName.getReason()));
@@ -76,15 +76,14 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
     }
 
     private Node buildReport(Path jarPath, org.kordamp.jarviz.core.model.ModuleName moduleName) {
-        Node root = createRootNode(jarPath)
-            .node($("report.key.name")).value(moduleName.getModuleName()).end()
-            .node($("report.key.source")).value(resolveSource(moduleName)).end()
-            .node($("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
-            .node($("report.key.valid")).value(moduleName.isValid()).end();
-        if (!moduleName.isValid()) {
-            root.node($("report.key.reason")).value(moduleName.getReason()).end();
-        }
-
-        return root;
+        return appendSubject(createRootNode(), jarPath, "module name", resultNode -> {
+            resultNode.node($("report.key.name")).value(moduleName.getModuleName()).end()
+                .node($("report.key.source")).value(resolveSource(moduleName)).end()
+                .node($("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
+                .node($("report.key.valid")).value(moduleName.isValid()).end();
+            if (!moduleName.isValid()) {
+                createRootNode().node($("report.key.reason")).value(moduleName.getReason()).end();
+            }
+        });
     }
 }

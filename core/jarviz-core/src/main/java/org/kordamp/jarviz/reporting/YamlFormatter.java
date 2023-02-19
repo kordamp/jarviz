@@ -73,7 +73,7 @@ public class YamlFormatter extends Formatter {
     @Override
     protected int indentationFor(Node node, int offset) {
         if (node.getParent().isPresent()) {
-            offset += node.getParent().get().isCollapsable() && node.isArrayElement() && node.isFirstChild() ? -(node.getIndentation() / 2) + 1 : 0;
+            offset += node.getParent().get().isCollapsable() && node.isArrayElement() && node.isFirstChild() ? -1 : 0;
         }
         return super.indentationFor(node, offset);
     }

@@ -71,16 +71,14 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
     }
 
     private Node buildReport(Path jarPath, String value) {
-        Node root = createRootNode(jarPath);
+        return appendSubject(createRootNode(), jarPath, "manifest query", resultNode -> {
+            if (isNotBlank(sectionName)) {
+                resultNode.node($("report.key.section.name")).value(sectionName).end();
+            }
 
-        if (isNotBlank(sectionName)) {
-            root.node($("report.key.section.name")).value(sectionName).end();
-        }
-
-        root.node($("report.key.attribute.name"))
-            .node($("report.key.name")).value(attributeName).end()
-            .node($("report.key.value")).value(value).end();
-
-        return root;
+            resultNode.node($("report.key.attribute.name"))
+                .node($("report.key.name")).value(attributeName).end()
+                .node($("report.key.value")).value(value).end();
+        });
     }
 }

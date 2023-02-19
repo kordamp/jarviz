@@ -70,17 +70,17 @@ public class ServicesShow extends AbstractJarvizSubcommand<Services> {
     }
 
     private Node buildReport(Format format, Path jarPath, List<String> services) {
-        Node root = createRootNode(jarPath);
-        Node implementations = root.node($("report.key.service")).value(serviceName).end()
-            .array($("report.key.implementations"));
+        return appendSubject(createRootNode(), jarPath, "services show", resultNode -> {
+            Node implementations = resultNode.node($("report.key.service")).value(serviceName).end()
+                .array($("report.key.implementations"));
 
-        for (String service : services) {
-            if (format != Format.XML) {
-                implementations.node(service);
-            } else {
-                implementations.node($("report.key.implementation")).value(service).end();
+            for (String service : services) {
+                if (format != Format.XML) {
+                    implementations.node(service);
+                } else {
+                    implementations.node($("report.key.implementation")).value(service).end();
+                }
             }
-        }
-        return root;
+        });
     }
 }

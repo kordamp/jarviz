@@ -66,16 +66,16 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
     }
 
     private Node buildReport(Format format, Path jarPath, List<String> services) {
-        Node root = createRootNode(jarPath);
-        Node implementations = root.array($("report.key.services"));
+        return appendSubject(createRootNode(), jarPath, "services list", resultNode -> {
+            Node implementations = resultNode.array($("report.key.services"));
 
-        for (String service : services) {
-            if (format != Format.XML) {
-                implementations.node(service);
-            } else {
-                implementations.node($("report.key.service")).value(service).end();
+            for (String service : services) {
+                if (format != Format.XML) {
+                    implementations.node(service);
+                } else {
+                    implementations.node($("report.key.service")).value(service).end();
+                }
             }
-        }
-        return root;
+        });
     }
 }

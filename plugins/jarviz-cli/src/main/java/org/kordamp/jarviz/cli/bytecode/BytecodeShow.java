@@ -140,69 +140,67 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
     }
 
     private Node buildReport(Format format, Path jarPath, BytecodeVersions bytecodeVersions) {
-        Node root = createRootNode(jarPath);
+        return appendSubject(createRootNode(), jarPath, "bytecode show", resultNode -> {
+            Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
+            Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
 
-        Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
-        Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
+            if (bc == 0 && jv == 0) {
+                Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
+                if (manifestBytecode.size() > 0) {
+                    Node bytecode = resultNode.array($("report.key.bytecode"));
+                    manifestBytecode.stream()
+                        .map(String::valueOf)
+                        .forEach(v -> {
+                            if (format == Format.TXT) {
+                                bytecode.node(v).end();
+                            } else {
+                                bytecode.collapsable($("report.key.version")).value(v).end();
+                            }
+                        });
+                }
+            }
 
-        if (bc == 0 && jv == 0) {
-            Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
-            if (manifestBytecode.size() > 0) {
-                Node bytecode = root.array($("report.key.bytecode"));
-                manifestBytecode.stream()
-                    .map(String::valueOf)
-                    .forEach(v -> {
-                        if (format == Format.TXT) {
-                            bytecode.node(v).end();
-                        } else {
-                            bytecode.collapsable($("report.key.version")).value(v).end();
+            if (jv == 0) {
+                Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
+                if (bc == 0) {
+                    unversionedClasses.keySet().stream()
+                        .sorted()
+                        .forEach(bytecodeVersion -> reportUnversioned(resultNode, unversionedClasses, bytecodeVersion));
+                } else {
+                    reportUnversioned(resultNode, unversionedClasses, bc);
+                }
+            }
+
+            Set<Integer> javaVersions = bytecodeVersions.getJavaVersionOfVersionedClasses();
+            if (jv == 0) {
+                for (Integer javaVersion : javaVersions) {
+                    Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
+                    if (bc == 0) {
+                        for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                            reportVersioned(resultNode, versionedClasses, javaVersion, entry.getKey());
                         }
-                    });
-            }
-        }
-
-        if (jv == 0) {
-            Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
-            if (bc == 0) {
-                unversionedClasses.keySet().stream()
-                    .sorted()
-                    .forEach(bytecodeVersion -> reportUnversioned(root, unversionedClasses, bytecodeVersion));
+                    } else {
+                        reportVersioned(resultNode, versionedClasses, javaVersion, bc);
+                    }
+                }
             } else {
-                reportUnversioned(root, unversionedClasses, bc);
-            }
-        }
-
-        Set<Integer> javaVersions = bytecodeVersions.getJavaVersionOfVersionedClasses();
-        if (jv == 0) {
-            for (Integer javaVersion : javaVersions) {
-                Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
+                Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
                 if (bc == 0) {
                     for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
-                        reportVersioned(root, versionedClasses, javaVersion, entry.getKey());
+                        reportVersioned(resultNode, versionedClasses, jv, entry.getKey());
                     }
                 } else {
-                    reportVersioned(root, versionedClasses, javaVersion, bc);
+                    reportVersioned(resultNode, versionedClasses, jv, bc);
                 }
             }
-        } else {
-            Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
-            if (bc == 0) {
-                for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
-                    reportVersioned(root, versionedClasses, jv, entry.getKey());
-                }
-            } else {
-                reportVersioned(root, versionedClasses, jv, bc);
-            }
-        }
-
-        return root;
+        });
     }
 
-    private void reportUnversioned(Node root, Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
+    private void reportUnversioned(Node resultNode, Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
         if (!unversionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = unversionedClasses.get(bytecodeVersion);
-        Node unversioned = root.node($("report.key.unversioned"))
+        Node unversioned = resultNode.node($("report.key.unversioned"))
             .node($("report.key.bytecode")).value(bytecodeVersion).end()
             .node($("report.key.total")).value(classes.size()).end();
 
@@ -212,11 +210,11 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         }
     }
 
-    private void reportVersioned(Node root, Map<Integer, List<String>> versionedClasses, Integer javaVersion, Integer bytecodeVersion) {
+    private void reportVersioned(Node resultNode, Map<Integer, List<String>> versionedClasses, Integer javaVersion, Integer bytecodeVersion) {
         if (!versionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = versionedClasses.get(bytecodeVersion);
-        Node versioned = root.node($("report.key.versioned"))
+        Node versioned = resultNode.node($("report.key.versioned"))
             .node($("report.key.bytecode")).value(bytecodeVersion).end()
             .node($("report.key.total")).value(classes.size()).end();
 

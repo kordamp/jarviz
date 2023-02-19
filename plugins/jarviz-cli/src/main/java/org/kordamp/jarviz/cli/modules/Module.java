@@ -17,8 +17,8 @@
  */
 package org.kordamp.jarviz.cli.modules;
 
-import org.kordamp.jarviz.cli.internal.AbstractJarvizCommand;
 import org.kordamp.jarviz.cli.Main;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizCommand;
 import picocli.CommandLine;
 
 /**
