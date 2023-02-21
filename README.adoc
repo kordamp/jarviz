@@ -14,7 +14,7 @@ image:https://img.shields.io/github/downloads/{project-owner}/{project-name}/tot
 ---
 
 Jarviz is a JAR file analyzer tool.  You can obtain metadata from a JAR such as its manifest, manifest entries,
-bytecode versions, declarative services, JPMS module descriptors and more.
+bytecode versions, declarative services, Java module descriptors and more.
 
 [source]
 ----
