@@ -8,8 +8,6 @@ on:
         required: true
 
 env:
-  JAVA_VERSION: '11'
-  JAVA_DISTRO: 'zulu'
   REPO_OWNER: 'kordamp'
   REPO_NAME: 'jarviz'
   GITHUB_BOT_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
@@ -37,22 +35,9 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}-${{ hashFiles('**/gradle.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
-
-      - name: Cache Gradle wrapper
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradlew-${{ hashFiles('**/gradlew') }}
-          restore-keys: ${{ runner.os }}-gradlew-
+          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: ${{ vars.JAVA_DISTRO }}
+          cache: 'gradle'
 
       - name: Version
         id: vars
