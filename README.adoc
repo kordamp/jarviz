@@ -49,22 +49,24 @@ bytecode version; an ordered list of total versioned classes.
 
 [source]
 ----
-$ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
+$ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.8.0
+subject: pomchecker-toolprovider-1.8.0.jar
 Unversioned classes. Bytecode version: 47 total: 9
 Unversioned classes. Bytecode version: 48 total: 239
-Unversioned classes. Bytecode version: 49 total: 358
+Unversioned classes. Bytecode version: 49 total: 314
 Unversioned classes. Bytecode version: 50 total: 896
-Unversioned classes. Bytecode version: 51 total: 2089
-Unversioned classes. Bytecode version: 52 total: 3366
-Unversioned classes. Bytecode version: 53 total: 1
+Unversioned classes. Bytecode version: 51 total: 595
+Unversioned classes. Bytecode version: 52 total: 4,571
+Unversioned classes. Bytecode version: 53 total: 2
 ----
 
 Use the `--details` flag to list all classes per bytecode version
 
 [source]
 ----
-$ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
+$ jarviz bytecode show --gav org.kordamp.maven:pomchecker-toolprovider:1.8.0 \
     --bytecode-version 47 --details
+subject: pomchecker-toolprovider-1.8.0.jar
 Unversioned classes. Bytecode version: 47 total: 9
 org.aopalliance.aop.Advice
 org.aopalliance.aop.AspectException
@@ -82,11 +84,13 @@ org.aopalliance.intercept.MethodInvocation
 [source]
 ----
 $ jarviz bytecode show --gav com.fasterxml.jackson.core:jackson-core:2.14.1
+subject: jackson-core-2.14.1.jar
 Unversioned classes. Bytecode version: 52 total: 160
 Versioned classes 9. Bytecode version: 53 total: 1
 
 $ jarviz bytecode show --gav com.fasterxml.jackson.core:jackson-core:2.14.1 \
     --bytecode-version 53 --details
+subject: jackson-core-2.14.1.jar
 Versioned classes 9. Bytecode version: 53 total: 1
 module-info
 ----
@@ -100,6 +104,7 @@ Show the JAR's manifest.
 [source]
 ----
 $ jarviz manifest show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
+subject: pomchecker-toolprovider-1.4.0.jar
 Manifest-Version: 1.0
 Created-By: Maven Jar Plugin 3.2.0
 Build-Jdk-Spec: 11
@@ -122,7 +127,8 @@ Query manifest attributes.
 ----
 $ jarviz manifest query --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
     --attribute-name Automatic-Module-Name
-org.kordamp.maven.pomchecker
+subject: pomchecker-toolprovider-1.4.0.jar
+Automatic-Module-Name: org.kordamp.maven.pomchecker
 ----
 
 === Module
@@ -137,6 +143,7 @@ Will show the module name, whether it's automatic or not, and if the name is val
 [source]
 ----
 $ jarviz module name --gav org.slf4j:slf4j-api:1.7.36
+subject: slf4j-api-1.7.36.jar
 name: org.slf4j
 source: manifest
 automatic: true
@@ -148,6 +155,7 @@ valid: true
 [source]
 ----
 $ jarviz module name --gav org.slf4j:slf4j-api:2.0.6
+subject: slf4j-api-2.0.6.jar
 name: org.slf4j
 source: explicit
 automatic: false
@@ -159,6 +167,7 @@ This JAR filename is invalid
 [source]
 ----
 $ jarviz module name --file foo-1-TAG.jar
+subject: foo-1-TAG.jar
 name: foo.1.TAG
 source: filename
 automatic: true
@@ -173,6 +182,7 @@ Show the module descriptor in detail.
 [source]
 ----
 $ jarviz module descriptor --gav jakarta.activation:jakarta.activation-api:2.1.1
+subject: jakarta.activation-api-2.1.1.jar
 name: jakarta.activation
 version: 2.1.1
 open: false
@@ -189,6 +199,44 @@ uses:
   jakarta.activation.spi.MimeTypeRegistryProvider
 ----
 
+=== Packages
+
+*split*
+
+Display split packages
+
+[source]
+----
+$ jarviz packages split --directory ~/.sdkman/candidates/maven/current/lib/
+subject: maven-artifact-3.9.0.jar
+org.apache.maven.artifact
+org.apache.maven.artifact.handler
+org.apache.maven.artifact.metadata
+org.apache.maven.artifact.repository
+org.apache.maven.artifact.repository.layout
+org.apache.maven.artifact.repository.metadata
+org.apache.maven.artifact.resolver
+org.apache.maven.artifact.resolver.filter
+org.apache.maven.artifact.versioning
+org.apache.maven.repository
+org.apache.maven.repository.legacy.metadata
+
+subject: maven-compat-3.9.0.jar
+org.apache.maven.artifact
+org.apache.maven.artifact.repository
+org.apache.maven.artifact.repository.layout
+org.apache.maven.artifact.repository.metadata
+org.apache.maven.artifact.resolver
+org.apache.maven.artifact.resolver.filter
+org.apache.maven.artifact.versioning
+org.apache.maven.execution
+org.apache.maven.project
+org.apache.maven.project.path
+org.apache.maven.repository
+
+...
+----
+
 === Services
 
 *list*
@@ -197,11 +245,12 @@ Display registered services.
 
 [source]
 ----
-$ jarviz services list --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0
-org.slf4j.spi.SLF4JServiceProvider
+$ jarviz services list --gav org.kordamp.maven:pomchecker-toolprovider:1.8.0
+subject: pomchecker-toolprovider-1.8.0.jar
 java.util.spi.ToolProvider
 javax.annotation.processing.Processor
 org.apache.commons.logging.LogFactory
+org.slf4j.spi.SLF4JServiceProvider
 ----
 
 *show*
@@ -210,8 +259,10 @@ Display service implementations for a given service.
 
 [source]
 ----
-$ jarviz services show --gav org.kordamp.maven:pomchecker-toolprovider:1.4.0 \
+$ jarviz services show --gav org.kordamp.maven:pomchecker-toolprovider:1.8.0 \
     --service-name java.util.spi.ToolProvider
+subject: pomchecker-toolprovider-1.8.0.jar
+service: java.util.spi.ToolProvider
 org.kordamp.maven.checker.toolprovider.Pomchecker
 ----
 
@@ -239,6 +290,7 @@ $ jarviz module name --gav com.sun.mail:jakarta.mail:2.0.1 \
     --report-format xml \
     --report-format json \
     --report-format yaml
+subject: jakarta.mail-2.0.1.jar
 name: jakarta.mail
 source: explicit
 automatic: false
@@ -248,14 +300,18 @@ valid: true
 [source]
 .jakarta.mail.txt
 ----
-subject:
-  file: jakarta.mail-2.0.1.jar
-  size: 689294
-  sha256: 8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23
-name: jakarta.mail
-source: explicit
-automatic: false
-valid: true
+subjects:
+  subject:
+    command: module name
+    jar:
+      file: jakarta.mail-2.0.1.jar
+      size: 689294
+      sha256: 8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23
+    result:
+      name: jakarta.mail
+      source: explicit
+      automatic: false
+      valid: true
 ----
 
 [source,xml]
@@ -263,15 +319,22 @@ valid: true
 .jakarta.mail.xml
 ----
 <jarviz>
-  <subject>
-    <file>jakarta.mail-2.0.1.jar</file>
-    <size>689294</size>
-    <sha256>8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23</sha256>
-  </subject>
-  <name>jakarta.mail</name>
-  <source>explicit</source>
-  <automatic>false</automatic>
-  <valid>true</valid>
+  <subjects>
+    <subject>
+      <command>module name</command>
+      <jar>
+        <file>jakarta.mail-2.0.1.jar</file>
+        <size>689294</size>
+        <sha256>8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23</sha256>
+      </jar>
+      <result>
+        <name>jakarta.mail</name>
+        <source>explicit</source>
+        <automatic>false</automatic>
+        <valid>true</valid>
+      </result>
+    </subject>
+  </subjects>
 </jarviz>
 ----
 
@@ -279,29 +342,39 @@ valid: true
 .jakarta.mail.json
 ----
 {
-  "subject": {
-    "file": "jakarta.mail-2.0.1.jar",
-    "size": 689294,
-    "sha256": "8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23"
-  },
-  "name": "jakarta.mail",
-  "source": "explicit",
-  "automatic": false,
-  "valid": true
+  "subjects": [
+    {
+      "command": "module name",
+      "jar": {
+        "file": "jakarta.mail-2.0.1.jar",
+        "size": 689294,
+        "sha256": "8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23"
+      },
+      "result": {
+        "name": "jakarta.mail",
+        "source": "explicit",
+        "automatic": false,
+        "valid": true
+      }
+    }
+  ]
 }
 ----
 
 [source,yaml]
 .jakarta.mail.yaml
 ----
-subject:
-  file: jakarta.mail-2.0.1.jar
-  size: 689294
-  sha256: 8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23
-name: jakarta.mail
-source: explicit
-automatic: false
-valid: true
+subjects:
+  - command: module name
+    jar:
+      file: jakarta.mail-2.0.1.jar
+      size: 689294
+      sha256: 8988bdbde922ee173db7179e23393dd2258f3b64f708f41082e03f0e0494cc23
+    result:
+      name: jakarta.mail
+      source: explicit
+      automatic: false
+      valid: true
 ----
 
 == Install

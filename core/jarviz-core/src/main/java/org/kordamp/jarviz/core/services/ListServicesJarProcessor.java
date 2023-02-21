@@ -22,25 +22,25 @@ import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class ListServicesJarProcessor implements JarProcessor<Optional<List<String>>> {
+public class ListServicesJarProcessor implements JarProcessor<Optional<Set<String>>> {
     private static final String META_INF_SERVICES = "META-INF/services/";
-    private final JarFileResolver<?> jarFileResolver;
+    private final JarFileResolver jarFileResolver;
     private Integer release;
 
-    public ListServicesJarProcessor(JarFileResolver<?> jarFileResolver) {
+    public ListServicesJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
@@ -53,11 +53,21 @@ public class ListServicesJarProcessor implements JarProcessor<Optional<List<Stri
     }
 
     @Override
-    public Optional<List<String>> getResult() throws JarvizException {
-        List<String> services = new ArrayList<>();
+    public Set<JarFileResult<Optional<Set<String>>>> getResult() throws JarvizException {
+        Set<JarFileResult<Optional<Set<String>>>> set = new TreeSet<>();
+
+        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+            set.add(processJarFile(jarFile));
+        }
+
+        return set;
+    }
+
+    private JarFileResult<Optional<Set<String>>> processJarFile(JarFile jarFile) {
+        Set<String> services = new TreeSet<>();
         boolean foundServices = false;
 
-        try (JarFile jarFile = jarFileResolver.resolveJarFile()) {
+        try (jarFile) {
             // Iterate all entries as we can't tell if they are sorted
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
@@ -69,9 +79,9 @@ public class ListServicesJarProcessor implements JarProcessor<Optional<List<Stri
                 }
             }
 
-            return foundServices ? Optional.of(unmodifiableList(services)) : Optional.empty();
+            return JarFileResult.of(jarFile, foundServices ? Optional.of(unmodifiableSet(services)) : Optional.empty());
         } catch (IOException ignored) {
-            return foundServices ? Optional.of(unmodifiableList(services)) : Optional.empty();
+            return JarFileResult.of(jarFile, foundServices ? Optional.of(unmodifiableSet(services)) : Optional.empty());
         }
     }
 }

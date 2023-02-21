@@ -19,6 +19,8 @@ package org.kordamp.jarviz.cli.internal;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.IO;
+import org.kordamp.jarviz.core.JarFileResolver;
+import org.kordamp.jarviz.core.JarFileResolvers;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Formatter;
@@ -35,10 +37,12 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -46,7 +50,6 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.util.stream.Collectors.toList;
 import static org.kordamp.jarviz.cli.internal.Colorizer.bool;
 import static org.kordamp.jarviz.cli.internal.Colorizer.colorize;
-import static org.kordamp.jarviz.util.StringUtils.getHyphenatedName;
 import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
@@ -59,19 +62,20 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
     public static final String SPACE = " ";
     public static final String EMPTY = "";
 
-    @CommandLine.ArgGroup(multiplicity = "1")
-    public Exclusive exclusive;
+    @CommandLine.Option(names = {"--directory"})
+    public Path[] directory;
 
-    public static class Exclusive {
-        @CommandLine.Option(names = {"--file"})
-        public Path file;
+    @CommandLine.Option(names = {"--file"})
+    public Path[] file;
 
-        @CommandLine.Option(names = {"--gav"})
-        public String gav;
+    @CommandLine.Option(names = {"--gav"})
+    public String[] gav;
 
-        @CommandLine.Option(names = {"--url"})
-        public URL url;
-    }
+    @CommandLine.Option(names = {"--url"})
+    public URL[] url;
+
+    @CommandLine.Option(names = {"--classpath"})
+    public String[] classpath;
 
     @CommandLine.Option(names = {"--cache-directory"}, paramLabel = "<directory>")
     public Path cache;
@@ -127,25 +131,6 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
             .collect(toList());
     }
 
-    protected List<String> collectEntries(String[] input) {
-        return collectEntries(input, false);
-    }
-
-    protected List<String> collectEntries(String[] input, boolean lowerCase) {
-        List<String> list = new ArrayList<>();
-        if (null != input && input.length > 0) {
-            for (String s : input) {
-                if (isNotBlank(s)) {
-                    if (!s.contains("-") && lowerCase) {
-                        s = getHyphenatedName(s);
-                    }
-                    list.add(lowerCase ? s.toLowerCase(Locale.ENGLISH) : s);
-                }
-            }
-        }
-        return list;
-    }
-
     protected Formatter resolveFormatter(Format format) {
         switch (format) {
             case XML:
@@ -168,13 +153,13 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         Node subjects = root.getChildren().isEmpty() ? root.array($("report.key.subjects")) : root.getChildren().get(0);
         Node resultNode = subjects
             .collapsable($("report.key.subject"))
-                .node($("report.key.command")).value(command).end()
-                .node($("report.key.jar"))
-                    .node($("report.key.file")).value(jarPath.getFileName()).end()
-                    .node($("report.key.size")).value(fileSize(jarPath)).end()
-                    .node($("report.key.sha256")).value(sha256(jarPath)).end()
-                .end()
-                .node($("report.key.result"));
+            .node($("report.key.command")).value(command).end()
+            .node($("report.key.jar"))
+            .node($("report.key.file")).value(jarPath.getFileName()).end()
+            .node($("report.key.size")).value(fileSize(jarPath)).end()
+            .node($("report.key.sha256")).value(sha256(jarPath)).end()
+            .end()
+            .node($("report.key.result"));
         result.accept(resultNode);
 
         return root;
@@ -207,6 +192,49 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
     }
 
     private String sha256(Path jarPath) {
-          return ChecksumUtils.checksum(jarPath);
+        return ChecksumUtils.checksum(jarPath);
+    }
+
+    protected Set<Path> collectEntries(Path[] input) {
+        Set<Path> set = new TreeSet<>();
+        if (null != input) {
+            Collections.addAll(set, input);
+        }
+        return set;
+    }
+
+    protected Set<URL> collectEntries(URL[] input) {
+        Set<URL> set = new LinkedHashSet<>();
+        if (null != input) {
+            Collections.addAll(set, input);
+        }
+        return set;
+    }
+
+    protected Set<String> collectEntries(String[] input) {
+        Set<String> set = new LinkedHashSet<>();
+        if (null != input) {
+            for (String s : input) {
+                if (isNotBlank(s)) {
+                    set.add(s.trim());
+                }
+            }
+        }
+        return set;
+    }
+
+    protected JarFileResolver createJarFileResolver() {
+        Set<JarFileResolver> resolvers = new LinkedHashSet<>();
+        resolvers.addAll(JarFileResolvers.gavJarFileResolvers(resolveCacheDirectory(), collectEntries(gav)));
+        resolvers.addAll(JarFileResolvers.pathJarFileResolvers(collectEntries(file)));
+        resolvers.addAll(JarFileResolvers.directoryJarFileResolvers(collectEntries(directory)));
+        resolvers.addAll(JarFileResolvers.classpathJarFileResolvers(collectEntries(classpath)));
+        resolvers.addAll(JarFileResolvers.urlJarFileResolvers(resolveCacheDirectory(), collectEntries(url)));
+
+        if (resolvers.isEmpty()) {
+            throw new JarvizException($$("ERROR_INSUFFICIENT_INPUTS"));
+        }
+
+        return JarFileResolvers.compositeJarFileResolver(resolvers);
     }
 }

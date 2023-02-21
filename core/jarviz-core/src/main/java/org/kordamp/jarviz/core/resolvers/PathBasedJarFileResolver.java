@@ -24,13 +24,16 @@ import org.kordamp.jarviz.core.JarvizException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.jar.JarFile;
+
+import static java.util.Collections.singleton;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class PathBasedJarFileResolver implements JarFileResolver<Path> {
+public class PathBasedJarFileResolver implements JarFileResolver {
     private final Path file;
     private JarFile jarFile;
 
@@ -39,13 +42,8 @@ public class PathBasedJarFileResolver implements JarFileResolver<Path> {
     }
 
     @Override
-    public Path getSource() {
-        return file;
-    }
-
-    @Override
-    public JarFile resolveJarFile() {
-        if (null != jarFile) return jarFile;
+    public Set<JarFile> resolveJarFiles() {
+        if (null != jarFile) return singleton(jarFile);
 
         if (Files.notExists(file)) {
             throw new JarvizException(RB.$("ERROR_PATH_DOES_NOT_EXIST", file.toAbsolutePath()));
@@ -62,7 +60,7 @@ public class PathBasedJarFileResolver implements JarFileResolver<Path> {
 
         try {
             jarFile = new JarFile(file.toFile());
-            return jarFile;
+            return singleton(jarFile);
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
         }

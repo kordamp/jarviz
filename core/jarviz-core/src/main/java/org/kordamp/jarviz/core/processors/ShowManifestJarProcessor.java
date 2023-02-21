@@ -23,6 +23,8 @@ import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.util.JarUtils;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -31,15 +33,24 @@ import java.util.jar.Manifest;
  * @since 0.1.0
  */
 public class ShowManifestJarProcessor implements JarProcessor<Optional<Manifest>> {
-    private final JarFileResolver<?> jarFileResolver;
+    private final JarFileResolver jarFileResolver;
 
-    public ShowManifestJarProcessor(JarFileResolver<?> jarFileResolver) {
+    public ShowManifestJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
     @Override
-    public Optional<Manifest> getResult() throws JarvizException {
-        JarFile jarFile = jarFileResolver.resolveJarFile();
-        return JarUtils.getManifest(jarFile);
+    public Set<JarFileResult<Optional<Manifest>>> getResult() throws JarvizException {
+        Set<JarFileResult<Optional<Manifest>>> set = new TreeSet<>();
+
+        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+            set.add(processJarFile(jarFile));
+        }
+
+        return set;
+    }
+
+    private JarFileResult<Optional<Manifest>> processJarFile(JarFile jarFile) {
+        return JarFileResult.of(jarFile, JarUtils.getManifest(jarFile));
     }
 }

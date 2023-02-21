@@ -28,15 +28,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Collections.singleton;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class UrlBasedJarFileResolver implements JarFileResolver<URL> {
+public class UrlBasedJarFileResolver implements JarFileResolver {
     private final URL url;
     private final Path cacheDirectory;
     private JarFile jarFile;
@@ -47,13 +49,8 @@ public class UrlBasedJarFileResolver implements JarFileResolver<URL> {
     }
 
     @Override
-    public URL getSource() {
-        return url;
-    }
-
-    @Override
-    public JarFile resolveJarFile() {
-        if (null != jarFile) return jarFile;
+    public Set<JarFile> resolveJarFiles() {
+        if (null != jarFile) return singleton(jarFile);
 
         Path path = Paths.get(url.getPath()).getFileName();
 
@@ -69,7 +66,7 @@ public class UrlBasedJarFileResolver implements JarFileResolver<URL> {
                 Instant remoteLastModified = Instant.ofEpochMilli(url.openConnection().getLastModified());
                 if (localLastModified.isAfter(remoteLastModified)) {
                     jarFile = new JarFile(file.toFile());
-                    return jarFile;
+                    return singleton(jarFile);
                 }
             } catch (IOException e) {
                 throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
@@ -84,7 +81,7 @@ public class UrlBasedJarFileResolver implements JarFileResolver<URL> {
 
         try {
             jarFile = new JarFile(file.toFile());
-            return jarFile;
+            return singleton(jarFile);
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
         }

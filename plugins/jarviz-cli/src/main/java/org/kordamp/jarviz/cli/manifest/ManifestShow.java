@@ -20,6 +20,7 @@ package org.kordamp.jarviz.cli.manifest;
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
+import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.processors.ShowManifestJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
@@ -28,11 +29,8 @@ import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
-
-import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
+import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -42,38 +40,54 @@ import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
     @Override
     protected int execute() {
-        JarFileResolver<?> jarFileResolver = createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        JarFileResolver jarFileResolver = createJarFileResolver();
         ShowManifestJarProcessor processor = new ShowManifestJarProcessor(jarFileResolver);
 
-        Optional<java.util.jar.Manifest> manifest = processor.getResult();
-        if (manifest.isEmpty()) return 1;
-
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            manifest.get().write(baos);
-            baos.flush();
-            baos.close();
-            parent().getOut().println(baos);
-            report(jarFileResolver, baos.toString().trim());
-        } catch (IOException e) {
-            throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE"), e);
+        Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results = processor.getResult();
+        if (results.isEmpty()) {
+            return 1;
         }
+
+        for (JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result : results) {
+            output(result);
+            if (results.size() > 1) parent().getOut().println("");
+        }
+        report(results);
 
         return 0;
     }
 
-    private void report(JarFileResolver<?> jarFileResolver, String manifest) {
-        if (null == reportPath) return;
-
-        Node node = buildReport(Paths.get(jarFileResolver.resolveJarFile().getName()), manifest);
-        for (Format format : validateReportFormats()) {
-            writeReport(resolveFormatter(format).write(node), format);
+    private void output(JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result) {
+        if (result.getResult().isPresent()) {
+            parent().getOut().println($$("output.subject", result.getJarFileName()));
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                result.getResult().get().write(baos);
+                baos.flush();
+                baos.close();
+                parent().getOut().println(baos);
+            } catch (IOException e) {
+                throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE"), e);
+            }
         }
     }
 
-    private Node buildReport(Path jarPath, String manifest) {
-        return appendSubject(createRootNode(), jarPath, "manifest show",
-            resultNode -> resultNode.node($("report.key.manifest")).value(manifest).end());
+    private void report(Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results) {
+        if (null == reportPath) return;
+
+        for (Format format : validateReportFormats()) {
+            Node root = createRootNode();
+            for (JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result : results) {
+                if (result.getResult().isPresent()) {
+                    buildReport(root, result);
+                }
+            }
+            writeReport(resolveFormatter(format).write(root), format);
+        }
+    }
+
+    private void buildReport(Node root, JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result) {
+        appendSubject(root, result.getJarPath(), "manifest show",
+            resultNode -> resultNode.node($("report.key.manifest")).value(result.getResult().get()).end());
     }
 }

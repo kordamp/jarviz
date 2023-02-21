@@ -33,16 +33,17 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Collections.singleton;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class GavBasedJarFileResolver implements JarFileResolver<String> {
-    private final String gav;
+public class GavBasedJarFileResolver implements JarFileResolver {
     private final String groupId;
     private final String artifactId;
     private final String version;
@@ -51,7 +52,6 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
 
     public GavBasedJarFileResolver(Path cacheDirectory, String gav) {
         this.cacheDirectory = cacheDirectory;
-        this.gav = gav;
 
         String[] parts = gav.split(":");
         if (parts.length == 3) {
@@ -64,13 +64,8 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
     }
 
     @Override
-    public String getSource() {
-        return gav;
-    }
-
-    @Override
-    public JarFile resolveJarFile() {
-        if (null != jarFile) return jarFile;
+    public Set<JarFile> resolveJarFiles() {
+        if (null != jarFile) return singleton(jarFile);
 
         String filename = artifactId + "-" + version + ".jar";
         String str = "https://repo1.maven.org/maven2/" + groupId + "/" + artifactId + "/" + version + "/" + filename;
@@ -126,10 +121,10 @@ public class GavBasedJarFileResolver implements JarFileResolver<String> {
         return Optional.empty();
     }
 
-    private JarFile createJarFile(Path file) {
+    private Set<JarFile> createJarFile(Path file) {
         try {
             jarFile = new JarFile(file.toFile());
-            return jarFile;
+            return singleton(jarFile);
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));
         }

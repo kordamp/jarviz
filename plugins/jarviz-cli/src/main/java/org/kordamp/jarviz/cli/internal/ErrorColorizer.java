@@ -15,20 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kordamp.jarviz.cli.internal;
+
+import picocli.CommandLine;
+
+import java.io.PrintWriter;
 
 /**
  * @author Andres Almiray
  * @since 0.3.0
  */
-module org.kordamp.jarviz.core {
-    exports org.kordamp.jarviz.bundle;
-    exports org.kordamp.jarviz.core;
-    exports org.kordamp.jarviz.core.bytecode;
-    exports org.kordamp.jarviz.core.model;
-    exports org.kordamp.jarviz.core.modules;
-    exports org.kordamp.jarviz.core.packages;
-    exports org.kordamp.jarviz.core.processors;
-    exports org.kordamp.jarviz.core.services;
-    exports org.kordamp.jarviz.reporting;
-    exports org.kordamp.jarviz.util;
+public class ErrorColorizer extends PrintWriter {
+    public ErrorColorizer(PrintWriter delegate) {
+        super(delegate, true);
+    }
+
+    @Override
+    public void print(String s) {
+        super.print(CommandLine.Help.Ansi.AUTO.text("@|red " + s + "|@"));
+    }
 }

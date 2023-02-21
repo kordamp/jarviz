@@ -15,15 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core;
+package org.kordamp.jarviz.core.resolvers;
 
+import org.kordamp.jarviz.core.JarFileResolver;
+
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.JarFile;
 
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.3.0
  */
-public interface JarFileResolver {
-    Set<JarFile> resolveJarFiles();
+public class CompositeJarFileResolver implements JarFileResolver {
+    private final Set<JarFileResolver> resolvers = new LinkedHashSet<>();
+
+    public CompositeJarFileResolver(Set<JarFileResolver> resolvers) {
+        this.resolvers.addAll(resolvers);
+    }
+
+    @Override
+    public Set<JarFile> resolveJarFiles() {
+        Set<JarFile> jarFiles = new LinkedHashSet<>();
+
+        for (JarFileResolver resolver : resolvers) {
+            jarFiles.addAll(resolver.resolveJarFiles());
+        }
+
+        return jarFiles;
+    }
 }

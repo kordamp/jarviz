@@ -19,17 +19,14 @@ package org.kordamp.jarviz.cli.services;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
+import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.services.ListServicesJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
-
-import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
+import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -42,34 +39,49 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
 
     @Override
     protected int execute() {
-        JarFileResolver<?> jarFileResolver = createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        JarFileResolver jarFileResolver = createJarFileResolver();
         ListServicesJarProcessor processor = new ListServicesJarProcessor(jarFileResolver);
 
-        Optional<List<String>> services = processor.getResult();
-        if (services.isPresent()) {
-            services.get().forEach(parent().getOut()::println);
-            report(jarFileResolver, services.get());
-            return 0;
+        Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results = processor.getResult();
+        if (results.isEmpty()) {
+            return 1;
         }
 
-        return 1;
+        for (JarProcessor.JarFileResult<Optional<Set<String>>> result : results) {
+            output(result);
+            if (results.size() > 1) parent().getOut().println("");
+        }
+        report(results);
+
+        return 0;
     }
 
-    private void report(JarFileResolver<?> jarFileResolver, List<String> services) {
+    private void output(JarProcessor.JarFileResult<Optional<Set<String>>> result) {
+        if (result.getResult().isPresent()) {
+            parent().getOut().println($$("output.subject", result.getJarFileName()));
+            result.getResult().get().forEach(parent().getOut()::println);
+        }
+    }
+
+    private void report(Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results) {
         if (null == reportPath) return;
 
         for (Format format : validateReportFormats()) {
-            Node node = buildReport(format, Paths.get(jarFileResolver.resolveJarFile().getName()), services);
-            writeReport(resolveFormatter(format).write(node), format);
+            Node root = createRootNode();
+            for (JarProcessor.JarFileResult<Optional<Set<String>>> result : results) {
+                if (result.getResult().isPresent()) {
+                    buildReport(format, root, result);
+                }
+            }
+            writeReport(resolveFormatter(format).write(root), format);
         }
     }
 
-    private Node buildReport(Format format, Path jarPath, List<String> services) {
-        return appendSubject(createRootNode(), jarPath, "services list", resultNode -> {
+    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<Optional<Set<String>>> result) {
+        appendSubject(root, result.getJarPath(), "services list", resultNode -> {
             Node implementations = resultNode.array($("report.key.services"));
 
-            for (String service : services) {
+            for (String service : result.getResult().get()) {
                 if (format != Format.XML) {
                     implementations.node(service);
                 } else {

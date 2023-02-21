@@ -19,13 +19,12 @@ package org.kordamp.jarviz.cli.modules;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
+import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.modules.DescriptorModuleJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +35,6 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.kordamp.jarviz.cli.internal.Colorizer.magenta;
-import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray
@@ -46,11 +44,26 @@ import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
     @Override
     protected int execute() {
-        JarFileResolver<?> jarFileResolver = createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        JarFileResolver jarFileResolver = createJarFileResolver();
         DescriptorModuleJarProcessor processor = new DescriptorModuleJarProcessor(jarFileResolver);
 
-        java.lang.module.ModuleDescriptor md = processor.getResult();
+        Set<JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor>> results = processor.getResult();
+        if (results.isEmpty()) {
+            return 1;
+        }
+
+        for (JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result : results) {
+            output(result);
+            if (results.size() > 1) parent().getOut().println("");
+        }
+        report(results);
+
+        return 0;
+    }
+
+    private void output(JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result) {
+        parent().getOut().println($$("output.subject", result.getJarFileName()));
+        java.lang.module.ModuleDescriptor md = result.getResult();
 
         List<java.lang.module.ModuleDescriptor.Exports> unqualifiedExports = md.exports().stream()
             .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
@@ -135,23 +148,24 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
             hiddenPackages.forEach(p -> parent().getOut()
                 .println(INDENT + p));
         }
-
-        report(jarFileResolver, md);
-
-        return 0;
     }
 
-    private void report(JarFileResolver<?> jarFileResolver, java.lang.module.ModuleDescriptor md) {
+    private void report(Set<JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor>> results) {
         if (null == reportPath) return;
 
         for (Format format : validateReportFormats()) {
-            Node node = buildReport(format, Paths.get(jarFileResolver.resolveJarFile().getName()), md);
-            writeReport(resolveFormatter(format).write(node), format);
+            Node root = createRootNode();
+            for (JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result : results) {
+                buildReport(format, root, result);
+            }
+            writeReport(resolveFormatter(format).write(root), format);
         }
     }
 
-    private Node buildReport(Format format, Path jarPath, java.lang.module.ModuleDescriptor md) {
-        return appendSubject(createRootNode(), jarPath, "module descriptor", resultNode -> {
+    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result) {
+        java.lang.module.ModuleDescriptor md = result.getResult();
+
+        appendSubject(root, result.getJarPath(), "module descriptor", resultNode -> {
             Node module = resultNode.node($("report.key.module"));
             module.node($("report.key.name")).value(md.name()).end();
             md.version().ifPresent(v -> module.node($("report.key.version")).value(v).end());

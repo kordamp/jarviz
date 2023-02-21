@@ -30,6 +30,7 @@ module org.kordamp.jarviz.cli {
     exports org.kordamp.jarviz.cli.internal to info.picocli;
     exports org.kordamp.jarviz.cli.manifest to info.picocli;
     exports org.kordamp.jarviz.cli.modules to info.picocli;
+    exports org.kordamp.jarviz.cli.packages to info.picocli;
     exports org.kordamp.jarviz.cli.services to info.picocli;
     opens org.kordamp.jarviz.cli.internal to info.picocli;
 }

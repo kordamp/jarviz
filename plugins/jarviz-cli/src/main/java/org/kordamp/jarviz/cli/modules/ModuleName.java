@@ -19,15 +19,13 @@ package org.kordamp.jarviz.cli.modules;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
+import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.modules.NameModuleJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
+import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -41,11 +39,26 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
 
     @Override
     protected int execute() {
-        JarFileResolver<?> jarFileResolver = createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        JarFileResolver jarFileResolver = createJarFileResolver();
         NameModuleJarProcessor processor = new NameModuleJarProcessor(jarFileResolver);
 
-        org.kordamp.jarviz.core.model.ModuleName moduleName = processor.getResult();
+        Set<JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName>> results = processor.getResult();
+        if (results.isEmpty()) {
+            return 1;
+        }
+
+        for (JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result : results) {
+            output(result);
+            if (results.size() > 1) parent().getOut().println("");
+        }
+        report(results);
+
+        return 0;
+    }
+
+    private void output(JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result) {
+        parent().getOut().println($$("output.subject", result.getJarFileName()));
+        org.kordamp.jarviz.core.model.ModuleName moduleName = result.getResult();
 
         parent().getOut().println($$("module.name", moduleName.getModuleName()));
         parent().getOut().println($$("module.source", resolveSource(moduleName)));
@@ -54,10 +67,6 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
         if (!moduleName.isValid()) {
             parent().getOut().println($$("module.reason", moduleName.getReason()));
         }
-
-        report(jarFileResolver, moduleName);
-
-        return 0;
     }
 
     private String resolveSource(org.kordamp.jarviz.core.model.ModuleName moduleName) {
@@ -66,17 +75,22 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
         return EXPLICIT;
     }
 
-    private void report(JarFileResolver<?> jarFileResolver, org.kordamp.jarviz.core.model.ModuleName moduleName) {
+    private void report(Set<JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName>> results) {
         if (null == reportPath) return;
 
         for (Format format : validateReportFormats()) {
-            Node node = buildReport(Paths.get(jarFileResolver.resolveJarFile().getName()), moduleName);
-            writeReport(resolveFormatter(format).write(node), format);
+            Node root = createRootNode();
+            for (JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result : results) {
+                buildReport(root, result);
+            }
+            writeReport(resolveFormatter(format).write(root), format);
         }
     }
 
-    private Node buildReport(Path jarPath, org.kordamp.jarviz.core.model.ModuleName moduleName) {
-        return appendSubject(createRootNode(), jarPath, "module name", resultNode -> {
+    private void buildReport(Node root, JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result) {
+        org.kordamp.jarviz.core.model.ModuleName moduleName = result.getResult();
+
+        appendSubject(root, result.getJarPath(), "module name", resultNode -> {
             resultNode.node($("report.key.name")).value(moduleName.getModuleName()).end()
                 .node($("report.key.source")).value(resolveSource(moduleName)).end()
                 .node($("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()

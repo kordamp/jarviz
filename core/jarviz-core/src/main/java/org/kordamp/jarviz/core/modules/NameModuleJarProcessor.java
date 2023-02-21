@@ -28,6 +28,8 @@ import org.kordamp.jarviz.util.JarUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
@@ -43,15 +45,24 @@ public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
     // This should be the correct pattern
     // private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+(\\.|_|-|\\+|$))");
     private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+(\\.|$))");
-    private final JarFileResolver<?> jarFileResolver;
+    private final JarFileResolver jarFileResolver;
 
-    public NameModuleJarProcessor(JarFileResolver<?> jarFileResolver) {
+    public NameModuleJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
     @Override
-    public ModuleName getResult() throws JarvizException {
-        JarFile jarFile = jarFileResolver.resolveJarFile();
+    public Set<JarFileResult<ModuleName>> getResult() throws JarvizException {
+        Set<JarFileResult<ModuleName>> set = new TreeSet<>();
+
+        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+            set.add(processJarFile(jarFile));
+        }
+
+        return set;
+    }
+
+    private JarFileResult<ModuleName> processJarFile(JarFile jarFile) {
         Path jarPath = Paths.get(jarFile.getName());
         String automaticModuleNameByFilename = deriveModuleNameFromFilename(jarPath.getFileName().toString());
         String automaticModuleNameByManifest = null;
@@ -65,7 +76,7 @@ public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
 
         ModuleNameJarPathAnalyzer analyzer = new ModuleNameJarPathAnalyzer(automaticModuleNameByManifest, automaticModuleNameByFilename);
         analyzer.handle(jarPath);
-        return analyzer.getResult();
+        return JarFileResult.of(jarFile, analyzer.getResult());
     }
 
     private String deriveModuleNameFromFilename(String filename) {

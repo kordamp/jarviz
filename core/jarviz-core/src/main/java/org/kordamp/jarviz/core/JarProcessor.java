@@ -17,10 +17,64 @@
  */
 package org.kordamp.jarviz.core;
 
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.Set;
+import java.util.jar.JarFile;
+
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
 public interface JarProcessor<R> {
-    R getResult() throws JarvizException;
+    Set<JarFileResult<R>> getResult() throws JarvizException;
+
+    class JarFileResult<R> implements Comparable<JarFileResult<R>> {
+        private final JarFile jarFile;
+        private final R result;
+
+        public static <R> JarFileResult<R> of(JarFile jarFile, R result) {
+            return new JarFileResult<>(jarFile, result);
+        }
+
+        private JarFileResult(JarFile jarFile, R result) {
+            this.jarFile = jarFile;
+            this.result = result;
+        }
+
+        public JarFile getJarFile() {
+            return jarFile;
+        }
+
+        public R getResult() {
+            return result;
+        }
+
+        public Path getJarPath() {
+            return Path.of(jarFile.getName());
+        }
+
+        public String getJarFileName() {
+            return Path.of(jarFile.getName()).getFileName().toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            JarFileResult<?> result = (JarFileResult<?>) o;
+            return getJarFileName().equals(result.getJarFileName());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getJarFileName());
+        }
+
+        @Override
+        public int compareTo(JarFileResult<R> o) {
+            if (null == o) return -1;
+            return getJarFileName().compareTo(o.getJarFileName());
+        }
+    }
 }

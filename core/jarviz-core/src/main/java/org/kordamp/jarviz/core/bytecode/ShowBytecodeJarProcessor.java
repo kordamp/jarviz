@@ -45,17 +45,25 @@ import static org.kordamp.jarviz.util.JarUtils.readMajorVersion;
 public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> {
     private static final Pattern MULTIRELEASE = Pattern.compile("META-INF/versions/(\\d+)/(.*\\.class)");
 
-    private final JarFileResolver<?> jarFileResolver;
+    private final JarFileResolver jarFileResolver;
 
-    public ShowBytecodeJarProcessor(JarFileResolver<?> jarFileResolver) {
+    public ShowBytecodeJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
     @Override
-    public BytecodeVersions getResult() throws JarvizException {
-        BytecodeVersions bytecodeVersions = new BytecodeVersions();
+    public Set<JarFileResult<BytecodeVersions>> getResult() throws JarvizException {
+        Set<JarFileResult<BytecodeVersions>> set = new TreeSet<>();
 
-        JarFile jarFile = jarFileResolver.resolveJarFile();
+        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+            set.add(processJarFile(jarFile));
+        }
+
+        return set;
+    }
+
+    private JarFileResult<BytecodeVersions> processJarFile(JarFile jarFile) {
+        BytecodeVersions bytecodeVersions = new BytecodeVersions();
         Optional<Manifest> manifest = JarUtils.getManifest(jarFile);
 
         if (manifest.isPresent()) {
@@ -99,6 +107,6 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
             }
         }
 
-        return bytecodeVersions;
+        return JarFileResult.of(jarFile, bytecodeVersions);
     }
 }

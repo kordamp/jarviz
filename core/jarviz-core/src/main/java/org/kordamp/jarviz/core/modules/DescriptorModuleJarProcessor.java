@@ -25,6 +25,8 @@ import org.kordamp.jarviz.core.analyzers.ModuleDescriptorJarPathAnalyzer;
 import java.lang.module.ModuleDescriptor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarFile;
 
 /**
@@ -32,19 +34,28 @@ import java.util.jar.JarFile;
  * @since 0.2.0
  */
 public class DescriptorModuleJarProcessor implements JarProcessor<ModuleDescriptor> {
-    private final JarFileResolver<?> jarFileResolver;
+    private final JarFileResolver jarFileResolver;
 
-    public DescriptorModuleJarProcessor(JarFileResolver<?> jarFileResolver) {
+    public DescriptorModuleJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
     @Override
-    public ModuleDescriptor getResult() throws JarvizException {
-        JarFile jarFile = jarFileResolver.resolveJarFile();
+    public Set<JarFileResult<ModuleDescriptor>> getResult() throws JarvizException {
+        Set<JarFileResult<ModuleDescriptor>> set = new TreeSet<>();
+
+        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+            set.add(processJarFile(jarFile));
+        }
+
+        return set;
+    }
+
+    private JarFileResult<ModuleDescriptor> processJarFile(JarFile jarFile) {
         Path jarPath = Paths.get(jarFile.getName());
 
         ModuleDescriptorJarPathAnalyzer analyzer = new ModuleDescriptorJarPathAnalyzer();
         analyzer.handle(jarPath);
-        return analyzer.getResult();
+        return JarFileResult.of(jarFile, analyzer.getResult());
     }
 }

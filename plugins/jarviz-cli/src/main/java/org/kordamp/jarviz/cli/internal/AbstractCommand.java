@@ -18,6 +18,7 @@
 package org.kordamp.jarviz.cli.internal;
 
 import org.kordamp.jarviz.cli.IO;
+import org.kordamp.jarviz.core.JarvizException;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -57,9 +58,25 @@ public abstract class AbstractCommand<C extends IO> extends BaseCommand implemen
 
         try {
             return execute();
-        } catch (Exception e) {
-            e.printStackTrace(parent().getOut());
+        } catch (JarvizException e) {
+            ErrorColorizer colorizer = new ErrorColorizer(parent().getOut());
+            String message = e.getMessage();
+            colorizer.println(message);
+            printDetails(e.getCause(), message, colorizer);
             return 1;
+        } catch (Exception e) {
+            e.printStackTrace(new ErrorColorizer(parent().getOut()));
+            return 1;
+        }
+    }
+
+    protected void printDetails(Throwable throwable, String message, ErrorColorizer colorizer) {
+        if (null == throwable) return;
+        String myMessage = throwable.getMessage();
+        if (!message.equals(myMessage)) {
+            colorizer.println(myMessage);
+        } else {
+            printDetails(throwable.getCause(), message, colorizer);
         }
     }
 

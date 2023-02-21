@@ -24,6 +24,8 @@ import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.util.JarUtils;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -32,11 +34,11 @@ import java.util.jar.Manifest;
  * @since 0.1.0
  */
 public class QueryManifestJarProcessor implements JarProcessor<Optional<String>> {
-    private final JarFileResolver<?> jarFileResolver;
+    private final JarFileResolver jarFileResolver;
     private String attributeName;
     private String sectionName;
 
-    public QueryManifestJarProcessor(JarFileResolver<?> jarFileResolver) {
+    public QueryManifestJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
@@ -57,15 +59,24 @@ public class QueryManifestJarProcessor implements JarProcessor<Optional<String>>
     }
 
     @Override
-    public Optional<String> getResult() throws JarvizException {
-        JarFile jarFile = jarFileResolver.resolveJarFile();
+    public Set<JarFileResult<Optional<String>>> getResult() throws JarvizException {
+        Set<JarFileResult<Optional<String>>> set = new TreeSet<>();
+
+        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+            set.add(processJarfile(jarFile));
+        }
+
+        return set;
+    }
+
+    private JarFileResult<Optional<String>> processJarfile(JarFile jarFile) {
         Optional<Manifest> manifest = JarUtils.getManifest(jarFile);
 
         if (manifest.isPresent()) {
             QueryJarManifestAnalyzer analyzer = new QueryJarManifestAnalyzer(sectionName, attributeName);
             analyzer.handle(jarFile, manifest.get());
-            return analyzer.getResult();
+            return JarFileResult.of(jarFile, analyzer.getResult());
         }
-        return Optional.empty();
+        return JarFileResult.of(jarFile, Optional.empty());
     }
 }

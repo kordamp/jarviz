@@ -20,20 +20,18 @@ package org.kordamp.jarviz.cli.bytecode;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.cli.internal.Colorizer;
 import org.kordamp.jarviz.core.JarFileResolver;
+import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.bytecode.ShowBytecodeJarProcessor;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
-import static org.kordamp.jarviz.core.JarFileResolvers.createJarFileResolver;
 
 /**
  * @author Andres Almiray
@@ -52,11 +50,26 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
 
     @Override
     protected int execute() {
-        JarFileResolver<?> jarFileResolver = createJarFileResolver(
-            exclusive.file, exclusive.gav, exclusive.url, resolveCacheDirectory());
+        JarFileResolver jarFileResolver = createJarFileResolver();
         ShowBytecodeJarProcessor processor = new ShowBytecodeJarProcessor(jarFileResolver);
 
-        BytecodeVersions bytecodeVersions = processor.getResult();
+        Set<JarProcessor.JarFileResult<BytecodeVersions>> results = processor.getResult();
+        if (results.isEmpty()) {
+            return 1;
+        }
+
+        for (JarProcessor.JarFileResult<BytecodeVersions> result : results) {
+            output(result);
+            if (results.size() > 1) parent().getOut().println("");
+        }
+        report(results);
+
+        return 0;
+    }
+
+    private void output(JarProcessor.JarFileResult<BytecodeVersions> result) {
+        parent().getOut().println($$("output.subject", result.getJarFileName()));
+        BytecodeVersions bytecodeVersions = result.getResult();
 
         Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
         Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
@@ -104,10 +117,6 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
                 printVersioned(versionedClasses, jv, bc);
             }
         }
-
-        report(jarFileResolver, bytecodeVersions);
-
-        return 0;
     }
 
     private void printUnversioned(Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
@@ -130,17 +139,21 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         }
     }
 
-    private void report(JarFileResolver<?> jarFileResolver, BytecodeVersions bytecodeVersions) {
+    private void report(Set<JarProcessor.JarFileResult<BytecodeVersions>> results) {
         if (null == reportPath) return;
 
         for (Format format : validateReportFormats()) {
-            Node node = buildReport(format, Paths.get(jarFileResolver.resolveJarFile().getName()), bytecodeVersions);
-            writeReport(resolveFormatter(format).write(node), format);
+            Node root = createRootNode();
+            for (JarProcessor.JarFileResult<BytecodeVersions> result : results) {
+                buildReport(format, root, result);
+            }
+            writeReport(resolveFormatter(format).write(root), format);
         }
     }
 
-    private Node buildReport(Format format, Path jarPath, BytecodeVersions bytecodeVersions) {
-        return appendSubject(createRootNode(), jarPath, "bytecode show", resultNode -> {
+    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<BytecodeVersions> result) {
+        appendSubject(root, result.getJarPath(), "bytecode show", resultNode -> {
+            BytecodeVersions bytecodeVersions = result.getResult();
             Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
             Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
 
