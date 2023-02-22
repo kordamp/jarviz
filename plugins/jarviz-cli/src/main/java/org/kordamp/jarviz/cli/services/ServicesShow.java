@@ -87,7 +87,7 @@ public class ServicesShow extends AbstractJarvizSubcommand<Services> {
                     buildReport(format, root, result);
                 }
             }
-            writeReport(resolveFormatter(format).write(root), format);
+            if (null != outputFormat) writeReport(resolveFormatter(format).write(root), format);
         }
     }
 

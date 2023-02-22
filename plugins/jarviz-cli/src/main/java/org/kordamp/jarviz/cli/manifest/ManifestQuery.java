@@ -69,7 +69,7 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
                 buildReport(root, result);
             }
         }
-        writeOutput(resolveFormatter(outputFormat).write(root));
+        if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
     private void output(JarProcessor.JarFileResult<Optional<String>> result) {

@@ -55,7 +55,7 @@ public class PackagesSplit extends AbstractJarvizSubcommand<Packages> {
                 buildReport(outputFormat, root, result);
             }
         }
-        writeOutput(resolveFormatter(outputFormat).write(root));
+        if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
     private void output(JarProcessor.JarFileResult<Set<String>> result) {
