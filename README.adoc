@@ -22,7 +22,7 @@ Jarviz is a JAR file analyzer tool
 Usage: jarviz [-hV] [-D=<key=value>]... [COMMAND]
 
 Options:
-  -D=<key=value>
+  -D=<key=value>    Sets a System property. 🔁
   -h, --help        Show this help message and exit.
   -V, --version     Print version information and exit.
 
@@ -30,6 +30,7 @@ Commands:
   bytecode             Commands for the JAR's bytecode.
   manifest             Commands for the JAR's manifest.
   module               Commands for modular JARs.
+  packages             Commands for packages.
   services             Commands for declarative services.
   generate-completion  Generate bash/zsh completion script for jarviz.
 
@@ -37,6 +38,20 @@ Documentation found at https://github.com/kordamp/jarviz
 ----
 
 == Commands
+
+All commands accept the following inputs
+
+[%header,cols="<,<3",width="100%"]
+|===
+| Flag      | Description
+| gav       | Maven GAV coordinates i.e, `com.fasterxml.jackson.core:jackson-core:2.14.1`. Resolvable only from Maven Central.
+| url       | URL to target resource i.e, `https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.14.1/jackson-core-2.14.1.jar`.
+| file      | Path to a local JAR file.
+| classpath | Platform specific set of file paths i.e, `/opt/jars/file.jar:/opt/jars/file2.jar` for Linux/OSX, `C:\jars\file1.jar;C:\jars\file2.jar` for Windows.
+| directory | Path to a directory that contains JAR files. Jarviz will recursively walk the tree looking for `\**/*.jar`.
+|===
+
+These inputs may be mixed and defined multiple times as needed.
 
 === Bytecode
 
