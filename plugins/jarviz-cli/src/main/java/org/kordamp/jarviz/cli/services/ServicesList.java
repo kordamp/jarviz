@@ -60,10 +60,9 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
                 output(result);
             } else {
                 buildReport(outputFormat, root, result);
-                writeOutput(resolveFormatter(outputFormat).write(root));
             }
-            if (results.size() > 1) parent().getOut().println("");
         }
+        writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
     private void output(JarProcessor.JarFileResult<Optional<Set<String>>> result) {

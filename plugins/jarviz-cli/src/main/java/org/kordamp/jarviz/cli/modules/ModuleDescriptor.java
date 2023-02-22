@@ -65,10 +65,9 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
                 output(result);
             } else {
                 buildReport(outputFormat, root, result);
-                writeOutput(resolveFormatter(outputFormat).write(root));
             }
-            if (results.size() > 1) parent().getOut().println("");
         }
+        writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
     private void output(JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result) {

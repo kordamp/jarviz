@@ -60,10 +60,9 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
                 output(result);
             } else {
                 buildReport(root, result);
-                writeOutput(resolveFormatter(outputFormat).write(root));
             }
-            if (results.size() > 1) parent().getOut().println("");
         }
+        writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
     private void output(JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result) {

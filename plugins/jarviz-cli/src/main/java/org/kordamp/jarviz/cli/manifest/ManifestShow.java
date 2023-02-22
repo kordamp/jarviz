@@ -61,10 +61,9 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
                 output(result);
             } else {
                 buildReport(root, result);
-                writeOutput(resolveFormatter(outputFormat).write(root));
             }
-            if (results.size() > 1) parent().getOut().println("");
         }
+        writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
     private void output(JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result) {
