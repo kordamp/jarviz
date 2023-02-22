@@ -37,9 +37,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,7 +47,8 @@ import java.util.function.Consumer;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
 import static org.kordamp.jarviz.cli.internal.Colorizer.bool;
 import static org.kordamp.jarviz.cli.internal.Colorizer.colorize;
 import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
@@ -87,7 +88,10 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
     protected Path reportPath;
 
     @CommandLine.Option(names = {"--report-format"}, paramLabel = "<format>")
-    String[] reportFormats;
+    Format[] reportFormats;
+
+    @CommandLine.Option(names = {"--output-format"}, paramLabel = "<format>")
+    protected Format outputFormat;
 
     @Override
     protected C parent() {
@@ -121,14 +125,13 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         return Paths.get(reportPath.toAbsolutePath() + "." + format.toString().toLowerCase(Locale.ROOT));
     }
 
-    protected List<Format> validateReportFormats() {
+    protected Set<Format> validateReportFormats() {
         if (null != reportPath && null == reportFormats || reportFormats.length == 0) {
-            return Collections.singletonList(Format.TXT);
+            return singleton(Format.TXT);
         }
 
-        return collectEntries(reportFormats).stream()
-            .map(Format::of)
-            .collect(toList());
+        return Arrays.stream(reportFormats)
+            .collect(toSet());
     }
 
     protected Formatter resolveFormatter(Format format) {
@@ -153,16 +156,20 @@ public abstract class AbstractJarvizSubcommand<C extends IO> extends AbstractCom
         Node subjects = root.getChildren().isEmpty() ? root.array($("report.key.subjects")) : root.getChildren().get(0);
         Node resultNode = subjects
             .collapsable($("report.key.subject"))
-            .node($("report.key.command")).value(command).end()
-            .node($("report.key.jar"))
-            .node($("report.key.file")).value(jarPath.getFileName()).end()
-            .node($("report.key.size")).value(fileSize(jarPath)).end()
-            .node($("report.key.sha256")).value(sha256(jarPath)).end()
-            .end()
-            .node($("report.key.result"));
+                .node($("report.key.command")).value(command).end()
+                .node($("report.key.jar"))
+                    .node($("report.key.file")).value(jarPath.getFileName()).end()
+                    .node($("report.key.size")).value(fileSize(jarPath)).end()
+                    .node($("report.key.sha256")).value(sha256(jarPath)).end()
+                .end()
+                .node($("report.key.result"));
         result.accept(resultNode);
 
         return root;
+    }
+
+    protected void writeOutput(String content) {
+        parent().getOut().println(content);
     }
 
     protected void writeReport(String content, Format format) {

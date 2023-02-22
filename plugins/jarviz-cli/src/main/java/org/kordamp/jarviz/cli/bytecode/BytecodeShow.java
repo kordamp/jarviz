@@ -58,13 +58,23 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
             return 1;
         }
 
-        for (JarProcessor.JarFileResult<BytecodeVersions> result : results) {
-            output(result);
-            if (results.size() > 1) parent().getOut().println("");
-        }
+        output(results);
         report(results);
 
         return 0;
+    }
+
+    private void output(Set<JarProcessor.JarFileResult<BytecodeVersions>> results) {
+        Node root = createRootNode();
+        for (JarProcessor.JarFileResult<BytecodeVersions> result : results) {
+            if (null == outputFormat) {
+                output(result);
+            } else {
+                buildReport(outputFormat, root, result);
+                writeOutput(resolveFormatter(outputFormat).write(root));
+            }
+            if (results.size() > 1) parent().getOut().println("");
+        }
     }
 
     private void output(JarProcessor.JarFileResult<BytecodeVersions> result) {

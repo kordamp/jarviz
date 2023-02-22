@@ -54,13 +54,23 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
             return 1;
         }
 
-        for (JarProcessor.JarFileResult<Optional<String>> result : results) {
-            output(result);
-            if (results.size() > 1) parent().getOut().println("");
-        }
+        output(results);
         report(results);
 
         return 0;
+    }
+
+    private void output(Set<JarProcessor.JarFileResult<Optional<String>>> results) {
+        Node root = createRootNode();
+        for (JarProcessor.JarFileResult<Optional<String>> result : results) {
+            if (null == outputFormat) {
+                output(result);
+            } else {
+                buildReport(root, result);
+                writeOutput(resolveFormatter(outputFormat).write(root));
+            }
+            if (results.size() > 1) parent().getOut().println("");
+        }
     }
 
     private void output(JarProcessor.JarFileResult<Optional<String>> result) {
@@ -85,7 +95,7 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
     }
 
     private void buildReport(Node root, JarProcessor.JarFileResult<Optional<String>> result) {
-        appendSubject(createRootNode(), result.getJarPath(), "manifest query", resultNode -> {
+        appendSubject(root, result.getJarPath(), "manifest query", resultNode -> {
             if (isNotBlank(sectionName)) {
                 resultNode.node($("report.key.section.name")).value(sectionName).end();
             }

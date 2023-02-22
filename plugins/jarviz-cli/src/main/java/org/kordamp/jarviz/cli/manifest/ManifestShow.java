@@ -48,13 +48,23 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
             return 1;
         }
 
-        for (JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result : results) {
-            output(result);
-            if (results.size() > 1) parent().getOut().println("");
-        }
+        output(results);
         report(results);
 
         return 0;
+    }
+
+    private void output(Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results) {
+        Node root = createRootNode();
+        for (JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result : results) {
+            if (null == outputFormat) {
+                output(result);
+            } else {
+                buildReport(root, result);
+                writeOutput(resolveFormatter(outputFormat).write(root));
+            }
+            if (results.size() > 1) parent().getOut().println("");
+        }
     }
 
     private void output(JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result) {

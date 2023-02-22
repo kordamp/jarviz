@@ -52,13 +52,23 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
             return 1;
         }
 
-        for (JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result : results) {
-            output(result);
-            if (results.size() > 1) parent().getOut().println("");
-        }
+        output(results);
         report(results);
 
         return 0;
+    }
+
+    private void output(Set<JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor>> results) {
+        Node root = createRootNode();
+        for (JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result : results) {
+            if (null == outputFormat) {
+                output(result);
+            } else {
+                buildReport(outputFormat, root, result);
+                writeOutput(resolveFormatter(outputFormat).write(root));
+            }
+            if (results.size() > 1) parent().getOut().println("");
+        }
     }
 
     private void output(JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result) {

@@ -39,13 +39,24 @@ public class PackagesSplit extends AbstractJarvizSubcommand<Packages> {
         SplitPackageJarProcessor processor = new SplitPackageJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<Set<String>>> results = processor.getResult();
-        for (JarProcessor.JarFileResult<Set<String>> result : results) {
-            output(result);
-            if (results.size() > 1) parent().getOut().println("");
-        }
+
+        output(results);
         report(results);
 
         return 0;
+    }
+
+    private void output(Set<JarProcessor.JarFileResult<Set<String>>> results) {
+        Node root = createRootNode();
+        for (JarProcessor.JarFileResult<Set<String>> result : results) {
+            if (null == outputFormat) {
+                output(result);
+            } else {
+                buildReport(outputFormat, root, result);
+                writeOutput(resolveFormatter(outputFormat).write(root));
+            }
+            if (results.size() > 1) parent().getOut().println("");
+        }
     }
 
     private void output(JarProcessor.JarFileResult<Set<String>> result) {

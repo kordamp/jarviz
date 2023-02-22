@@ -47,13 +47,23 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
             return 1;
         }
 
-        for (JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result : results) {
-            output(result);
-            if (results.size() > 1) parent().getOut().println("");
-        }
+        output(results);
         report(results);
 
         return 0;
+    }
+
+    private void output(Set<JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName>> results) {
+        Node root = createRootNode();
+        for (JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result : results) {
+            if (null == outputFormat) {
+                output(result);
+            } else {
+                buildReport(root, result);
+                writeOutput(resolveFormatter(outputFormat).write(root));
+            }
+            if (results.size() > 1) parent().getOut().println("");
+        }
     }
 
     private void output(JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName> result) {
@@ -96,7 +106,7 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
                 .node($("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
                 .node($("report.key.valid")).value(moduleName.isValid()).end();
             if (!moduleName.isValid()) {
-                createRootNode().node($("report.key.reason")).value(moduleName.getReason()).end();
+                resultNode.node($("report.key.reason")).value(moduleName.getReason()).end();
             }
         });
     }
