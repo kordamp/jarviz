@@ -21,8 +21,9 @@ import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.cli.internal.Colorizer;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.ShowBytecodeJarProcessor;
+import org.kordamp.jarviz.core.model.BytecodeVersion;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
+import org.kordamp.jarviz.core.processors.ShowBytecodeJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -80,11 +81,11 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         parent().getOut().println($$("output.subject", result.getJarFileName()));
         BytecodeVersions bytecodeVersions = result.getResult();
 
-        Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
+        BytecodeVersion bc = BytecodeVersion.of(bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0);
         Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
 
-        if (bc == 0 && jv == 0) {
-            Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
+        if (bc.isEmpty() && 0 == jv) {
+            Set<BytecodeVersion> manifestBytecode = bytecodeVersions.getManifestBytecode();
             if (manifestBytecode.size() > 0) {
                 parent().getOut().println($$("bytecode.version.attribute", manifestBytecode.stream()
                     .map(String::valueOf)
@@ -93,9 +94,9 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
             }
         }
 
-        if (jv == 0) {
-            Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
-            if (bc == 0) {
+        if (0 == jv) {
+            Map<BytecodeVersion, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
+            if (bc.isEmpty()) {
                 unversionedClasses.keySet().stream()
                     .sorted()
                     .forEach(bytecodeVersion -> printUnversioned(unversionedClasses, bytecodeVersion));
@@ -105,11 +106,11 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         }
 
         Set<Integer> javaVersions = bytecodeVersions.getJavaVersionOfVersionedClasses();
-        if (jv == 0) {
+        if (0 == jv) {
             for (Integer javaVersion : javaVersions) {
-                Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
-                if (bc == 0) {
-                    for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                Map<BytecodeVersion, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
+                if (bc.isEmpty()) {
+                    for (Map.Entry<BytecodeVersion, List<String>> entry : versionedClasses.entrySet()) {
                         printVersioned(versionedClasses, javaVersion, entry.getKey());
                     }
                 } else {
@@ -117,9 +118,9 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
                 }
             }
         } else {
-            Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
-            if (bc == 0) {
-                for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+            Map<BytecodeVersion, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
+            if (bc.isEmpty()) {
+                for (Map.Entry<BytecodeVersion, List<String>> entry : versionedClasses.entrySet()) {
                     printVersioned(versionedClasses, jv, entry.getKey());
                 }
             } else {
@@ -128,7 +129,7 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         }
     }
 
-    private void printUnversioned(Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
+    private void printUnversioned(Map<BytecodeVersion, List<String>> unversionedClasses, BytecodeVersion bytecodeVersion) {
         if (!unversionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = unversionedClasses.get(bytecodeVersion);
@@ -138,7 +139,7 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         }
     }
 
-    private void printVersioned(Map<Integer, List<String>> versionedClasses, Integer javaVersion, Integer bytecodeVersion) {
+    private void printVersioned(Map<BytecodeVersion, List<String>> versionedClasses, Integer javaVersion, BytecodeVersion bytecodeVersion) {
         if (!versionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = versionedClasses.get(bytecodeVersion);
@@ -163,11 +164,11 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
     private void buildReport(Format format, Node root, JarProcessor.JarFileResult<BytecodeVersions> result) {
         appendSubject(root, result.getJarPath(), "bytecode show", resultNode -> {
             BytecodeVersions bytecodeVersions = result.getResult();
-            Integer bc = bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0;
+            BytecodeVersion bc = BytecodeVersion.of(bytecodeVersion != null && bytecodeVersion > 43 ? bytecodeVersion : 0);
             Integer jv = javaVersion != null && javaVersion > 8 ? javaVersion : 0;
 
-            if (bc == 0 && jv == 0) {
-                Set<Integer> manifestBytecode = bytecodeVersions.getManifestBytecode();
+            if (bc.isEmpty() && 0 == jv) {
+                Set<BytecodeVersion> manifestBytecode = bytecodeVersions.getManifestBytecode();
                 if (manifestBytecode.size() > 0) {
                     Node bytecode = resultNode.array($("report.key.bytecode"));
                     manifestBytecode.stream()
@@ -182,9 +183,9 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
                 }
             }
 
-            if (jv == 0) {
-                Map<Integer, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
-                if (bc == 0) {
+            if (0 == jv) {
+                Map<BytecodeVersion, List<String>> unversionedClasses = bytecodeVersions.getUnversionedClasses();
+                if (bc.isEmpty()) {
                     unversionedClasses.keySet().stream()
                         .sorted()
                         .forEach(bytecodeVersion -> reportUnversioned(resultNode, unversionedClasses, bytecodeVersion));
@@ -194,11 +195,11 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
             }
 
             Set<Integer> javaVersions = bytecodeVersions.getJavaVersionOfVersionedClasses();
-            if (jv == 0) {
+            if (0 == jv) {
                 for (Integer javaVersion : javaVersions) {
-                    Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
-                    if (bc == 0) {
-                        for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                    Map<BytecodeVersion, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(javaVersion);
+                    if (bc.isEmpty()) {
+                        for (Map.Entry<BytecodeVersion, List<String>> entry : versionedClasses.entrySet()) {
                             reportVersioned(resultNode, versionedClasses, javaVersion, entry.getKey());
                         }
                     } else {
@@ -206,9 +207,9 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
                     }
                 }
             } else {
-                Map<Integer, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
-                if (bc == 0) {
-                    for (Map.Entry<Integer, List<String>> entry : versionedClasses.entrySet()) {
+                Map<BytecodeVersion, List<String>> versionedClasses = bytecodeVersions.getVersionedClasses(jv);
+                if (bc.isEmpty()) {
+                    for (Map.Entry<BytecodeVersion, List<String>> entry : versionedClasses.entrySet()) {
                         reportVersioned(resultNode, versionedClasses, jv, entry.getKey());
                     }
                 } else {
@@ -218,7 +219,7 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         });
     }
 
-    private void reportUnversioned(Node resultNode, Map<Integer, List<String>> unversionedClasses, Integer bytecodeVersion) {
+    private void reportUnversioned(Node resultNode, Map<BytecodeVersion, List<String>> unversionedClasses, BytecodeVersion bytecodeVersion) {
         if (!unversionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = unversionedClasses.get(bytecodeVersion);
@@ -232,11 +233,12 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
         }
     }
 
-    private void reportVersioned(Node resultNode, Map<Integer, List<String>> versionedClasses, Integer javaVersion, Integer bytecodeVersion) {
+    private void reportVersioned(Node resultNode, Map<BytecodeVersion, List<String>> versionedClasses, Integer javaVersion, BytecodeVersion bytecodeVersion) {
         if (!versionedClasses.containsKey(bytecodeVersion)) return;
 
         List<String> classes = versionedClasses.get(bytecodeVersion);
         Node versioned = resultNode.node($("report.key.versioned"))
+            .node($("report.key.java.version")).value(javaVersion).end()
             .node($("report.key.bytecode")).value(bytecodeVersion).end()
             .node($("report.key.total")).value(classes.size()).end();
 

@@ -21,6 +21,7 @@ import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
+import org.kordamp.jarviz.core.model.BytecodeVersion;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
 import org.kordamp.jarviz.util.JarUtils;
 
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
 
 import static java.util.Arrays.stream;
 import static org.kordamp.jarviz.core.Constants.ATTR_BYTECODE_VERSION;
-import static org.kordamp.jarviz.util.JarUtils.readMajorVersion;
+import static org.kordamp.jarviz.util.JarUtils.readBytecodeVersion;
 
 /**
  * @author Andres Almiray
@@ -70,9 +71,10 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
             QueryJarManifestAnalyzer analyzer = new QueryJarManifestAnalyzer(ATTR_BYTECODE_VERSION);
             analyzer.handle(jarFile, manifest.get());
             analyzer.getResult().ifPresent(v -> {
-                Set<Integer> set = new TreeSet<>();
+                Set<BytecodeVersion> set = new TreeSet<>();
                 stream(v.split(","))
                     .map(Integer::parseInt)
+                    .map(BytecodeVersion::of)
                     .forEach(set::add);
                 bytecodeVersions.setManifestBytecode(set);
             });
@@ -84,7 +86,7 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
             String entryName = entry.getName();
             if (!entryName.endsWith(".class")) continue;
 
-            Integer majorVersion = readMajorVersion(jarFile, entry);
+            BytecodeVersion bytecodeVersion = readBytecodeVersion(jarFile, entry);
             Matcher matcher = MULTIRELEASE.matcher(entryName);
             if (matcher.matches()) {
                 // TODO: Report only if JAR is multi-release?
@@ -95,7 +97,7 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
                         .replace('\\', '.')
                         .replace('$', '.');
                     className = className.substring(0, className.length() - 6);
-                    bytecodeVersions.addVersionedClass(javaVersion, majorVersion, className);
+                    bytecodeVersions.addVersionedClass(javaVersion, bytecodeVersion, className);
                 }
             } else {
                 String className = entryName
@@ -103,7 +105,7 @@ public class ShowBytecodeJarProcessor implements JarProcessor<BytecodeVersions> 
                     .replace('\\', '.')
                     .replace('$', '.');
                 className = className.substring(0, className.length() - 6);
-                bytecodeVersions.addUnversionedClass(majorVersion, className);
+                bytecodeVersions.addUnversionedClass(bytecodeVersion, className);
             }
         }
 

@@ -19,6 +19,7 @@ package org.kordamp.jarviz.util;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarvizException;
+import org.kordamp.jarviz.core.model.BytecodeVersion;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class JarUtils {
         }
     }
 
-    public static Integer readMajorVersion(JarFile jarFile, JarEntry entry) {
+    public static BytecodeVersion readBytecodeVersion(JarFile jarFile, JarEntry entry) {
         try {
             return JarUtils.withJarEntry(jarFile, entry, inputStream -> {
                 byte[] magicAndClassFileVersion = new byte[8];
@@ -60,7 +61,10 @@ public class JarUtils {
 
                     total -= read;
                 }
-                return (magicAndClassFileVersion[6] << 8) + magicAndClassFileVersion[7];
+
+                int minor = (magicAndClassFileVersion[4] << 8) + magicAndClassFileVersion[5];
+                int major = (magicAndClassFileVersion[6] << 8) + magicAndClassFileVersion[7];
+                return BytecodeVersion.of(major, minor);
             });
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_READING_JAR_ENTRY", entry.getName(), jarFile.getName()));

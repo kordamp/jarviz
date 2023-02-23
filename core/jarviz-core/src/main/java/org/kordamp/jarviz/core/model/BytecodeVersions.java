@@ -34,37 +34,37 @@ import static java.util.Collections.unmodifiableSet;
  * @since 0.1.0
  */
 public class BytecodeVersions {
-    private final Set<Integer> manifestBytecode = new TreeSet<>();
-    private final Map<Integer, List<String>> unversionedClasses = new LinkedHashMap<>();
-    private final Map<Integer, Map<Integer, List<String>>> versionedClasses = new LinkedHashMap<>();
+    private final Set<BytecodeVersion> manifestBytecode = new TreeSet<>();
+    private final Map<BytecodeVersion, List<String>> unversionedClasses = new LinkedHashMap<>();
+    private final Map<Integer, Map<BytecodeVersion, List<String>>> versionedClasses = new LinkedHashMap<>();
 
-    public Set<Integer> getManifestBytecode() {
+    public Set<BytecodeVersion> getManifestBytecode() {
         return unmodifiableSet(manifestBytecode);
     }
 
-    public void setManifestBytecode(Set<Integer> manifestBytecode) {
+    public void setManifestBytecode(Set<BytecodeVersion> manifestBytecode) {
         this.manifestBytecode.clear();
         this.manifestBytecode.addAll(manifestBytecode);
     }
 
-    public void addUnversionedClass(Integer bytecodeVersion, String className) {
+    public void addUnversionedClass(BytecodeVersion bytecodeVersion, String className) {
         unversionedClasses.computeIfAbsent(bytecodeVersion, k -> new ArrayList<>())
             .add(className);
     }
 
-    public void addVersionedClass(Integer javaVersion, Integer bytecodeVersion, String className) {
+    public void addVersionedClass(Integer javaVersion, BytecodeVersion bytecodeVersion, String className) {
         versionedClasses.computeIfAbsent(javaVersion, k -> new LinkedHashMap<>())
             .computeIfAbsent(bytecodeVersion, k -> new ArrayList<>())
             .add(className);
     }
 
-    public Set<Integer> getBytecodeOfUnversionedClasses() {
+    public Set<BytecodeVersion> getBytecodeOfUnversionedClasses() {
         return unmodifiableSet(new TreeSet<>(unversionedClasses.keySet()));
     }
 
-    public Map<Integer, List<String>> getUnversionedClasses() {
-        LinkedHashMap<Integer, List<String>> tmp = new LinkedHashMap<>();
-        for (Map.Entry<Integer, List<String>> entry : unversionedClasses.entrySet()) {
+    public Map<BytecodeVersion, List<String>> getUnversionedClasses() {
+        Map<BytecodeVersion, List<String>> tmp = new LinkedHashMap<>();
+        for (Map.Entry<BytecodeVersion, List<String>> entry : unversionedClasses.entrySet()) {
             tmp.put(entry.getKey(), unmodifiableList(entry.getValue()));
         }
         return unmodifiableMap(tmp);
@@ -74,11 +74,11 @@ public class BytecodeVersions {
         return unmodifiableSet(new TreeSet<>(versionedClasses.keySet()));
     }
 
-    public Map<Integer, List<String>> getVersionedClasses(Integer javaVersion) {
+    public Map<BytecodeVersion, List<String>> getVersionedClasses(Integer javaVersion) {
         if (!versionedClasses.containsKey(javaVersion)) return emptyMap();
 
-        LinkedHashMap<Integer, List<String>> tmp = new LinkedHashMap<>();
-        for (Map.Entry<Integer, List<String>> entry : versionedClasses.get(javaVersion).entrySet()) {
+        LinkedHashMap<BytecodeVersion, List<String>> tmp = new LinkedHashMap<>();
+        for (Map.Entry<BytecodeVersion, List<String>> entry : versionedClasses.get(javaVersion).entrySet()) {
             tmp.put(entry.getKey(), unmodifiableList(entry.getValue()));
         }
         return unmodifiableMap(tmp);
