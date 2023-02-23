@@ -216,6 +216,35 @@ uses:
 
 === Packages
 
+*validate*
+
+Validate package names
+
+[source]
+----
+$ jarviz packages validate --gav dev.gradleplugins:gradle-api:8.0.1
+subject: gradle-api-8.0.1.jar
+total: 72
+org.gradle.internal.impldep.META-INF.versions.11.org.bouncycastle.jcajce.provider.asymmetric.edec
+org.gradle.internal.impldep.META-INF.versions.15.org.bouncycastle.jcajce.provider.asymmetric.edec
+org.gradle.internal.impldep.META-INF.versions.9
+org.gradle.internal.impldep.META-INF.versions.9.com.sun.istack.logging
+org.gradle.internal.impldep.META-INF.versions.9.jakarta.xml.bind
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.anssi
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.bc
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.cryptlib
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.cryptopro
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.gm
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.isara
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.nist
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.oiw
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.pkcs
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.rosstandart
+org.gradle.internal.impldep.META-INF.versions.9.org.bouncycastle.asn1.sec
+...
+----
+
 *split*
 
 Display split packages

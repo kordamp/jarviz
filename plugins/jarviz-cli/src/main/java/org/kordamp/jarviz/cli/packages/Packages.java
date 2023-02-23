@@ -26,7 +26,7 @@ import picocli.CommandLine;
  * @since 0.3.0
  */
 @CommandLine.Command(name = "packages",
-    subcommands = PackagesSplit.class)
+    subcommands = {PackagesSplit.class, PackagesValidate.class})
 public class Packages extends AbstractJarvizCommand<Main> {
     @CommandLine.Spec
     public CommandLine.Model.CommandSpec spec;

@@ -20,7 +20,7 @@ package org.kordamp.jarviz.cli.packages;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.SplitPackageJarProcessor;
+import org.kordamp.jarviz.core.processors.ValidatePackageJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -31,12 +31,12 @@ import java.util.Set;
  * @author Andres Almiray
  * @since 0.3.0
  */
-@CommandLine.Command(name = "split")
-public class PackagesSplit extends AbstractJarvizSubcommand<Packages> {
+@CommandLine.Command(name = "validate")
+public class PackagesValidate extends AbstractJarvizSubcommand<Packages> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        SplitPackageJarProcessor processor = new SplitPackageJarProcessor(jarFileResolver);
+        ValidatePackageJarProcessor processor = new ValidatePackageJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<Set<String>>> results = processor.getResult();
 
@@ -77,7 +77,7 @@ public class PackagesSplit extends AbstractJarvizSubcommand<Packages> {
     }
 
     private void buildReport(Format format, Node root, JarProcessor.JarFileResult<Set<String>> result) {
-        appendSubject(root, result.getJarPath(), "packages split", resultNode -> {
+        appendSubject(root, result.getJarPath(), "packages validate", resultNode -> {
             resultNode.node($("report.key.total")).value(result.getResult().size()).end();
             Node packages = resultNode.array($("report.key.packages"));
 
