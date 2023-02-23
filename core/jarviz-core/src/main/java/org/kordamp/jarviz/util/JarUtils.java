@@ -21,6 +21,7 @@ import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.model.BytecodeVersion;
 
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,20 +52,14 @@ public class JarUtils {
     public static BytecodeVersion readBytecodeVersion(JarFile jarFile, JarEntry entry) {
         try {
             return JarUtils.withJarEntry(jarFile, entry, inputStream -> {
-                byte[] magicAndClassFileVersion = new byte[8];
-                int total = magicAndClassFileVersion.length;
-                while (total > 0) {
-                    int read = inputStream.read(magicAndClassFileVersion, magicAndClassFileVersion.length - total, total);
-                    if (read == -1) {
+                try (DataInputStream data = new DataInputStream(inputStream)) {
+                    if (0xCAFEBABE != data.readInt()) {
                         throw new EOFException(jarFile.getName());
                     }
-
-                    total -= read;
+                    int minor = data.readUnsignedShort();
+                    int major = data.readUnsignedShort();
+                    return BytecodeVersion.of(major, minor);
                 }
-
-                int minor = (magicAndClassFileVersion[4] << 8) + magicAndClassFileVersion[5];
-                int major = (magicAndClassFileVersion[6] << 8) + magicAndClassFileVersion[7];
-                return BytecodeVersion.of(major, minor);
             });
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_READING_JAR_ENTRY", entry.getName(), jarFile.getName()));
