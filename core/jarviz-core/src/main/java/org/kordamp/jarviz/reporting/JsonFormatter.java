@@ -55,7 +55,11 @@ public class JsonFormatter extends Formatter {
 
     @Override
     protected void append(Report report, Node node) {
-        if (isBlank(node.getValue()) && node.getChildren().isEmpty()) return;
+        if (isBlank(node.getValue()) && node.getChildren().isEmpty()) {
+            report.indent(indentationFor(node))
+                .append(quote(node.getName()));
+            return;
+        }
 
         if (!node.isCollapsable()) {
             report.indent(indentationFor(node))

@@ -46,7 +46,12 @@ public class YamlFormatter extends Formatter {
 
     @Override
     protected void append(Report report, Node node) {
-        if (isBlank(node.getValue()) && node.getChildren().isEmpty()) return;
+        if (isBlank(node.getValue()) && node.getChildren().isEmpty()) {
+            report.indent(indentationFor(node))
+                .append(node.isArrayElement() ? (node.isFirstChild() ? ITEM : EMPTY) : EMPTY)
+                .append(element(node.getName()));
+            return;
+        }
 
         if (!node.isCollapsable()) {
             report.indent(indentationFor(node))

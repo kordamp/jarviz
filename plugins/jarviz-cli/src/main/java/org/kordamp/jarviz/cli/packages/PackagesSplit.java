@@ -82,10 +82,10 @@ public class PackagesSplit extends AbstractJarvizSubcommand<Packages> {
             Node packages = resultNode.array($("report.key.packages"));
 
             for (String thePackage : result.getResult()) {
-                if (format != Format.XML) {
+                if (format == Format.TXT) {
                     packages.node(thePackage);
                 } else {
-                    packages.node($("report.key.package")).value(thePackage).end();
+                    packages.collapsable($("report.key.package")).value(thePackage).end();
                 }
             }
         });
