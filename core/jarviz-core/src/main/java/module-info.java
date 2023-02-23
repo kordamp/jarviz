@@ -23,12 +23,8 @@
 module org.kordamp.jarviz.core {
     exports org.kordamp.jarviz.bundle;
     exports org.kordamp.jarviz.core;
-    exports org.kordamp.jarviz.core.bytecode;
     exports org.kordamp.jarviz.core.model;
-    exports org.kordamp.jarviz.core.modules;
-    exports org.kordamp.jarviz.core.packages;
     exports org.kordamp.jarviz.core.processors;
-    exports org.kordamp.jarviz.core.services;
     exports org.kordamp.jarviz.reporting;
     exports org.kordamp.jarviz.util;
 }

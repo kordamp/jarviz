@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core.bytecode;
+package org.kordamp.jarviz.core.processors;
 
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;

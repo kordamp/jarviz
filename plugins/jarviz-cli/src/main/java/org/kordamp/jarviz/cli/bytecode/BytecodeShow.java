@@ -21,7 +21,7 @@ import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.cli.internal.Colorizer;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.bytecode.ShowBytecodeJarProcessor;
+import org.kordamp.jarviz.core.processors.ShowBytecodeJarProcessor;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;

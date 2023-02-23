@@ -15,13 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core.services;
+package org.kordamp.jarviz.core.processors;
 
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Set;
@@ -30,17 +33,21 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toSet;
+import static org.kordamp.jarviz.util.JarUtils.withJarEntry;
+import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class ListServicesJarProcessor implements JarProcessor<Optional<Set<String>>> {
+public class ShowServicesJarProcessor implements JarProcessor<Optional<Set<String>>> {
     private static final String META_INF_SERVICES = "META-INF/services/";
     private final JarFileResolver jarFileResolver;
     private Integer release;
+    private String serviceName;
 
-    public ListServicesJarProcessor(JarFileResolver jarFileResolver) {
+    public ShowServicesJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
@@ -50,6 +57,14 @@ public class ListServicesJarProcessor implements JarProcessor<Optional<Set<Strin
 
     public void setRelease(Integer release) {
         this.release = release;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     @Override
@@ -67,15 +82,19 @@ public class ListServicesJarProcessor implements JarProcessor<Optional<Set<Strin
         Set<String> services = new TreeSet<>();
         boolean foundServices = false;
 
+        String target = META_INF_SERVICES + serviceName;
         try (jarFile) {
-            // Iterate all entries as we can't tell if they are sorted
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
                 String name = entry.getName();
-                if (name.startsWith(META_INF_SERVICES) && name.length() > META_INF_SERVICES.length()) {
+                if (name.equals(target)) {
                     foundServices = true;
-                    services.add(name.substring(META_INF_SERVICES.length()));
+                    services.addAll(withJarEntry(jarFile, entry, inputStream -> new BufferedReader(new InputStreamReader(inputStream,
+                        StandardCharsets.UTF_8)).lines()
+                        .filter(s -> isNotBlank(s) && !s.startsWith("#"))
+                        .collect(toSet())));
+                    break;
                 }
             }
 

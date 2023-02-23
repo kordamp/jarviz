@@ -20,7 +20,7 @@ package org.kordamp.jarviz.cli.services;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.services.ListServicesJarProcessor;
+import org.kordamp.jarviz.core.processors.ListServicesJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
