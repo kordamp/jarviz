@@ -66,7 +66,7 @@ public class BytecodeVersion implements Comparable<BytecodeVersion> {
 
     @Override
     public String toString() {
-        return major + (0 != minor ? "." + minor : "");
+        return major + (0 != minor ? "." + minor : "") + asJavaVersion();
     }
 
     @Override
@@ -80,5 +80,19 @@ public class BytecodeVersion implements Comparable<BytecodeVersion> {
     @Override
     public int hashCode() {
         return Objects.hash(major, minor);
+    }
+
+    private String asJavaVersion() {
+        // Java 1.1
+        if (45 == major && 3 == minor) {
+            return " (Java 1.1)";
+        }
+
+        int javaVersion = major - 44;
+        if (65535 == minor) {
+            return " (Java " + javaVersion + "-preview)";
+        } else {
+            return " (Java " + javaVersion + ")";
+        }
     }
 }
