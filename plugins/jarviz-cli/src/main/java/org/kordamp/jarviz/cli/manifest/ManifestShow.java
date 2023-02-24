@@ -22,7 +22,7 @@ import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
-import org.kordamp.jarviz.core.processors.ShowManifestJarProcessor;
+import org.kordamp.jarviz.core.processors.ManifestShowJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -41,7 +41,7 @@ public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        ShowManifestJarProcessor processor = new ShowManifestJarProcessor(jarFileResolver);
+        ManifestShowJarProcessor processor = new ManifestShowJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results = processor.getResult();
         if (results.isEmpty()) {

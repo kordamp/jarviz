@@ -21,8 +21,9 @@ import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.ModuleDescriptorJarPathAnalyzer;
+import org.kordamp.jarviz.core.model.ModuleMetadata;
+import org.kordamp.jarviz.core.model.ModuleName;
 
-import java.lang.module.ModuleDescriptor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -33,16 +34,18 @@ import java.util.jar.JarFile;
  * @author Andres Almiray
  * @since 0.2.0
  */
-public class DescriptorModuleJarProcessor implements JarProcessor<ModuleDescriptor> {
+public class ModuleDescriptorJarProcessor implements JarProcessor<ModuleMetadata> {
     private final JarFileResolver jarFileResolver;
+    private final ModuleNameJarProcessor moduleNameJarProcessor;
 
-    public DescriptorModuleJarProcessor(JarFileResolver jarFileResolver) {
+    public ModuleDescriptorJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
+        this.moduleNameJarProcessor = new ModuleNameJarProcessor(jarFileResolver);
     }
 
     @Override
-    public Set<JarFileResult<ModuleDescriptor>> getResult() throws JarvizException {
-        Set<JarFileResult<ModuleDescriptor>> set = new TreeSet<>();
+    public Set<JarFileResult<ModuleMetadata>> getResult() throws JarvizException {
+        Set<JarFileResult<ModuleMetadata>> set = new TreeSet<>();
 
         for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
             set.add(processJarFile(jarFile));
@@ -51,11 +54,16 @@ public class DescriptorModuleJarProcessor implements JarProcessor<ModuleDescript
         return set;
     }
 
-    private JarFileResult<ModuleDescriptor> processJarFile(JarFile jarFile) {
+    private JarFileResult<ModuleMetadata> processJarFile(JarFile jarFile) {
+        JarFileResult<ModuleName> moduleName = moduleNameJarProcessor.processJarFile(jarFile);
+        if (!moduleName.getResult().isValid()) {
+            return JarFileResult.of(jarFile, ModuleMetadata.of(moduleName.getResult()));
+        }
+
         Path jarPath = Paths.get(jarFile.getName());
 
         ModuleDescriptorJarPathAnalyzer analyzer = new ModuleDescriptorJarPathAnalyzer();
         analyzer.handle(jarPath);
-        return JarFileResult.of(jarFile, analyzer.getResult());
+        return JarFileResult.of(jarFile, ModuleMetadata.of(moduleName.getResult(), analyzer.getResult()));
     }
 }

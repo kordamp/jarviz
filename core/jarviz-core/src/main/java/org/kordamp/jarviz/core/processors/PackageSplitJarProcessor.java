@@ -21,7 +21,6 @@ import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
-import org.kordamp.jarviz.util.StringUtils;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -31,75 +30,19 @@ import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static org.kordamp.jarviz.util.StringUtils.isBlank;
 import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
  * @since 0.3.0
  */
-public class ValidatePackageJarProcessor implements JarProcessor<Set<String>> {
+public class PackageSplitJarProcessor implements JarProcessor<Set<String>> {
+    private static final String MODULE_INFO = "module-info.class";
     private static final String VERSIONED = "META-INF/versions/";
-
-    private static final Set<String> RESERVED_KEYWORDS = Set.of(
-        "abstract",
-        "assert",
-        "boolean",
-        "break",
-        "byte",
-        "case",
-        "catch",
-        "char",
-        "class",
-        "const",
-        "continue",
-        "default",
-        "do",
-        "double",
-        "else",
-        "enum",
-        "extends",
-        "final",
-        "finally",
-        "float",
-        "for",
-        "goto",
-        "if",
-        "implements",
-        "import",
-        "instanceof",
-        "int",
-        "interface",
-        "long",
-        "native",
-        "new",
-        "package",
-        "private",
-        "protected",
-        "public",
-        "return",
-        "short",
-        "static",
-        "strictfp",
-        "super",
-        "switch",
-        "synchronized",
-        "this",
-        "throw",
-        "throws",
-        "transient",
-        "try",
-        "void",
-        "volatile",
-        "while",
-        "true",
-        "false",
-        "null",
-        "_");
 
     private final JarFileResolver jarFileResolver;
 
-    public ValidatePackageJarProcessor(JarFileResolver jarFileResolver) {
+    public PackageSplitJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
@@ -107,23 +50,35 @@ public class ValidatePackageJarProcessor implements JarProcessor<Set<String>> {
     public Set<JarFileResult<Set<String>>> getResult() throws JarvizException {
         Set<JarFileResult<Set<String>>> set = new TreeSet<>();
 
+        PackageCounter packageCounter = new PackageCounter();
         PackageTracker packageTracker = new PackageTracker();
 
-        for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
+        Set<JarFile> jarFiles = jarFileResolver.resolveJarFiles();
+        if (jarFiles.size() < 2) {
+            throw new JarvizException(RB.$("ERROR_NOT_ENOUGH_INPUT_JARS", "2"));
+        }
+
+        for (JarFile jarFile : jarFiles) {
             try (jarFile) {
                 jarFile.stream()
                     .map(JarEntry::getName)
-                    .filter(entryName -> entryName.endsWith(".class"))
+                    .filter(entryName -> entryName.endsWith(".class") && !entryName.startsWith(VERSIONED) && !entryName.equals(MODULE_INFO))
                     .map(this::asPackage)
                     .distinct()
-                    .filter(StringUtils::isNotBlank)
-                    .filter(this::isInvalid)
-                    .forEach(thePackage -> packageTracker.add(jarFile, thePackage));
+                    .sorted()
+                    .forEach(thePackage -> {
+                        packageCounter.add(thePackage);
+                        packageTracker.add(jarFile, thePackage);
+                    });
             } catch (IOException e) {
                 throw new JarvizException(RB.$("ERROR_OPENING_JAR", jarFile.getName()));
             }
         }
 
+        // remove all packages with count == 1
+        packageCounter.cleanup();
+        // retain split packages
+        packageTracker.cleanup(packageCounter.packages.keySet());
         for (Map.Entry<JarFile, Set<String>> e : packageTracker.packages.entrySet()) {
             Set<String> splitPackages = e.getValue();
             if (!splitPackages.isEmpty()) {
@@ -135,22 +90,28 @@ public class ValidatePackageJarProcessor implements JarProcessor<Set<String>> {
     }
 
     private String asPackage(String name) {
-        if (name.startsWith(VERSIONED)) {
-            name = name.substring(VERSIONED.length());
-            int p = name.indexOf("/");
-            name = name.substring(p + 1);
-        }
         int i = name.lastIndexOf('/');
         return i != -1 ? name.substring(0, i).replace('/', '.') : "";
     }
 
-    private boolean isInvalid(String thePackage) {
-        for (String part : thePackage.split("\\.")) {
-            if (!isJavaIdentifier(part)) {
-                return true;
+    private static class PackageCounter {
+        private static final Integer ZERO = 0;
+        private final Map<String, Integer> packages = new LinkedHashMap<>();
+
+        private void add(String thePackage) {
+            if (isNotBlank(thePackage)) {
+                Integer count = packages.computeIfAbsent(thePackage, k -> ZERO);
+                packages.put(thePackage, count + 1);
             }
         }
-        return false;
+
+        private void cleanup() {
+            for (String key : new TreeSet<>(packages.keySet())) {
+                if (packages.get(key) == 1) {
+                    packages.remove(key);
+                }
+            }
+        }
     }
 
     private static class PackageTracker {
@@ -162,27 +123,11 @@ public class ValidatePackageJarProcessor implements JarProcessor<Set<String>> {
                     .add(thePackage);
             }
         }
-    }
 
-    private boolean isJavaIdentifier(String str) {
-        if (isBlank(str) || RESERVED_KEYWORDS.contains(str)) {
-            return false;
-        }
-
-        int first = Character.codePointAt(str, 0);
-        if (!Character.isJavaIdentifierStart(first)) {
-            return false;
-        }
-
-        int i = Character.charCount(first);
-        while (i < str.length()) {
-            int cp = Character.codePointAt(str, i);
-            if (!Character.isJavaIdentifierPart(cp)) {
-                return false;
+        private void cleanup(Set<String> splitPackages) {
+            for (Set<String> packagerPerJar : packages.values()) {
+                packagerPerJar.retainAll(splitPackages);
             }
-            i += Character.charCount(cp);
         }
-
-        return true;
     }
 }

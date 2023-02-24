@@ -20,7 +20,7 @@ package org.kordamp.jarviz.cli.manifest;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.QueryManifestJarProcessor;
+import org.kordamp.jarviz.core.processors.ManifestQueryJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -45,7 +45,7 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        QueryManifestJarProcessor processor = new QueryManifestJarProcessor(jarFileResolver);
+        ManifestQueryJarProcessor processor = new ManifestQueryJarProcessor(jarFileResolver);
         processor.setAttributeName(attributeName);
         processor.setSectionName(sectionName);
 

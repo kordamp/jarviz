@@ -32,10 +32,10 @@ import java.util.jar.Manifest;
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class ShowManifestJarProcessor implements JarProcessor<Optional<Manifest>> {
+public class ManifestShowJarProcessor implements JarProcessor<Optional<Manifest>> {
     private final JarFileResolver jarFileResolver;
 
-    public ShowManifestJarProcessor(JarFileResolver jarFileResolver) {
+    public ManifestShowJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

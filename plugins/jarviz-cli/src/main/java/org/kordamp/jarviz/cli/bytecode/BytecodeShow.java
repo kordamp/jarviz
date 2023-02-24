@@ -23,7 +23,7 @@ import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.model.BytecodeVersion;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
-import org.kordamp.jarviz.core.processors.ShowBytecodeJarProcessor;
+import org.kordamp.jarviz.core.processors.BytecodeShowJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -52,7 +52,7 @@ public class BytecodeShow extends AbstractJarvizSubcommand<Bytecode> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        ShowBytecodeJarProcessor processor = new ShowBytecodeJarProcessor(jarFileResolver);
+        BytecodeShowJarProcessor processor = new BytecodeShowJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<BytecodeVersions>> results = processor.getResult();
         if (results.isEmpty()) {

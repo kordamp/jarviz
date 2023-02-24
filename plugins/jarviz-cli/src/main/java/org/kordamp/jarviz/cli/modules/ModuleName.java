@@ -20,7 +20,7 @@ package org.kordamp.jarviz.cli.modules;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.NameModuleJarProcessor;
+import org.kordamp.jarviz.core.processors.ModuleNameJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -33,14 +33,14 @@ import java.util.Set;
  */
 @CommandLine.Command(name = "name")
 public class ModuleName extends AbstractJarvizSubcommand<Module> {
-    private static final String EXPLICIT = "explicit";
-    private static final String FILENAME = "filename";
-    private static final String MANIFEST = "manifest";
+    public static final String EXPLICIT = "explicit";
+    public static final String FILENAME = "filename";
+    public static final String MANIFEST = "manifest";
 
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        NameModuleJarProcessor processor = new NameModuleJarProcessor(jarFileResolver);
+        ModuleNameJarProcessor processor = new ModuleNameJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<org.kordamp.jarviz.core.model.ModuleName>> results = processor.getResult();
         if (results.isEmpty()) {
@@ -78,7 +78,7 @@ public class ModuleName extends AbstractJarvizSubcommand<Module> {
         }
     }
 
-    private String resolveSource(org.kordamp.jarviz.core.model.ModuleName moduleName) {
+    public static String resolveSource(org.kordamp.jarviz.core.model.ModuleName moduleName) {
         if (moduleName.isAutomaticByManifest()) return MANIFEST;
         if (moduleName.isAutomaticByFilename()) return FILENAME;
         return EXPLICIT;

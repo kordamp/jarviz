@@ -33,12 +33,12 @@ import java.util.jar.Manifest;
  * @author Andres Almiray
  * @since 0.1.0
  */
-public class QueryManifestJarProcessor implements JarProcessor<Optional<String>> {
+public class ManifestQueryJarProcessor implements JarProcessor<Optional<String>> {
     private final JarFileResolver jarFileResolver;
     private String attributeName;
     private String sectionName;
 
-    public QueryManifestJarProcessor(JarFileResolver jarFileResolver) {
+    public ManifestQueryJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 

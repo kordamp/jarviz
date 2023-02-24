@@ -20,7 +20,7 @@ package org.kordamp.jarviz.cli.services;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.ListServicesJarProcessor;
+import org.kordamp.jarviz.core.processors.ServicesListJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -40,7 +40,7 @@ public class ServicesList extends AbstractJarvizSubcommand<Services> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        ListServicesJarProcessor processor = new ListServicesJarProcessor(jarFileResolver);
+        ServicesListJarProcessor processor = new ServicesListJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results = processor.getResult();
         if (results.isEmpty()) {

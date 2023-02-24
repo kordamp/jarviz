@@ -20,7 +20,7 @@ package org.kordamp.jarviz.cli.packages;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.ValidatePackageJarProcessor;
+import org.kordamp.jarviz.core.processors.PackageValidateJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -36,7 +36,7 @@ public class PackagesValidate extends AbstractJarvizSubcommand<Packages> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        ValidatePackageJarProcessor processor = new ValidatePackageJarProcessor(jarFileResolver);
+        PackageValidateJarProcessor processor = new PackageValidateJarProcessor(jarFileResolver);
 
         Set<JarProcessor.JarFileResult<Set<String>>> results = processor.getResult();
 

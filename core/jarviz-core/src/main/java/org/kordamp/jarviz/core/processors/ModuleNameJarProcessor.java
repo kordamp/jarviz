@@ -41,13 +41,13 @@ import static org.kordamp.jarviz.core.Constants.ATTR_AUTOMATIC_MODULE_NAME;
  * @author Andres Almiray
  * @since 0.2.0
  */
-public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
+public class ModuleNameJarProcessor implements JarProcessor<ModuleName> {
     // This should be the correct pattern
     // private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+(\\.|_|-|\\+|$))");
     private static final Pattern VERSION_PATTERN = Pattern.compile("-(\\d+(\\.|$))");
     private final JarFileResolver jarFileResolver;
 
-    public NameModuleJarProcessor(JarFileResolver jarFileResolver) {
+    public ModuleNameJarProcessor(JarFileResolver jarFileResolver) {
         this.jarFileResolver = jarFileResolver;
     }
 
@@ -62,7 +62,7 @@ public class NameModuleJarProcessor implements JarProcessor<ModuleName> {
         return set;
     }
 
-    private JarFileResult<ModuleName> processJarFile(JarFile jarFile) {
+    JarFileResult<ModuleName> processJarFile(JarFile jarFile) {
         Path jarPath = Paths.get(jarFile.getName());
         String automaticModuleNameByFilename = deriveModuleNameFromFilename(jarPath.getFileName().toString());
         String automaticModuleNameByManifest = null;

@@ -20,7 +20,8 @@ package org.kordamp.jarviz.cli.modules;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
 import org.kordamp.jarviz.core.JarFileResolver;
 import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.DescriptorModuleJarProcessor;
+import org.kordamp.jarviz.core.model.ModuleMetadata;
+import org.kordamp.jarviz.core.processors.ModuleDescriptorJarProcessor;
 import org.kordamp.jarviz.reporting.Format;
 import org.kordamp.jarviz.reporting.Node;
 import picocli.CommandLine;
@@ -35,6 +36,8 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.kordamp.jarviz.cli.internal.Colorizer.magenta;
+import static org.kordamp.jarviz.cli.modules.ModuleName.EXPLICIT;
+import static org.kordamp.jarviz.cli.modules.ModuleName.resolveSource;
 
 /**
  * @author Andres Almiray
@@ -45,9 +48,9 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
     @Override
     protected int execute() {
         JarFileResolver jarFileResolver = createJarFileResolver();
-        DescriptorModuleJarProcessor processor = new DescriptorModuleJarProcessor(jarFileResolver);
+        ModuleDescriptorJarProcessor processor = new ModuleDescriptorJarProcessor(jarFileResolver);
 
-        Set<JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor>> results = processor.getResult();
+        Set<JarProcessor.JarFileResult<ModuleMetadata>> results = processor.getResult();
         if (results.isEmpty()) {
             return 1;
         }
@@ -58,9 +61,9 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         return 0;
     }
 
-    private void output(Set<JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor>> results) {
+    private void output(Set<JarProcessor.JarFileResult<ModuleMetadata>> results) {
         Node root = createRootNode();
-        for (JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result : results) {
+        for (JarProcessor.JarFileResult<ModuleMetadata> result : results) {
             if (null == outputFormat) {
                 output(result);
             } else {
@@ -70,9 +73,20 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
     }
 
-    private void output(JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result) {
+    private void output(JarProcessor.JarFileResult<ModuleMetadata> result) {
         parent().getOut().println($$("output.subject", result.getJarFileName()));
-        java.lang.module.ModuleDescriptor md = result.getResult();
+
+        org.kordamp.jarviz.core.model.ModuleName moduleName = result.getResult().getModuleName();
+        if (!moduleName.isValid()) {
+            parent().getOut().println($$("module.name", moduleName.getModuleName()));
+            parent().getOut().println($$("module.source", resolveSource(moduleName)));
+            parent().getOut().println($$("module.automatic", $b(!EXPLICIT.equals(resolveSource(moduleName)))));
+            parent().getOut().println($$("module.valid", $b(moduleName.isValid())));
+            parent().getOut().println($$("module.reason", moduleName.getReason()));
+            return;
+        }
+
+        java.lang.module.ModuleDescriptor md = result.getResult().getModuleDescriptor().get();
 
         List<java.lang.module.ModuleDescriptor.Exports> unqualifiedExports = md.exports().stream()
             .sorted(comparing(java.lang.module.ModuleDescriptor.Exports::source))
@@ -159,22 +173,33 @@ public class ModuleDescriptor extends AbstractJarvizSubcommand<Module> {
         }
     }
 
-    private void report(Set<JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor>> results) {
+    private void report(Set<JarProcessor.JarFileResult<ModuleMetadata>> results) {
         if (null == reportPath) return;
 
         for (Format format : validateReportFormats()) {
             Node root = createRootNode();
-            for (JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result : results) {
+            for (JarProcessor.JarFileResult<ModuleMetadata> result : results) {
                 buildReport(format, root, result);
             }
             writeReport(resolveFormatter(format).write(root), format);
         }
     }
 
-    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<java.lang.module.ModuleDescriptor> result) {
-        java.lang.module.ModuleDescriptor md = result.getResult();
+    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<ModuleMetadata> result) {
 
         appendSubject(root, result.getJarPath(), "module descriptor", resultNode -> {
+            org.kordamp.jarviz.core.model.ModuleName moduleName = result.getResult().getModuleName();
+            if (!moduleName.isValid()) {
+                resultNode.node($("report.key.name")).value(moduleName.getModuleName()).end()
+                    .node($("report.key.source")).value(resolveSource(moduleName)).end()
+                    .node($("report.key.automatic")).value(!EXPLICIT.equals(resolveSource(moduleName))).end()
+                    .node($("report.key.valid")).value(moduleName.isValid()).end()
+                    .node($("report.key.reason")).value(moduleName.getReason()).end();
+                return;
+            }
+
+            java.lang.module.ModuleDescriptor md = result.getResult().getModuleDescriptor().get();
+
             Node module = resultNode.node($("report.key.module"));
             module.node($("report.key.name")).value(md.name()).end();
             md.version().ifPresent(v -> module.node($("report.key.version")).value(v).end());
