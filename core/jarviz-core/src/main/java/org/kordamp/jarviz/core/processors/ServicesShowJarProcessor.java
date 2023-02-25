@@ -17,9 +17,8 @@
  */
 package org.kordamp.jarviz.core.processors;
 
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
+import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 
 import java.io.BufferedReader;
 import java.io.IOException;

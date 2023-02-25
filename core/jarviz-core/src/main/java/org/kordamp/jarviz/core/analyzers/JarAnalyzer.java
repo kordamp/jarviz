@@ -15,14 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core;
-
-import java.util.jar.JarFile;
+package org.kordamp.jarviz.core.analyzers;
 
 /**
  * @author Andres Almiray
- * @since 0.2.0
+ * @since 0.1.0
  */
-public interface JarFileAnalyzer<R> extends JarAnalyzer<R> {
-    void handle(JarFile jarFile) throws JarvizException;
+public interface JarAnalyzer<R> {
+    R getResult();
 }

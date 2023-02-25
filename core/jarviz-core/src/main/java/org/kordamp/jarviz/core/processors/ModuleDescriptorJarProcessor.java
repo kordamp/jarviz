@@ -17,12 +17,11 @@
  */
 package org.kordamp.jarviz.core.processors;
 
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.ModuleDescriptorJarPathAnalyzer;
 import org.kordamp.jarviz.core.model.ModuleMetadata;
 import org.kordamp.jarviz.core.model.ModuleName;
+import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -15,7 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core;
+package org.kordamp.jarviz.core.processors;
+
+import org.kordamp.jarviz.core.JarvizException;
 
 import java.nio.file.Path;
 import java.util.Objects;

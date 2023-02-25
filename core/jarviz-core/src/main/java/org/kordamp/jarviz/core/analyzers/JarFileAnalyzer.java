@@ -15,25 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.mrjar;
+package org.kordamp.jarviz.core.analyzers;
 
-import org.kordamp.jarviz.cli.Main;
-import org.kordamp.jarviz.cli.internal.AbstractJarvizCommand;
-import picocli.CommandLine;
+import org.kordamp.jarviz.core.JarvizException;
+
+import java.util.jar.JarFile;
 
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.2.0
  */
-@CommandLine.Command(name = "mrjar",
-    subcommands = MrjarValidate.class)
-public class Mrjar extends AbstractJarvizCommand<Main> {
-    @CommandLine.Spec
-    public CommandLine.Model.CommandSpec spec;
-
-    @Override
-    protected int execute() {
-        spec.commandLine().usage(parent.getOut());
-        return 0;
-    }
+public interface JarFileAnalyzer<R> extends JarAnalyzer<R> {
+    void handle(JarFile jarFile) throws JarvizException;
 }

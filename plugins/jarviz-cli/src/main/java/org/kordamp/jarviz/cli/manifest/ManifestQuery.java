@@ -18,17 +18,8 @@
 package org.kordamp.jarviz.cli.manifest;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.ManifestQueryJarProcessor;
-import org.kordamp.jarviz.reporting.Format;
-import org.kordamp.jarviz.reporting.Node;
+import org.kordamp.jarviz.commands.ManifestQueryCommand;
 import picocli.CommandLine;
-
-import java.util.Optional;
-import java.util.Set;
-
-import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
@@ -44,64 +35,21 @@ public class ManifestQuery extends AbstractJarvizSubcommand<Manifest> {
 
     @Override
     protected int execute() {
-        JarFileResolver jarFileResolver = createJarFileResolver();
-        ManifestQueryJarProcessor processor = new ManifestQueryJarProcessor(jarFileResolver);
-        processor.setAttributeName(attributeName);
-        processor.setSectionName(sectionName);
-
-        Set<JarProcessor.JarFileResult<Optional<String>>> results = processor.getResult();
-        if (results.isEmpty()) {
-            return 1;
-        }
-
-        output(results);
-        report(results);
-
-        return 0;
-    }
-
-    private void output(Set<JarProcessor.JarFileResult<Optional<String>>> results) {
-        Node root = createRootNode();
-        for (JarProcessor.JarFileResult<Optional<String>> result : results) {
-            if (null == outputFormat) {
-                output(result);
-            } else {
-                buildReport(root, result);
-            }
-        }
-        if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
-    }
-
-    private void output(JarProcessor.JarFileResult<Optional<String>> result) {
-        if (result.getResult().isPresent()) {
-            parent().getOut().println($$("output.subject", result.getJarFileName()));
-            parent().getOut().println($$("manifest.query.attribute", attributeName, result.getResult().get()));
-        }
-    }
-
-    private void report(Set<JarProcessor.JarFileResult<Optional<String>>> results) {
-        if (null == reportPath) return;
-
-        for (Format format : validateReportFormats()) {
-            Node root = createRootNode();
-            for (JarProcessor.JarFileResult<Optional<String>> result : results) {
-                if (result.getResult().isPresent()) {
-                    buildReport(root, result);
-                }
-            }
-            writeReport(resolveFormatter(format).write(root), format);
-        }
-    }
-
-    private void buildReport(Node root, JarProcessor.JarFileResult<Optional<String>> result) {
-        appendSubject(root, result.getJarPath(), "manifest query", resultNode -> {
-            if (isNotBlank(sectionName)) {
-                resultNode.node($("report.key.section.name")).value(sectionName).end();
-            }
-
-            resultNode.node($("report.key.attribute.name"))
-                .node($("report.key.name")).value(attributeName).end()
-                .node($("report.key.value")).value(result.getResult().get()).end();
-        });
+        return new ManifestQueryCommand().execute(ManifestQueryCommand.config()
+            .withOut(parent().getOut())
+            .withErr(parent().getErr())
+            .withFailOnError(failOnError)
+            .withGavs(collectEntries(gav))
+            .withFiles(collectEntries(file))
+            .withUrls(collectEntries(url))
+            .withClasspaths(collectEntries(classpath))
+            .withDirectories(collectEntries(directory))
+            .withCacheDirectory(cache)
+            .withReportPath(reportPath)
+            .withReportFormats(resolveReportFormats())
+            .withOutputFormat(outputFormat)
+            .withSectionName(sectionName)
+            .withAttributeName(attributeName)
+        );
     }
 }

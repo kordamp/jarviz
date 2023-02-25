@@ -17,8 +17,6 @@
  */
 package org.kordamp.jarviz.core.resolvers;
 
-import org.kordamp.jarviz.core.JarFileResolver;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.JarFile;

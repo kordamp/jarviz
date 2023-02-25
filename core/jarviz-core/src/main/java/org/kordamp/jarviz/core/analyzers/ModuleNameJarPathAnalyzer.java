@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.core.analyzers;
 
-import org.kordamp.jarviz.core.JarPathAnalyzer;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.model.ModuleName;
 

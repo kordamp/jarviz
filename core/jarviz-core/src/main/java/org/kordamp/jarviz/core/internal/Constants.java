@@ -15,16 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.cli.bytecode;
-
-import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
-import picocli.CommandLine;
+package org.kordamp.jarviz.core.internal;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-@CommandLine.Command(name = "validate")
-public class BytecodeValidate extends AbstractJarvizSubcommand<Bytecode> {
-
+public interface Constants {
+    String ATTR_BYTECODE_VERSION = "Bytecode-Version";
+    String ATTR_AUTOMATIC_MODULE_NAME = "Automatic-Module-Name";
 }

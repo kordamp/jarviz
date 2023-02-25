@@ -18,15 +18,8 @@
 package org.kordamp.jarviz.cli.services;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.ServicesListJarProcessor;
-import org.kordamp.jarviz.reporting.Format;
-import org.kordamp.jarviz.reporting.Node;
+import org.kordamp.jarviz.commands.ServicesListCommand;
 import picocli.CommandLine;
-
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -34,69 +27,21 @@ import java.util.Set;
  */
 @CommandLine.Command(name = "list")
 public class ServicesList extends AbstractJarvizSubcommand<Services> {
-    // @CommandLine.Option(names = {"--release"})
-    // public Integer file;
-
     @Override
     protected int execute() {
-        JarFileResolver jarFileResolver = createJarFileResolver();
-        ServicesListJarProcessor processor = new ServicesListJarProcessor(jarFileResolver);
-
-        Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results = processor.getResult();
-        if (results.isEmpty()) {
-            return 1;
-        }
-
-        output(results);
-        report(results);
-
-        return 0;
-    }
-
-    private void output(Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results) {
-        Node root = createRootNode();
-        for (JarProcessor.JarFileResult<Optional<Set<String>>> result : results) {
-            if (null == outputFormat) {
-                output(result);
-            } else {
-                buildReport(outputFormat, root, result);
-            }
-        }
-        if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
-    }
-
-    private void output(JarProcessor.JarFileResult<Optional<Set<String>>> result) {
-        if (result.getResult().isPresent()) {
-            parent().getOut().println($$("output.subject", result.getJarFileName()));
-            result.getResult().get().forEach(parent().getOut()::println);
-        }
-    }
-
-    private void report(Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results) {
-        if (null == reportPath) return;
-
-        for (Format format : validateReportFormats()) {
-            Node root = createRootNode();
-            for (JarProcessor.JarFileResult<Optional<Set<String>>> result : results) {
-                if (result.getResult().isPresent()) {
-                    buildReport(format, root, result);
-                }
-            }
-            writeReport(resolveFormatter(format).write(root), format);
-        }
-    }
-
-    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<Optional<Set<String>>> result) {
-        appendSubject(root, result.getJarPath(), "services list", resultNode -> {
-            Node implementations = resultNode.array($("report.key.services"));
-
-            for (String service : result.getResult().get()) {
-                if (format != Format.XML) {
-                    implementations.node(service);
-                } else {
-                    implementations.node($("report.key.service")).value(service).end();
-                }
-            }
-        });
+        return new ServicesListCommand().execute(ServicesListCommand.config()
+            .withOut(parent().getOut())
+            .withErr(parent().getErr())
+            .withFailOnError(failOnError)
+            .withGavs(collectEntries(gav))
+            .withFiles(collectEntries(file))
+            .withUrls(collectEntries(url))
+            .withClasspaths(collectEntries(classpath))
+            .withDirectories(collectEntries(directory))
+            .withCacheDirectory(cache)
+            .withReportPath(reportPath)
+            .withReportFormats(resolveReportFormats())
+            .withOutputFormat(outputFormat)
+        );
     }
 }

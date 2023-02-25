@@ -21,10 +21,9 @@
  * @since 0.3.0
  */
 module org.kordamp.jarviz.core {
-    exports org.kordamp.jarviz.bundle;
+    requires info.picocli;
+
     exports org.kordamp.jarviz.core;
-    exports org.kordamp.jarviz.core.model;
-    exports org.kordamp.jarviz.core.processors;
-    exports org.kordamp.jarviz.reporting;
+    exports org.kordamp.jarviz.commands;
     exports org.kordamp.jarviz.util;
 }

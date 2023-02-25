@@ -17,10 +17,27 @@
  */
 package org.kordamp.jarviz.core;
 
+import java.util.Locale;
+
+import static org.kordamp.jarviz.util.StringUtils.isBlank;
+
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.2.0
  */
-public interface JarAnalyzer<R> {
-    R getResult();
+public enum Format {
+    TXT,
+    JSON,
+    YAML,
+    XML;
+
+    @Override
+    public String toString() {
+        return name().toLowerCase(Locale.ENGLISH);
+    }
+
+    public static Format of(String str) {
+        if (isBlank(str)) return null;
+        return Format.valueOf(str.toUpperCase(Locale.ENGLISH).trim());
+    }
 }

@@ -55,3 +55,14 @@ projects {
         }
     }
 }
+
+enforce {
+    mergeStrategy = 'append'
+
+    rule(enforcer.rules.ForceDependencies) { r ->
+        r.dependencies.addAll "org.codehaus.plexus:plexus-utils:3.4.2",
+            "org.codehaus.plexus:plexus-classworlds:2.6.0",
+            "org.codehaus.plexus:plexus-component-annotations:2.1.0",
+            "org.apache.commons:commons-lang3:3.12.0"
+    }
+}

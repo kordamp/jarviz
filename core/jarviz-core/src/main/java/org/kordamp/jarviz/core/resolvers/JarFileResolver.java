@@ -15,15 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core;
+package org.kordamp.jarviz.core.resolvers;
 
-import java.util.jar.JarEntry;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 /**
  * @author Andres Almiray
  * @since 0.1.0
  */
-public interface JarContentAnalyzer<R> extends JarAnalyzer<R> {
-    void handle(JarFile jarFile, JarEntry jarEntry) throws JarvizException;
+public interface JarFileResolver {
+    Set<JarFile> resolveJarFiles();
 }

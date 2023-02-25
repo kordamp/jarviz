@@ -17,12 +17,11 @@
  */
 package org.kordamp.jarviz.core.processors;
 
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.ModuleNameJarPathAnalyzer;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.core.model.ModuleName;
+import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 import org.kordamp.jarviz.util.JarUtils;
 
 import java.nio.file.Path;
@@ -35,7 +34,7 @@ import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.kordamp.jarviz.core.Constants.ATTR_AUTOMATIC_MODULE_NAME;
+import static org.kordamp.jarviz.core.internal.Constants.ATTR_AUTOMATIC_MODULE_NAME;
 
 /**
  * @author Andres Almiray
@@ -87,6 +86,6 @@ public class ModuleNameJarProcessor implements JarProcessor<ModuleName> {
             name = name.substring(0, matcher.start());
         }
 
-        return name.replace("[^A-Za-z0-9]", ".");
+        return name.replaceAll("[^A-Za-z0-9]", ".");
     }
 }

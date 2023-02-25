@@ -18,15 +18,8 @@
 package org.kordamp.jarviz.cli.services;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.ServicesShowJarProcessor;
-import org.kordamp.jarviz.reporting.Format;
-import org.kordamp.jarviz.reporting.Node;
+import org.kordamp.jarviz.commands.ServicesShowCommand;
 import picocli.CommandLine;
-
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -37,72 +30,22 @@ public class ServicesShow extends AbstractJarvizSubcommand<Services> {
     @CommandLine.Option(names = {"--service-name"}, required = true, paramLabel = "<name>")
     public String serviceName;
 
-    @CommandLine.Option(names = {"--release"})
-    public Integer file;
-
     @Override
     protected int execute() {
-        JarFileResolver jarFileResolver = createJarFileResolver();
-        ServicesShowJarProcessor processor = new ServicesShowJarProcessor(jarFileResolver);
-        processor.setServiceName(serviceName);
-
-        Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results = processor.getResult();
-        if (results.isEmpty()) {
-            return 1;
-        }
-
-        output(results);
-        report(results);
-
-        return 0;
-    }
-
-    private void output(Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results) {
-        Node root = createRootNode();
-        for (JarProcessor.JarFileResult<Optional<Set<String>>> result : results) {
-            if (null == outputFormat) {
-                output(result);
-            } else {
-                buildReport(outputFormat, root, result);
-            }
-        }
-        writeOutput(resolveFormatter(outputFormat).write(root));
-    }
-
-    private void output(JarProcessor.JarFileResult<Optional<Set<String>>> result) {
-        if (result.getResult().isPresent()) {
-            parent().getOut().println($$("output.subject", result.getJarFileName()));
-            parent().getOut().println($$("services.show.service", serviceName));
-            result.getResult().get().forEach(parent().getOut()::println);
-        }
-    }
-
-    private void report(Set<JarProcessor.JarFileResult<Optional<Set<String>>>> results) {
-        if (null == reportPath) return;
-
-        for (Format format : validateReportFormats()) {
-            Node root = createRootNode();
-            for (JarProcessor.JarFileResult<Optional<Set<String>>> result : results) {
-                if (result.getResult().isPresent()) {
-                    buildReport(format, root, result);
-                }
-            }
-            if (null != outputFormat) writeReport(resolveFormatter(format).write(root), format);
-        }
-    }
-
-    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<Optional<Set<String>>> result) {
-        appendSubject(root, result.getJarPath(), "services list", resultNode -> {
-            Node implementations = resultNode.node($("report.key.service")).value(serviceName).end()
-                .array($("report.key.implementations"));
-
-            for (String service : result.getResult().get()) {
-                if (format != Format.XML) {
-                    implementations.node(service);
-                } else {
-                    implementations.node($("report.key.implementation")).value(service).end();
-                }
-            }
-        });
+        return new ServicesShowCommand().execute(ServicesShowCommand.config()
+            .withOut(parent().getOut())
+            .withErr(parent().getErr())
+            .withFailOnError(failOnError)
+            .withGavs(collectEntries(gav))
+            .withFiles(collectEntries(file))
+            .withUrls(collectEntries(url))
+            .withClasspaths(collectEntries(classpath))
+            .withDirectories(collectEntries(directory))
+            .withCacheDirectory(cache)
+            .withReportPath(reportPath)
+            .withReportFormats(resolveReportFormats())
+            .withOutputFormat(outputFormat)
+            .withServiceName(serviceName)
+        );
     }
 }

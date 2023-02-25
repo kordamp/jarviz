@@ -21,6 +21,10 @@ config {
     }
 }
 
+dependencies {
+    api "info.picocli:picocli:$picocliVersion"
+}
+
 project.rootProject.gradle.addBuildListener(new BuildAdapter() {
     @Override
     void projectsEvaluated(Gradle gradle) {

@@ -17,12 +17,11 @@
  */
 package org.kordamp.jarviz.core.processors;
 
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
 import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.analyzers.QueryJarManifestAnalyzer;
 import org.kordamp.jarviz.core.model.BytecodeVersion;
 import org.kordamp.jarviz.core.model.BytecodeVersions;
+import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 import org.kordamp.jarviz.util.JarUtils;
 
 import java.util.Enumeration;
@@ -36,7 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Arrays.stream;
-import static org.kordamp.jarviz.core.Constants.ATTR_BYTECODE_VERSION;
+import static org.kordamp.jarviz.core.internal.Constants.ATTR_BYTECODE_VERSION;
 import static org.kordamp.jarviz.util.JarUtils.readBytecodeVersion;
 
 /**

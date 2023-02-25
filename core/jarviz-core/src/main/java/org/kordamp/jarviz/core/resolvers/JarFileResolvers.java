@@ -15,14 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core;
-
-import org.kordamp.jarviz.core.resolvers.ClasspathBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.CompositeJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.DirectoryBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.GavBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.PathBasedJarFileResolver;
-import org.kordamp.jarviz.core.resolvers.UrlBasedJarFileResolver;
+package org.kordamp.jarviz.core.resolvers;
 
 import java.net.URL;
 import java.nio.file.Path;

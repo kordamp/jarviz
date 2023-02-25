@@ -22,6 +22,10 @@ package org.kordamp.jarviz.core.model;
  * @since 0.2.0
  */
 public class ModuleName {
+    public static final String EXPLICIT = "explicit";
+    public static final String FILENAME = "filename";
+    public static final String MANIFEST = "manifest";
+
     private final String moduleName;
     private final boolean automaticByManifest;
     private final boolean automaticByFilename;
@@ -34,6 +38,12 @@ public class ModuleName {
         this.automaticByFilename = automaticByFilename;
         this.valid = null == reason;
         this.reason = reason;
+    }
+
+    public String resolveSource() {
+        if (isAutomaticByManifest()) return MANIFEST;
+        if (isAutomaticByFilename()) return FILENAME;
+        return EXPLICIT;
     }
 
     public boolean isAutomatic() {
@@ -56,8 +66,16 @@ public class ModuleName {
         return valid;
     }
 
+    public boolean isNotValid() {
+        return !valid;
+    }
+
     public String getReason() {
         return reason;
+    }
+
+    public String asError() {
+        return moduleName + " (" + resolveSource() + ") is not valid because " + reason;
     }
 
     public static ModuleName fromAutomaticByManifest(String moduleName, String reason) {

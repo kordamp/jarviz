@@ -15,15 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.core;
+package org.kordamp.jarviz.core.analyzers;
 
-import java.util.Set;
-import java.util.jar.JarFile;
+import org.kordamp.jarviz.core.JarvizException;
+
+import java.nio.file.Path;
 
 /**
  * @author Andres Almiray
- * @since 0.1.0
+ * @since 0.2.0
  */
-public interface JarFileResolver {
-    Set<JarFile> resolveJarFiles();
+public interface JarPathAnalyzer<R> extends JarAnalyzer<R> {
+    void handle(Path path) throws JarvizException;
 }

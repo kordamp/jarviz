@@ -17,20 +17,9 @@
  */
 package org.kordamp.jarviz.cli.manifest;
 
-import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.JarvizException;
-import org.kordamp.jarviz.core.processors.ManifestShowJarProcessor;
-import org.kordamp.jarviz.reporting.Format;
-import org.kordamp.jarviz.reporting.Node;
+import org.kordamp.jarviz.commands.ManifestShowCommand;
 import picocli.CommandLine;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -40,63 +29,19 @@ import java.util.Set;
 public class ManifestShow extends AbstractJarvizSubcommand<Manifest> {
     @Override
     protected int execute() {
-        JarFileResolver jarFileResolver = createJarFileResolver();
-        ManifestShowJarProcessor processor = new ManifestShowJarProcessor(jarFileResolver);
-
-        Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results = processor.getResult();
-        if (results.isEmpty()) {
-            return 1;
-        }
-
-        output(results);
-        report(results);
-
-        return 0;
-    }
-
-    private void output(Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results) {
-        Node root = createRootNode();
-        for (JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result : results) {
-            if (null == outputFormat) {
-                output(result);
-            } else {
-                buildReport(root, result);
-            }
-        }
-        if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
-    }
-
-    private void output(JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result) {
-        if (result.getResult().isPresent()) {
-            parent().getOut().println($$("output.subject", result.getJarFileName()));
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                result.getResult().get().write(baos);
-                baos.flush();
-                baos.close();
-                parent().getOut().println(baos);
-            } catch (IOException e) {
-                throw new JarvizException(RB.$("ERROR_UNEXPECTED_WRITE"), e);
-            }
-        }
-    }
-
-    private void report(Set<JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>>> results) {
-        if (null == reportPath) return;
-
-        for (Format format : validateReportFormats()) {
-            Node root = createRootNode();
-            for (JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result : results) {
-                if (result.getResult().isPresent()) {
-                    buildReport(root, result);
-                }
-            }
-            writeReport(resolveFormatter(format).write(root), format);
-        }
-    }
-
-    private void buildReport(Node root, JarProcessor.JarFileResult<Optional<java.util.jar.Manifest>> result) {
-        appendSubject(root, result.getJarPath(), "manifest show",
-            resultNode -> resultNode.node($("report.key.manifest")).value(result.getResult().get()).end());
+        return new ManifestShowCommand().execute(ManifestShowCommand.config()
+            .withOut(parent().getOut())
+            .withErr(parent().getErr())
+            .withFailOnError(failOnError)
+            .withGavs(collectEntries(gav))
+            .withFiles(collectEntries(file))
+            .withUrls(collectEntries(url))
+            .withClasspaths(collectEntries(classpath))
+            .withDirectories(collectEntries(directory))
+            .withCacheDirectory(cache)
+            .withReportPath(reportPath)
+            .withReportFormats(resolveReportFormats())
+            .withOutputFormat(outputFormat)
+        );
     }
 }

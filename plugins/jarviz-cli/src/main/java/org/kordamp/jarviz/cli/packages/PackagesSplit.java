@@ -18,14 +18,8 @@
 package org.kordamp.jarviz.cli.packages;
 
 import org.kordamp.jarviz.cli.internal.AbstractJarvizSubcommand;
-import org.kordamp.jarviz.core.JarFileResolver;
-import org.kordamp.jarviz.core.JarProcessor;
-import org.kordamp.jarviz.core.processors.PackageSplitJarProcessor;
-import org.kordamp.jarviz.reporting.Format;
-import org.kordamp.jarviz.reporting.Node;
+import org.kordamp.jarviz.commands.PackagesSplitCommand;
 import picocli.CommandLine;
-
-import java.util.Set;
 
 /**
  * @author Andres Almiray
@@ -35,59 +29,19 @@ import java.util.Set;
 public class PackagesSplit extends AbstractJarvizSubcommand<Packages> {
     @Override
     protected int execute() {
-        JarFileResolver jarFileResolver = createJarFileResolver();
-        PackageSplitJarProcessor processor = new PackageSplitJarProcessor(jarFileResolver);
-
-        Set<JarProcessor.JarFileResult<Set<String>>> results = processor.getResult();
-
-        output(results);
-        report(results);
-
-        return 0;
-    }
-
-    private void output(Set<JarProcessor.JarFileResult<Set<String>>> results) {
-        Node root = createRootNode();
-        for (JarProcessor.JarFileResult<Set<String>> result : results) {
-            if (null == outputFormat) {
-                output(result);
-            } else {
-                buildReport(outputFormat, root, result);
-            }
-        }
-        if (null != outputFormat) writeOutput(resolveFormatter(outputFormat).write(root));
-    }
-
-    private void output(JarProcessor.JarFileResult<Set<String>> result) {
-        parent().getOut().println($$("output.subject", result.getJarFileName()));
-        parent().getOut().println($$("output.total", result.getResult().size()));
-        result.getResult().forEach(parent().getOut()::println);
-    }
-
-    private void report(Set<JarProcessor.JarFileResult<Set<String>>> results) {
-        if (null == reportPath) return;
-
-        for (Format format : validateReportFormats()) {
-            Node root = createRootNode();
-            for (JarProcessor.JarFileResult<Set<String>> result : results) {
-                buildReport(format, root, result);
-            }
-            writeReport(resolveFormatter(format).write(root), format);
-        }
-    }
-
-    private void buildReport(Format format, Node root, JarProcessor.JarFileResult<Set<String>> result) {
-        appendSubject(root, result.getJarPath(), "packages split", resultNode -> {
-            resultNode.node($("report.key.total")).value(result.getResult().size()).end();
-            Node packages = resultNode.array($("report.key.packages"));
-
-            for (String thePackage : result.getResult()) {
-                if (format == Format.TXT) {
-                    packages.node(thePackage);
-                } else {
-                    packages.collapsable($("report.key.package")).value(thePackage).end();
-                }
-            }
-        });
+        return new PackagesSplitCommand().execute(PackagesSplitCommand.config()
+            .withOut(parent().getOut())
+            .withErr(parent().getErr())
+            .withFailOnError(failOnError)
+            .withGavs(collectEntries(gav))
+            .withFiles(collectEntries(file))
+            .withUrls(collectEntries(url))
+            .withClasspaths(collectEntries(classpath))
+            .withDirectories(collectEntries(directory))
+            .withCacheDirectory(cache)
+            .withReportPath(reportPath)
+            .withReportFormats(resolveReportFormats())
+            .withOutputFormat(outputFormat)
+        );
     }
 }

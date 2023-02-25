@@ -17,7 +17,6 @@
  */
 package org.kordamp.jarviz.core.analyzers;
 
-import org.kordamp.jarviz.core.JarManifestAnalyzer;
 import org.kordamp.jarviz.core.JarvizException;
 
 import java.util.Optional;

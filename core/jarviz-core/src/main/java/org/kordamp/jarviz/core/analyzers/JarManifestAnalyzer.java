@@ -15,29 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kordamp.jarviz.reporting;
+package org.kordamp.jarviz.core.analyzers;
 
-import java.util.Locale;
+import org.kordamp.jarviz.core.JarvizException;
 
-import static org.kordamp.jarviz.util.StringUtils.isBlank;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  * @author Andres Almiray
- * @since 0.2.0
+ * @since 0.1.0
  */
-public enum Format {
-    TXT,
-    JSON,
-    YAML,
-    XML;
-
-    @Override
-    public String toString() {
-        return name().toLowerCase(Locale.ENGLISH);
-    }
-
-    public static Format of(String str) {
-        if (isBlank(str)) return null;
-        return Format.valueOf(str.toUpperCase(Locale.ENGLISH).trim());
-    }
+public interface JarManifestAnalyzer<R> extends JarAnalyzer<R> {
+    void handle(JarFile jarFile, Manifest manifest) throws JarvizException;
 }
