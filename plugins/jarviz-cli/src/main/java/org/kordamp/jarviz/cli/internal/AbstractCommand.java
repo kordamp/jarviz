@@ -17,6 +17,7 @@
  */
 package org.kordamp.jarviz.cli.internal;
 
+import org.kordamp.jarviz.core.InsufficientInputsException;
 import org.kordamp.jarviz.cli.IO;
 import org.kordamp.jarviz.core.JarvizException;
 import picocli.CommandLine;
@@ -58,6 +59,13 @@ public abstract class AbstractCommand<C extends IO> extends BaseCommand implemen
 
         try {
             return execute();
+        } catch (InsufficientInputsException e) {
+            ErrorColorizer colorizer = new ErrorColorizer(parent().getOut());
+            String message = e.getMessage();
+            colorizer.println(message);
+            printDetails(e.getCause(), message, colorizer);
+            spec.commandLine().usage(getOut());
+            return 1;
         } catch (JarvizException e) {
             ErrorColorizer colorizer = new ErrorColorizer(parent().getOut());
             String message = e.getMessage();

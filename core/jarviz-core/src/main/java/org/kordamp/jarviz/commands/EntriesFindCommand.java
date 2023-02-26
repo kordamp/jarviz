@@ -75,6 +75,8 @@ public class EntriesFindCommand extends AbstractCommand<EntriesFindCommand.Confi
         processor.setEntryPattern(configuration.getEntryPattern());
 
         Set<JarProcessor.JarFileResult<Set<String>>> results = processor.getResult();
+        // may have been updated
+        configuration.withEntryPattern(processor.getEntryPattern());
         if (results.isEmpty()) {
             return 1;
         }

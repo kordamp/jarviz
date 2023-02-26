@@ -17,6 +17,7 @@
  */
 package org.kordamp.jarviz.core.internal;
 
+import org.kordamp.jarviz.core.InsufficientInputsException;
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.Format;
 import org.kordamp.jarviz.core.JarvizException;
@@ -158,7 +159,7 @@ public abstract class AbstractCommand<C extends Configuration<C>> {
         resolvers.addAll(JarFileResolvers.urlJarFileResolvers(cacheDirectory, configuration.getUrls()));
 
         if (resolvers.isEmpty()) {
-            throw new JarvizException($$("ERROR_INSUFFICIENT_INPUTS"));
+            throw new InsufficientInputsException($$("ERROR_INSUFFICIENT_INPUTS"));
         }
 
         return JarFileResolvers.compositeJarFileResolver(resolvers);

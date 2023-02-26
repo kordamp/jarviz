@@ -53,8 +53,8 @@ public class EntriesFind extends AbstractJarvizSubcommand<Entries> {
             .withReportPath(reportPath)
             .withReportFormats(resolveReportFormats())
             .withOutputFormat(outputFormat)
-            .withEntryName(exclusive.entryName)
-            .withEntryPattern(exclusive.entryPattern)
+            .withEntryName(null != exclusive ? exclusive.entryName : "")
+            .withEntryPattern(null != exclusive ? exclusive.entryPattern : "")
         );
     }
 }

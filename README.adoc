@@ -125,9 +125,31 @@ entry name: META-INF/MANIFEST.MF
 META-INF/MANIFEST.MF
 ----
 
+Using `glob` syntax
+
 [source]
 ----
-$ jarviz entries find --gav org.slf4j:slf4j-api:2.0.6 --entry-pattern org.slf4j.spi.*.class
+$ jarviz entries find --gav org.slf4j:slf4j-api:2.0.6 --entry-pattern glob:/org/slf4j/spi/*.class
+subject: slf4j-api-2.0.6.jar
+entry pattern: org.slf4j.spi.*.class
+org/slf4j/spi/CallerBoundaryAware.class
+org/slf4j/spi/DefaultLoggingEventBuilder$1.class
+org/slf4j/spi/DefaultLoggingEventBuilder.class
+org/slf4j/spi/LocationAwareLogger.class
+org/slf4j/spi/LoggerFactoryBinder.class
+org/slf4j/spi/LoggingEventAware.class
+org/slf4j/spi/LoggingEventBuilder.class
+org/slf4j/spi/MDCAdapter.class
+org/slf4j/spi/MarkerFactoryBinder.class
+org/slf4j/spi/NOPLoggingEventBuilder.class
+org/slf4j/spi/SLF4JServiceProvider.class
+----
+
+Using `regex` syntax
+
+[source]
+----
+$ jarviz entries find --gav org.slf4j:slf4j-api:2.0.6 --entry-pattern regex:/org/slf4j/spi/.*.class
 subject: slf4j-api-2.0.6.jar
 entry pattern: org.slf4j.spi.*.class
 org/slf4j/spi/CallerBoundaryAware.class

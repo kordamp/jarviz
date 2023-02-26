@@ -21,14 +21,19 @@ import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.regex.Pattern;
 
 import static java.util.Collections.unmodifiableSet;
+import static org.kordamp.jarviz.util.StringUtils.isBlank;
 import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
@@ -36,6 +41,9 @@ import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
  * @since 0.3.0
  */
 public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
+    private static final String GLOB_PREFIX = "glob:";
+    private static final String REGEX_PREFIX = "regex:";
+
     private final JarFileResolver jarFileResolver;
     private String entryName;
     private String entryPattern;
@@ -65,29 +73,36 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
     public Set<JarFileResult<Set<String>>> getResult() throws JarvizException {
         Set<JarFileResult<Set<String>>> set = new TreeSet<>();
 
-        Pattern pattern = isNotBlank(entryPattern) ? Pattern.compile(entryPattern) : null;
+        entryPattern = normalizePattern(entryPattern);
         for (JarFile jarFile : jarFileResolver.resolveJarFiles()) {
-            set.add(processJarFile(jarFile, pattern));
+            set.add(processJarFile(jarFile, entryPattern));
         }
 
         return set;
     }
 
-    private JarFileResult<Set<String>> processJarFile(JarFile jarFile, Pattern pattern) {
+    private JarFileResult<Set<String>> processJarFile(JarFile jarFile, String pattern) {
         Set<String> entries = new TreeSet<>();
 
         try (jarFile) {
-            Enumeration<JarEntry> jarEntries = jarFile.entries();
-            while (jarEntries.hasMoreElements()) {
-                JarEntry entry = jarEntries.nextElement();
-                String name = entry.getName();
-                if (null != pattern) {
-                    if (pattern.matcher(name).matches()) {
+            if (isNotBlank(pattern)) {
+                try (FileSystem zipfs = FileSystems.newFileSystem(Path.of(jarFile.getName()),
+                    this.getClass().getClassLoader())) {
+                    PathMatcher pathMatcher = zipfs.getPathMatcher(pattern);
+                    Files.walk(zipfs.getPath("/"))
+                        .filter(pathMatcher::matches)
+                        .map(p -> p.toString().substring(1))
+                        .forEach(entries::add);
+                }
+            } else {
+                Enumeration<JarEntry> jarEntries = jarFile.entries();
+                while (jarEntries.hasMoreElements()) {
+                    JarEntry entry = jarEntries.nextElement();
+                    String name = entry.getName();
+                    if (name.equals(entryName)) {
                         entries.add(name);
+                        break;
                     }
-                } else if (name.equals(entryName)) {
-                    entries.add(name);
-                    break;
                 }
             }
 
@@ -95,5 +110,24 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
         } catch (IOException ignored) {
             return JarFileResult.of(jarFile, unmodifiableSet(entries));
         }
+    }
+
+    private String normalizePattern(String pattern) {
+        if (isBlank(pattern)) return pattern;
+
+        if (!pattern.startsWith(GLOB_PREFIX) && !pattern.startsWith(REGEX_PREFIX)) {
+            pattern = GLOB_PREFIX + pattern;
+        }
+
+        if (pattern.startsWith(GLOB_PREFIX)) {
+            String path = pattern.substring(GLOB_PREFIX.length());
+            if (path.startsWith("**") || path.startsWith("/")) {
+                return pattern;
+            } else {
+                return GLOB_PREFIX + "**/" + path;
+            }
+        }
+
+        return pattern;
     }
 }
