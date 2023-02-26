@@ -19,6 +19,7 @@ package org.kordamp.jarviz.commands;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.Format;
+import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.internal.AbstractCommand;
 import org.kordamp.jarviz.core.internal.AbstractConfiguration;
 import org.kordamp.jarviz.core.processors.JarProcessor;
@@ -27,6 +28,9 @@ import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 import org.kordamp.jarviz.reporting.Node;
 
 import java.util.Set;
+
+import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Andres Almiray
@@ -50,6 +54,17 @@ public class PackagesValidateCommand extends AbstractCommand<PackagesValidateCom
 
         output(configuration, results);
         report(configuration, results);
+
+        Set<String> errors = results.stream()
+            .map(r -> r.getJarFileName() + " has invalid package names: " +
+                r.getResult())
+            .collect(toSet());
+
+        if (configuration.isFailOnError()) {
+            throw new JarvizException(String.join(lineSeparator(), errors));
+        } else {
+            configuration.getErr().println(String.join(lineSeparator(), errors));
+        }
 
         return 0;
     }

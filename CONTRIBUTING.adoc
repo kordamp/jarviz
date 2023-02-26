@@ -102,7 +102,7 @@ Alternatively, a core member can squash your commits within Github.
 
 == Documentation
 
-Documentation changes should be posted to link:https://github.com/kordamp/jarviz.github.io[kordamp/jarviz.github.io].
+Documentation changes should be posted to link:https://github.com/kordamp/jarviz/wiki[].
 
 == Code of Conduct
 

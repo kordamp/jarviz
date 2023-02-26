@@ -15,23 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kordamp.jarviz.cli.entries;
+
+import org.kordamp.jarviz.cli.Main;
+import org.kordamp.jarviz.cli.internal.AbstractJarvizCommand;
+import picocli.CommandLine;
 
 /**
  * @author Andres Almiray
- * @since 0.3.0
+ * @since 0.1.0
  */
-module org.kordamp.jarviz.cli {
-    exports org.kordamp.jarviz.cli;
+@CommandLine.Command(name = "entries",
+    subcommands = {EntriesFind.class})
+public class Entries extends AbstractJarvizCommand<Main> {
+    @CommandLine.Spec
+    public CommandLine.Model.CommandSpec spec;
 
-    requires org.kordamp.jarviz.core;
-    requires info.picocli;
-
-    exports org.kordamp.jarviz.cli.bytecode to info.picocli;
-    exports org.kordamp.jarviz.cli.entries to info.picocli;
-    exports org.kordamp.jarviz.cli.internal to info.picocli;
-    exports org.kordamp.jarviz.cli.manifest to info.picocli;
-    exports org.kordamp.jarviz.cli.modules to info.picocli;
-    exports org.kordamp.jarviz.cli.packages to info.picocli;
-    exports org.kordamp.jarviz.cli.services to info.picocli;
-    opens org.kordamp.jarviz.cli.internal to info.picocli;
+    @Override
+    protected int execute() {
+        spec.commandLine().usage(parent.getOut());
+        return 0;
+    }
 }

@@ -19,9 +19,11 @@ package org.kordamp.jarviz.commands;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.Format;
+import org.kordamp.jarviz.core.JarvizException;
 import org.kordamp.jarviz.core.internal.AbstractCommand;
 import org.kordamp.jarviz.core.internal.AbstractConfiguration;
 import org.kordamp.jarviz.core.model.ModuleMetadata;
+import org.kordamp.jarviz.core.model.ModuleName;
 import org.kordamp.jarviz.core.processors.JarProcessor;
 import org.kordamp.jarviz.core.processors.ModuleDescriptorJarProcessor;
 import org.kordamp.jarviz.core.resolvers.JarFileResolver;
@@ -33,9 +35,11 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.kordamp.jarviz.core.internal.Colorizer.magenta;
 
 /**
@@ -63,6 +67,19 @@ public class ModuleDescriptorCommand extends AbstractCommand<ModuleDescriptorCom
 
         output(configuration, results);
         report(configuration, results);
+
+        Set<String> errors = results.stream()
+            .map(JarProcessor.JarFileResult::getResult)
+            .map(ModuleMetadata::getModuleName)
+            .filter(ModuleName::isNotValid)
+            .map(ModuleName::asError)
+            .collect(toSet());
+
+        if (configuration.isFailOnError()) {
+            throw new JarvizException(String.join(lineSeparator(), errors));
+        } else {
+            configuration.getErr().println(String.join(lineSeparator(), errors));
+        }
 
         return 0;
     }

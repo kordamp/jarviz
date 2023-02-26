@@ -67,6 +67,8 @@ public class ModuleNameCommand extends AbstractCommand<ModuleNameCommand.Configu
 
         if (configuration.isFailOnError()) {
             throw new JarvizException(String.join(lineSeparator(), errors));
+        } else {
+            configuration.getErr().println(String.join(lineSeparator(), errors));
         }
 
         return 0;
