@@ -4,7 +4,7 @@
 :project-name:       jarviz
 :project-groupId:    org.kordamp.jarviz
 :project-artifactId: jarviz-core
-:project-version: 0.2.0
+:project-version: 0.3.0
 
 image:http://img.shields.io/github/actions/workflow/status/{project-owner}/{project-name}/early-access.yml?branch=main&logo=github&label=Build["Build Status", link="https://github.com/{project-owner}/{project-name}/actions"]
 image:https://img.shields.io/maven-central/v/{project-groupId}/{project-artifactId}.svg[Download, link="https://search.maven.org/#search|ga|1|g:{project-groupId} AND a:{project-artifactId}"]
