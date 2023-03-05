@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 import static java.util.Collections.unmodifiableSet;
 import static org.kordamp.jarviz.util.StringUtils.isBlank;
@@ -64,9 +65,8 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
         return entryPattern;
     }
 
-    public EntriesFindJarProcessor setEntryPattern(String entryPattern) {
+    public void setEntryPattern(String entryPattern) {
         this.entryPattern = entryPattern;
-        return this;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
         return set;
     }
 
-    private JarFileResult<Set<String>> processJarFile(JarFile jarFile, String pattern) {
+    protected JarFileResult<Set<String>> processJarFile(JarFile jarFile, String pattern) {
         Set<String> entries = new TreeSet<>();
 
         try (jarFile) {
@@ -89,10 +89,10 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
                 try (FileSystem zipfs = FileSystems.newFileSystem(Path.of(jarFile.getName()),
                     this.getClass().getClassLoader())) {
                     PathMatcher pathMatcher = zipfs.getPathMatcher(pattern);
-                    Files.walk(zipfs.getPath("/"))
-                        .filter(pathMatcher::matches)
-                        .map(p -> p.toString().substring(1))
-                        .forEach(entries::add);
+                    try (Stream<Path> stream = Files.walk(zipfs.getPath("/"))) {
+                        stream.filter(pathMatcher::matches)
+                            .forEach(path -> processJarEntry(jarFile, zipfs, path, entries));
+                    }
                 }
             } else {
                 Enumeration<JarEntry> jarEntries = jarFile.entries();
@@ -100,7 +100,7 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
                     JarEntry entry = jarEntries.nextElement();
                     String name = entry.getName();
                     if (name.equals(entryName)) {
-                        entries.add(name);
+                        processJarEntry(jarFile, entry, entries);
                         break;
                     }
                 }
@@ -110,6 +110,22 @@ public class EntriesFindJarProcessor implements JarProcessor<Set<String>> {
         } catch (IOException ignored) {
             return JarFileResult.of(jarFile, unmodifiableSet(entries));
         }
+    }
+
+    protected void processJarEntry(JarFile jarFile, FileSystem zipfs, Path path, Set<String> entries) {
+        String entryName = path.toString();
+        if (entryName.startsWith("/")) {
+            entryName = entryName.substring(1);
+        }
+        entries.add(entryName);
+    }
+
+    protected void processJarEntry(JarFile jarFile, JarEntry entry, Set<String> entries)  {
+        String entryName = entry.getName();
+        if (entryName.startsWith("/")) {
+            entryName = entryName.substring(1);
+        }
+        entries.add(entryName);
     }
 
     private String normalizePattern(String pattern) {

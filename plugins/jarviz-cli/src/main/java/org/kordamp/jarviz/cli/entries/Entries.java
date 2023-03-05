@@ -26,7 +26,7 @@ import picocli.CommandLine;
  * @since 0.1.0
  */
 @CommandLine.Command(name = "entries",
-    subcommands = {EntriesFind.class})
+    subcommands = {EntriesExtract.class, EntriesFind.class})
 public class Entries extends AbstractJarvizCommand<Main> {
     @CommandLine.Spec
     public CommandLine.Model.CommandSpec spec;

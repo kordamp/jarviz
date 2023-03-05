@@ -21,11 +21,12 @@ import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.Format;
 import org.kordamp.jarviz.core.internal.AbstractCommand;
 import org.kordamp.jarviz.core.internal.AbstractConfiguration;
-import org.kordamp.jarviz.core.processors.EntriesFindJarProcessor;
+import org.kordamp.jarviz.core.processors.EntriesExtractJarProcessor;
 import org.kordamp.jarviz.core.processors.JarProcessor;
 import org.kordamp.jarviz.core.resolvers.JarFileResolver;
 import org.kordamp.jarviz.reporting.Node;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 import static org.kordamp.jarviz.util.StringUtils.isBlank;
@@ -35,7 +36,7 @@ import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
  * @author Andres Almiray
  * @since 0.3.0
  */
-public class EntriesFindCommand extends AbstractCommand<EntriesFindCommand.Configuration> {
+public class EntriesExtractCommand extends AbstractCommand<EntriesExtractCommand.Configuration> {
     public static Configuration config() {
         return new Configuration();
     }
@@ -43,6 +44,8 @@ public class EntriesFindCommand extends AbstractCommand<EntriesFindCommand.Confi
     public static class Configuration extends AbstractConfiguration<Configuration> {
         private String entryName;
         private String entryPattern;
+        private boolean flatten;
+        private Path targetDirectory = Path.of(".");
 
         public String getEntryName() {
             return entryName;
@@ -65,14 +68,36 @@ public class EntriesFindCommand extends AbstractCommand<EntriesFindCommand.Confi
             this.entryPattern = entryPattern;
             return this;
         }
+
+        public boolean isFlatten() {
+            return flatten;
+        }
+
+        public Configuration withFlatten(boolean flatten) {
+            this.flatten = flatten;
+            return this;
+        }
+
+        public Path getTargetDirectory() {
+            return targetDirectory;
+        }
+
+        public Configuration withTargetDirectory(Path targetDirectory) {
+            if (null != targetDirectory) {
+                this.targetDirectory = targetDirectory;
+            }
+            return this;
+        }
     }
 
     @Override
     public int execute(Configuration configuration) {
         JarFileResolver jarFileResolver = createJarFileResolver(configuration);
-        EntriesFindJarProcessor processor = new EntriesFindJarProcessor(jarFileResolver);
+        EntriesExtractJarProcessor processor = new EntriesExtractJarProcessor(jarFileResolver);
         processor.setEntryName(configuration.getEntryName());
         processor.setEntryPattern(configuration.getEntryPattern());
+        processor.setTargetDirectory(configuration.getTargetDirectory());
+        processor.setFlatten(configuration.isFlatten());
 
         Set<JarProcessor.JarFileResult<Set<String>>> results = processor.getResult();
         // may have been updated

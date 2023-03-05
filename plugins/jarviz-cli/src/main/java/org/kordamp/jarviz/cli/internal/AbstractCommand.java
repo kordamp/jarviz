@@ -17,8 +17,8 @@
  */
 package org.kordamp.jarviz.cli.internal;
 
-import org.kordamp.jarviz.core.InsufficientInputsException;
 import org.kordamp.jarviz.cli.IO;
+import org.kordamp.jarviz.core.InsufficientInputsException;
 import org.kordamp.jarviz.core.JarvizException;
 import picocli.CommandLine;
 

@@ -113,6 +113,40 @@ module-info
 
 === Entries
 
+*extract*
+
+Extract a given JAR entry or entries.
+
+[source]
+----
+$ jarviz entries extract --gav org.slf4j:slf4j-api:2.0.6 --entry-name META-INF/MANIFEST.MF
+subject: slf4j-api-2.0.6.jar
+entry name: META-INF/MANIFEST.MF
+META-INF/MANIFEST.MF
+
+$ tree slf4j-api-2.0.6
+slf4j-api-2.0.6
+└── META-INF
+    └── MANIFEST.MF
+
+1 directory, 1 file
+----
+
+----
+$ jarviz entries extract --gav org.slf4j:slf4j-api:2.0.6 --entry-pattern META-INF/maven/**/* --flatten
+subject: slf4j-api-2.0.6.jar
+entry pattern: glob:**/META-INF/maven/**/*
+META-INF/maven/org.slf4j/slf4j-api/pom.properties
+META-INF/maven/org.slf4j/slf4j-api/pom.xml
+
+$ tree slf4j-api-2.0.6
+slf4j-api-2.0.6
+├── pom.properties
+└── pom.xml
+
+0 directories, 2 files
+----
+
 *find*
 
 Find a given JAR entry or entries.
