@@ -96,7 +96,7 @@ org.aopalliance.intercept.MethodInterceptor
 org.aopalliance.intercept.MethodInvocation
 ----
 
-`jackson-core` is an Multi Release JAR (MR-JAR).
+`jackson-core` is a Multi Release JAR (MR-JAR).
 
 [source]
 ----

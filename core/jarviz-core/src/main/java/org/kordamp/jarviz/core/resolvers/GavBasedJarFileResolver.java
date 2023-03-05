@@ -19,6 +19,8 @@ package org.kordamp.jarviz.core.resolvers;
 
 import org.kordamp.jarviz.bundle.RB;
 import org.kordamp.jarviz.core.JarvizException;
+import org.kordamp.jarviz.core.internal.GavAwareJarFile;
+import org.kordamp.jarviz.core.model.Gav;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,40 +46,23 @@ import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
  * @since 0.1.0
  */
 public class GavBasedJarFileResolver implements JarFileResolver {
-    private final String groupId;
-    private final String artifactId;
-    private final String version;
-    private final String classifier;
+    private final Gav gav;
     private final Path cacheDirectory;
     private JarFile jarFile;
 
     public GavBasedJarFileResolver(Path cacheDirectory, String gav) {
         this.cacheDirectory = cacheDirectory;
-
-        String[] parts = gav.split(":");
-        if (parts.length == 4) {
-            this.groupId = parts[0].trim().replace(".", "/");
-            this.artifactId = parts[1].trim();
-            this.version = parts[2].trim();
-            this.classifier = parts[3].trim();
-        } else if (parts.length == 3) {
-            this.groupId = parts[0].trim().replace(".", "/");
-            this.artifactId = parts[1].trim();
-            this.version = parts[2].trim();
-            this.classifier = null;
-        } else {
-            throw new JarvizException(RB.$("ERROR_INVALID_GAV", gav));
-        }
+        this.gav = new Gav(gav);
     }
 
     @Override
     public Set<JarFile> resolveJarFiles() {
         if (null != jarFile) return singleton(jarFile);
 
-        String filename = artifactId + "-" + version + (isNotBlank(classifier) ? "-" + classifier : "") + ".jar";
-        String str = "https://repo1.maven.org/maven2/" + groupId + "/" + artifactId + "/" + version + "/" + filename;
+        String filename = gav.getArtifactId() + "-" + gav.getVersion() + (isNotBlank(gav.getClassifier()) ? "-" + gav.getClassifier() : "") + ".jar";
+        String str = "https://repo1.maven.org/maven2/" + gav.getGroupId() + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/" + filename;
         String mavenLocal = String.join(File.separator, List.of(System.getProperty("user.home"), ".m2", "repository",
-            groupId.replace("/", File.separator), artifactId, version, filename));
+            gav.getGroupId().replace("/", File.separator), gav.getArtifactId(), gav.getVersion(), filename));
 
         URL url = null;
         try {
@@ -130,7 +115,7 @@ public class GavBasedJarFileResolver implements JarFileResolver {
 
     private Set<JarFile> createJarFile(Path file) {
         try {
-            jarFile = new JarFile(file.toFile());
+            jarFile = new GavAwareJarFile(file.toFile(), gav);
             return singleton(jarFile);
         } catch (IOException e) {
             throw new JarvizException(RB.$("ERROR_OPENING_JAR", file.toAbsolutePath()));

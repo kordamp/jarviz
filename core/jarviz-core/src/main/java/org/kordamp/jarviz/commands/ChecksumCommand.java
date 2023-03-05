@@ -29,6 +29,9 @@ import org.kordamp.jarviz.reporting.Node;
 
 import java.util.Set;
 
+import static org.kordamp.jarviz.core.internal.Colorizer.cyan;
+import static org.kordamp.jarviz.core.internal.Colorizer.green;
+import static org.kordamp.jarviz.core.internal.Colorizer.red;
 import static org.kordamp.jarviz.util.StringUtils.padRight;
 
 /**
@@ -74,19 +77,8 @@ public class ChecksumCommand extends AbstractCommand<ChecksumCommand.Configurati
         configuration.getOut().println($$("output.subject", result.getJarFileName()));
         result.getResult().forEach(checksum -> {
             String extension = padRight(checksum.getAlgorithm().extension(), 7);
-            String outcome = "✅";
-            switch (checksum.getOutcome()) {
-                case FAILURE:
-                    outcome = "❌";
-                    break;
-                case UNAVAILABLE:
-                    outcome = "🔘";
-                    break;
-                default:
-                    outcome = "✅";
-            }
 
-            configuration.getOut().println(result.getJarFileName() + extension + " " + outcome);
+            configuration.getOut().println(result.getJarFileName() + extension + " " + colorize(checksum.getOutcome()));
         });
     }
 
@@ -112,5 +104,17 @@ public class ChecksumCommand extends AbstractCommand<ChecksumCommand.Configurati
                     .node(RB.$("report.key.outcome")).value(checksum.getOutcome()).end();
             }
         });
+    }
+
+    private String colorize(Checksum.Outcome outcome) {
+        switch (outcome) {
+            case SUCCESS:
+                return green(outcome.toString());
+            case FAILURE:
+                return red(outcome.toString());
+            case UNAVAILABLE:
+                return cyan(outcome.toString());
+        }
+        return "";
     }
 }
