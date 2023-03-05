@@ -37,6 +37,7 @@ import java.util.jar.JarFile;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.singleton;
+import static org.kordamp.jarviz.util.StringUtils.isNotBlank;
 
 /**
  * @author Andres Almiray
@@ -46,6 +47,7 @@ public class GavBasedJarFileResolver implements JarFileResolver {
     private final String groupId;
     private final String artifactId;
     private final String version;
+    private final String classifier;
     private final Path cacheDirectory;
     private JarFile jarFile;
 
@@ -53,10 +55,16 @@ public class GavBasedJarFileResolver implements JarFileResolver {
         this.cacheDirectory = cacheDirectory;
 
         String[] parts = gav.split(":");
-        if (parts.length == 3) {
+        if (parts.length == 4) {
             this.groupId = parts[0].trim().replace(".", "/");
             this.artifactId = parts[1].trim();
             this.version = parts[2].trim();
+            this.classifier = parts[3].trim();
+        } else if (parts.length == 3) {
+            this.groupId = parts[0].trim().replace(".", "/");
+            this.artifactId = parts[1].trim();
+            this.version = parts[2].trim();
+            this.classifier = null;
         } else {
             throw new JarvizException(RB.$("ERROR_INVALID_GAV", gav));
         }
@@ -66,7 +74,7 @@ public class GavBasedJarFileResolver implements JarFileResolver {
     public Set<JarFile> resolveJarFiles() {
         if (null != jarFile) return singleton(jarFile);
 
-        String filename = artifactId + "-" + version + ".jar";
+        String filename = artifactId + "-" + version + (isNotBlank(classifier) ? "-" + classifier : "") + ".jar";
         String str = "https://repo1.maven.org/maven2/" + groupId + "/" + artifactId + "/" + version + "/" + filename;
         String mavenLocal = String.join(File.separator, List.of(System.getProperty("user.home"), ".m2", "repository",
             groupId.replace("/", File.separator), artifactId, version, filename));

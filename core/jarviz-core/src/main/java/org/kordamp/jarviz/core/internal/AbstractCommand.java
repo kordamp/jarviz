@@ -29,6 +29,7 @@ import org.kordamp.jarviz.reporting.Node;
 import org.kordamp.jarviz.reporting.TxtFormatter;
 import org.kordamp.jarviz.reporting.XmlFormatter;
 import org.kordamp.jarviz.reporting.YamlFormatter;
+import org.kordamp.jarviz.util.Algorithm;
 import org.kordamp.jarviz.util.ChecksumUtils;
 
 import java.io.IOException;
@@ -146,7 +147,7 @@ public abstract class AbstractCommand<C extends Configuration<C>> {
     }
 
     private String sha256(Path jarPath) {
-        return ChecksumUtils.checksum(jarPath);
+        return ChecksumUtils.checksum(Algorithm.SHA_256, jarPath);
     }
 
     protected JarFileResolver createJarFileResolver(C configuration) {

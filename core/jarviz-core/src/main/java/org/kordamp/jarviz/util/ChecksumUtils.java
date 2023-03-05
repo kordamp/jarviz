@@ -37,9 +37,9 @@ public class ChecksumUtils {
         // prevent instantiation
     }
 
-    public static String checksum(Path path) {
+    public static String checksum(Algorithm algorithm, Path path)  {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance(algorithm.formatted());
             return encodeHex(digest.digest(Files.readAllBytes(path)));
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new JarvizException(RB.$("ERROR_UNEXPECTED"), e);
