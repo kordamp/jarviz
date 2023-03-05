@@ -43,12 +43,13 @@ jobs:
         id: vars
         shell: bash
         run: |
+          git config --global user.email "${{ secrets.COMMIT_EMAIL }}"
+          git config --global user.name "Andres Almiray"
+          git merge origin/development
           echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           echo ${{ github.event.inputs.version }} > VERSION
           git add VERSION
           sed -i -e "s/^\:project-version\:\ .*/:project-version: ${{ github.event.inputs.version }}/g" README.adoc
-          git config --global user.email "${{ secrets.COMMIT_EMAIL }}"
-          git config --global user.name "Andres Almiray"
           git commit -a -m "Releasing version ${{ github.event.inputs.version }}"
           git push origin main
 
@@ -66,7 +67,6 @@ jobs:
       - name: Release
         uses: jreleaser/release-action@v2
         with:
-          version: early-access
           arguments: full-release
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
