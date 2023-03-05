@@ -28,6 +28,7 @@ Options:
 
 Commands:
   bytecode             Commands for the JAR's bytecode.
+  checksum             Verify JAR checksums.
   entries              Commands for JAR entries.
   manifest             Commands for the JAR's manifest.
   module               Commands for modular JARs.
@@ -109,6 +110,20 @@ $ jarviz bytecode show --gav com.fasterxml.jackson.core:jackson-core:2.14.1 \
 subject: jackson-core-2.14.1.jar
 Versioned classes 9. Bytecode version: 53 total: 1
 module-info
+----
+
+=== Checksum
+
+Verify JAR checksums.
+
+[source]
+----
+$ jarviz checksum --gav org.jreleaser:jreleaser:1.5.0
+subject: jreleaser-1.5.0.jar
+jreleaser-1.5.0.jar.md5    ✅
+jreleaser-1.5.0.jar.sha1   ✅
+jreleaser-1.5.0.jar.sha256 ✅
+jreleaser-1.5.0.jar.sha512 ✅
 ----
 
 === Entries

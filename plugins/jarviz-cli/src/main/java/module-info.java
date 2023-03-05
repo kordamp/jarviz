@@ -27,6 +27,7 @@ module org.kordamp.jarviz.cli {
     requires info.picocli;
 
     exports org.kordamp.jarviz.cli.bytecode to info.picocli;
+    exports org.kordamp.jarviz.cli.checksum to info.picocli;
     exports org.kordamp.jarviz.cli.entries to info.picocli;
     exports org.kordamp.jarviz.cli.internal to info.picocli;
     exports org.kordamp.jarviz.cli.manifest to info.picocli;

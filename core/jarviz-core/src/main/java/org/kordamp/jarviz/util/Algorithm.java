@@ -35,6 +35,10 @@ public enum Algorithm {
         return name().toUpperCase(Locale.ENGLISH).replace("_", "-");
     }
 
+    public String extension() {
+        return "." + name().toLowerCase(Locale.ENGLISH).replace("_", "");
+    }
+
     public static Algorithm of(String str) {
         if (isBlank(str)) return null;
 
