@@ -130,6 +130,7 @@ assemble:
           platform: 'windows-x86_64'
         #- path: '{{jdkPathPrefix}}/zulu19WindowsArm/{{jdkFilePrefix}}-win_aarch64'
         #  platform: 'windows-aarch_64'
+      copyJars: false
       mainJar:
         path: 'plugins/jarviz-cli/build/libs/jarviz-cli-{{projectVersion}}.jar'
       jars:
