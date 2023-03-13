@@ -60,10 +60,12 @@ public class PackagesValidateCommand extends AbstractCommand<PackagesValidateCom
                 r.getResult())
             .collect(toSet());
 
-        if (configuration.isFailOnError()) {
-            throw new JarvizException(String.join(lineSeparator(), errors));
-        } else {
-            configuration.getErr().println(String.join(lineSeparator(), errors));
+        if (!errors.isEmpty()) {
+            if (configuration.isFailOnError()) {
+                throw new JarvizException(String.join(lineSeparator(), errors));
+            } else {
+                configuration.getErr().println(String.join(lineSeparator(), errors));
+            }
         }
 
         return 0;

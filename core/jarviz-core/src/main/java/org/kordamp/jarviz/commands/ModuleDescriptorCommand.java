@@ -75,10 +75,12 @@ public class ModuleDescriptorCommand extends AbstractCommand<ModuleDescriptorCom
             .map(ModuleName::asError)
             .collect(toSet());
 
-        if (configuration.isFailOnError()) {
-            throw new JarvizException(String.join(lineSeparator(), errors));
-        } else {
-            configuration.getErr().println(String.join(lineSeparator(), errors));
+        if (!errors.isEmpty()) {
+            if (configuration.isFailOnError()) {
+                throw new JarvizException(String.join(lineSeparator(), errors));
+            } else {
+                configuration.getErr().println(String.join(lineSeparator(), errors));
+            }
         }
 
         return 0;
