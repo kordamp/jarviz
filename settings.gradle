@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2022-2023 The Jarviz authors.
+ * Copyright 2022-2024 The Jarviz authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,10 +59,21 @@ projects {
 enforce {
     mergeStrategy = 'append'
 
+    rule(enforcer.rules.BanDuplicateClasses) { r ->
+        r.ignoreWhenIdentical.set(true)
+        r.dependency("com.google.guava:guava:$guavaVersion".toString()) { d->
+            d.ignore('com.google.common.*')
+        }
+    }
+
     rule(enforcer.rules.ForceDependencies) { r ->
-        r.dependencies.addAll "org.codehaus.plexus:plexus-utils:3.4.2",
-            "org.codehaus.plexus:plexus-classworlds:2.6.0",
-            "org.codehaus.plexus:plexus-component-annotations:2.1.0",
-            "org.apache.commons:commons-lang3:3.12.0"
+        r.dependencies.addAll "org.codehaus.plexus:plexus-utils:$plexusVersion",
+            "com.google.errorprone:error_prone_annotations:$errorproneVersion",
+            "com.google.guava:guava:$guavaVersion",
+            "commons-codec:commons-codec:$commonsCodecVersion",
+            "org.apache.commons:commons-lang3:$commonsLang3Version",
+            "org.apache.httpcomponents:httpcore:$httpcoreVersion",
+            "org.codehaus.plexus:plexus-classworlds:$classworldsVersion",
+            "org.codehaus.plexus:plexus-component-annotations:$plexusAnnotationsVersion"
     }
 }
