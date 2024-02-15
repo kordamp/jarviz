@@ -20,7 +20,8 @@ jobs:
       JAR_SIZE: ${{ steps.bach.outputs.JAR_SIZE }}
       JAR_CSUM: ${{ steps.bach.outputs.JAR_CSUM }}
       DOC_SIZE: ${{ steps.bach.outputs.DOC_SIZE }}
-      HASHES: ${{ steps.hash.outputs.hashes }}
+      HASHES: ${{ steps.slsa.outputs.HASHES }}
+      TAGNAME: ${{ steps.slsa.outputs.TAGNAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -93,11 +94,12 @@ jobs:
             out/jreleaser/trace.log
             out/jreleaser/output.properties
 
-      - name: SLSA hashes
+      - name: SLSA
         shell: bash
-        id: hash
+        id: slsa
         run: |
-          echo "hashes=$(cat out/jreleaser/checksums/checksums_sha256.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "HASHES=$(cat out/jreleaser/checksums/checksums_sha256.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "TAGNAME=$(grep tagName out/jreleaser/output.properties | awk -F'=' '{print $2}')" >> "$GITHUB_OUTPUT"
 
       - name: Grab bach-info
         id: bach
@@ -117,33 +119,12 @@ jobs:
       actions: read
       id-token: write
       contents: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.4.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
     with:
-      base64-subjects: "${{ needs.release.outputs.HASHES }}"
-      upload-assets: false
-      provenance-name: 'jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl'
-
-  upload-provenance:
-    name: Upload provenance
-    needs: [provenance]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download upload script
-        run: |
-          curl -sL https://raw.githubusercontent.com/kordamp/jarviz/main/.github/scripts/upload-provenance.sh --output upload-provenance.sh
-          chmod +x upload-provenance.sh
-
-      - name: Download provenance
-        uses: actions/download-artifact@v4
-        with:
-          name: jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl
-
-      - name: Commit
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
-          TAG: "v${{ github.event.inputs.version }}"
-          PROVENANCE_FILE: 'jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl'
-        run: sh upload-provenance.sh
+      base64-subjects: ${{ needs.release.outputs.HASHES }}
+      upload-assets: true
+      upload-tag-name: ${{ needs.release.outputs.TAGNAME }}
+      provenance-name: jarviz-all-${{ github.event.inputs.version }}.intoto.jsonl
 
   update-bach-info:
     name: Update bach-info
