@@ -63,6 +63,7 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
         options.javaModuleVersion.set(String.valueOf(project.version))
+        options.release.set(targetCompatibility as Integer)
     }
 }
 
