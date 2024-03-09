@@ -84,27 +84,46 @@ shadowJar {
     exclude 'plugin.xml'
 }
 
-task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
-    target = tasks.shadowJar
-    prefix = 'jarviz.shadow'
-}
-
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
+tasks.shadowJar.dependsOn(tasks.register('relocateShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) { t->
+    t.target = tasks.shadowJar
+    t.prefix = 'jarviz.shadow'
+})
 
 jar.finalizedBy(shadowJar)
 addMainModuleInfo.mustRunAfter(shadowJar)
+
+def reproducibleTimestamp = tasks.register('reproducibleTimestamp', org.kordamp.gradle.archive.ReproducibleTimestamp) {t ->
+    t.target = tasks.shadowJar
+    t.dependsOn(tasks.addMainModuleInfo)
+    t.mustRunAfter(tasks.addMainModuleInfo)
+}
+shadowJar.finalizedBy(reproducibleTimestamp)
+assemble.dependsOn(reproducibleTimestamp)
 
 tasks.withType(JavaCompile) { JavaCompile c ->
     c.sourceCompatibility = JavaVersion.VERSION_11
     c.targetCompatibility = JavaVersion.VERSION_11
 }
 
-task versionFile {
-    inputs.property('version', project.version)
-    outputs.file(project.layout.buildDirectory.file('VERSION'))
-    doLast {
+classes.dependsOn(tasks.register('version') {t ->
+    t.inputs.property('version', project.version)
+    t.outputs.file(project.layout.buildDirectory.file('VERSION'))
+    t.doLast {
         project.layout.buildDirectory.file('VERSION').get().asFile.text = project.version
     }
+})
+
+['startScripts', 'distTar', 'distZip',
+ 'startShadowScripts', 'shadowDistTar', 'shadowDistZip'].each { n ->
+    tasks.named(n) { t -> t.enabled = false }
 }
 
-classes.dependsOn(versionFile)
+afterEvaluate {
+    def shadowJar = project.tasks.findByName('shadowJar')
+    def publishTask = project.tasks.findByName('publishMainPublicationToMavenLocal')
+    if (publishTask && shadowJar) publishTask.dependsOn(shadowJar)
+    publishTask = tasks.findByName('publishMainPublicationToLocalSnapshotRepository')
+    if (publishTask && shadowJar) publishTask.dependsOn(shadowJar)
+    publishTask = tasks.findByName('publishMainPublicationToLocalReleaseRepository')
+    if (publishTask && shadowJar) publishTask.dependsOn(shadowJar)
+}
