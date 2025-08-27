@@ -566,7 +566,14 @@ sdk install {project-name}
 brew install {project-owner}/tap/{project-name}
 ----
 
-*Scoop*:
+*MacPorts*
+
+[source]
+----
+sudo port install jarviz
+----
+
+*Scoop*
 
 Requires Java 11
 [source]
